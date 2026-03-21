@@ -1,0 +1,325 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-neutral-900;
+  }
+  
+  body {
+    @apply bg-neutral-900 text-white antialiased;
+  }
+  
+  #root {
+    @apply bg-neutral-900 min-h-screen;
+  }
+  
+  /* Override specific white backgrounds for better visibility */
+  .bg-white {
+    @apply bg-neutral-800 border border-neutral-700 text-white !important;
+  }
+  
+  .bg-gray-50 {
+    @apply bg-neutral-900 !important;
+  }
+  
+  .bg-gray-900 {
+    @apply bg-neutral-900 !important;
+  }
+  
+  .bg-gray-800 {
+    @apply bg-neutral-800 !important;
+  }
+  
+  .bg-gray-700 {
+    @apply bg-neutral-700 !important;
+  }
+  
+  /* Touch optimization */
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+  
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-600;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-neutral-800 text-white hover:bg-neutral-700 focus-visible:ring-neutral-500 border border-neutral-700;
+  }
+  
+  .btn-outline {
+    @apply btn border border-neutral-600 bg-neutral-800 text-white hover:bg-neutral-700 focus-visible:ring-neutral-500;
+  }
+  
+  .input {
+    @apply flex h-10 w-full rounded-md border border-neutral-600 bg-neutral-800 text-white px-3 py-2 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  .card {
+    @apply bg-neutral-800 rounded-lg shadow-lg overflow-hidden border border-neutral-700;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Safe area for mobile devices with notches */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@layer utilities {
+  /* Touch-friendly minimum sizes */
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px];
+  }
+  
+  /* Prevent text selection on interactive elements */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Luxury animations */
+  @keyframes shimmer {
+    0% {
+      background-position: -400% 0;
+    }
+    100% {
+      background-position: 400% 0;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes spin-reverse {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(1.05);
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .animate-slideUp {
+    animation: slideUp 0.8s ease-out forwards;
+  }
+  
+  .animate-scaleIn {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+  
+  .animate-spin-reverse {
+    animation: spin-reverse 2s linear infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 2s ease-in-out infinite;
+  }
+  
+  /* Stagger animation delays */
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+  
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .animate-delay-400 {
+    animation-delay: 400ms;
+  }
+}
+ 
+ /* Futuristic Scroll Animation Elements */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  @keyframes slideLeft {
+    0%, 100% {
+      transform: translateX(0);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  
+  @keyframes slideRight {
+    0%, 100% {
+      transform: translateX(0);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.2;
+    }
+  }
+  
+  @keyframes fadeInOut {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  
+  @keyframes scanDown {
+    0% {
+      transform: translateY(-100vh);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
+  }
+
+  /* ── New: Background text & decorative animations ── */
+  @keyframes driftUp {
+    0% { transform: translateY(40px); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(-40px); opacity: 0; }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.08; filter: blur(60px); transform: scale(1); }
+    50% { opacity: 0.18; filter: blur(80px); transform: scale(1.15); }
+  }
+
+  @keyframes orbitSlow {
+    0%   { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+  }
+
+  @keyframes dashDraw {
+    0%   { stroke-dashoffset: 1000; opacity: 0; }
+    30%  { opacity: 0.3; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+
+  @keyframes textReveal {
+    0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+    50%  { clip-path: inset(0 0% 0 0); opacity: 0.06; }
+    100% { clip-path: inset(0 0% 0 0); opacity: 0.03; }
+  }
+
+  @keyframes floatHorizontal {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(15px) translateY(-10px); }
+    50% { transform: translateX(0) translateY(-20px); }
+    75% { transform: translateX(-15px) translateY(-10px); }
+  }
+
+  @keyframes borderGlow {
+    0%, 100% { border-color: rgba(220,38,38,0.1); box-shadow: 0 0 0 rgba(220,38,38,0); }
+    50% { border-color: rgba(220,38,38,0.3); box-shadow: 0 0 30px rgba(220,38,38,0.1); }
+  }
+
+  @keyframes marqueeLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
