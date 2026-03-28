@@ -9,16 +9,14 @@ import Home from './pages/public/Home';
 import CarList from './pages/public/CarList';
 import CarDetail from './pages/public/CarDetail';
 
-
-import Contact from './pages/public/Contact';
-import Finanzierung from './pages/public/Finanzierung';
-import Inzahlungnahme from './pages/public/Inzahlungnahme';
-import FAQ from './pages/public/FAQ';
-import Service from './pages/public/Service';
+// Removed utility pages per user request
 
 // Legal Pages
 import Impressum from './pages/legal/Impressum';
 import Datenschutz from './pages/legal/Datenschutz';
+
+// Company Pages
+import Geschichte from './pages/public/Geschichte';
 
 // Utility Pages
 import NotFound from './pages/utility/NotFound';
@@ -31,29 +29,22 @@ import AdminCarAdd from './pages/admin/AdminCarAdd';
 import AdminCarEdit from './pages/admin/AdminCarEdit';
 import AdminTradeIns from './pages/admin/AdminTradeIns';
 
-import ScrollToTop from './components/ScrollToTop';
+import SmoothScroll from './components/SmoothScroll';
 
 function App() {
   return (
-    <>
-      <ScrollToTop />
+    <SmoothScroll>
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/fahrzeuge" element={<CarList />} />
           <Route path="/fahrzeug/:id" element={<CarDetail />} />
-
-          <Route path="/finanzierung" element={<Finanzierung />} />
-          <Route path="/inzahlungnahme" element={<Inzahlungnahme />} />
-
-          <Route path="/service" element={<Service />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/kontakt" element={<Contact />} />
-          
           {/* Legal Pages */}
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/datenschutz" element={<Datenschutz />} />
+          {/* Company Pages */}
+          <Route path="/geschichte" element={<Geschichte />} />
           
           {/* 404 - Must be last */}
           <Route path="*" element={<NotFound />} />
@@ -74,7 +65,7 @@ function App() {
       {/* Global Components */}
       <ChatBot />
       <CookieConsent />
-    </>
+    </SmoothScroll>
   );
 }
 

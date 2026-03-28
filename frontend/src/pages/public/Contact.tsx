@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../../services/api';
 
 
 interface ContactForm {
@@ -34,9 +35,7 @@ export default function Contact() {
   const onSubmit = async (data: ContactForm) => {
     try {
       setSubmitting(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Contact form:', data);
+      await api.post('/contact', data);
       toast.success('Vielen Dank! Wir werden uns innerhalb von 24 Stunden bei Ihnen melden.');
       reset();
     } catch (error) {
@@ -56,14 +55,14 @@ export default function Contact() {
       </Helmet>
 
       {/* Hero */}
-      <div className="relative bg-[#0a0a0a] text-white py-24 overflow-hidden">
+      <div className="relative bg-gray-900 text-white py-24 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
           <motion.div 
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"
+            className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] mix-blend-screen pointer-events-none"
           />
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -95,12 +94,12 @@ export default function Contact() {
             transition={{ duration: 0.7, delay: 0.3 }}
             className="lg:col-span-2"
           >
-            <div className="bg-zinc-900/80 backdrop-blur-2xl border border-zinc-800/80 rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.5)] relative overflow-hidden group">
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-8 md:p-10 shadow-lg relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-400 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               
               <div className="relative z-10">
-                <h2 className="text-3xl font-bold mb-8 text-white flex items-center gap-4">
+                <h2 className="text-3xl font-bold mb-8 text-gray-100 flex items-center gap-4">
                   Senden Sie uns eine Nachricht
                 </h2>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -120,7 +119,7 @@ export default function Contact() {
                     <option value="Divers">Divers</option>
                   </select>
                   {errors.salutation && (
-                    <p className="mt-1 text-sm text-red-600">{errors.salutation.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.salutation.message}</p>
                   )}
                 </div>
 
@@ -137,7 +136,7 @@ export default function Contact() {
                       className="input w-full"
                     />
                     {errors.firstName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+                      <p className="mt-1 text-sm text-red-500">{errors.firstName.message}</p>
                     )}
                   </div>
 
@@ -152,7 +151,7 @@ export default function Contact() {
                       className="input w-full"
                     />
                     {errors.lastName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
+                      <p className="mt-1 text-sm text-red-500">{errors.lastName.message}</p>
                     )}
                   </div>
                 </div>
@@ -176,7 +175,7 @@ export default function Contact() {
                       className="input w-full"
                     />
                     {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                      <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
                     )}
                   </div>
 
@@ -191,7 +190,7 @@ export default function Contact() {
                       className="input w-full"
                     />
                     {errors.phone && (
-                      <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+                      <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
                     )}
                   </div>
                 </div>
@@ -214,7 +213,7 @@ export default function Contact() {
                     <option value="Sonstiges">Sonstiges</option>
                   </select>
                   {errors.subject && (
-                    <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.subject.message}</p>
                   )}
                 </div>
 
@@ -228,7 +227,7 @@ export default function Contact() {
                       {...register('carReference')}
                       type="text"
                       id="carReference"
-                      className="input w-full bg-zinc-900 border border-zinc-800"
+                      className="input w-full bg-[#1a1a1f] border border-white/[0.06]"
                       readOnly
                     />
                   </div>
@@ -247,7 +246,7 @@ export default function Contact() {
                     placeholder="Teilen Sie uns mit, wie wir Ihnen helfen können..."
                   />
                   {errors.message && (
-                    <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
                   )}
                 </div>
 
@@ -259,12 +258,12 @@ export default function Contact() {
                       type="checkbox"
                       className="mt-1"
                     />
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-gray-500">
                       Ich habe die Datenschutzerklärung zur Kenntnis genommen und stimme zu, dass meine Angaben zur Kontaktaufnahme und für Rückfragen gespeichert werden. *
                     </span>
                   </label>
                   {errors.privacy && (
-                    <p className="mt-1 text-sm text-red-600">{errors.privacy.message}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.privacy.message}</p>
                   )}
                 </div>
 
@@ -275,7 +274,7 @@ export default function Contact() {
                   disabled={submitting}
                   className="relative w-full group overflow-hidden bg-gradient-to-r from-red-600 to-red-500 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center gap-3 transition-shadow hover:shadow-[0_0_20px_rgba(220,38,38,0.4)]"
                 >
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <div className="absolute inset-0 bg-white/[0.02]/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                   <span className="relative z-10 flex items-center gap-2">
                     {submitting ? (
                       <>
@@ -305,16 +304,16 @@ export default function Contact() {
             {/* Address Card */}
             <motion.div 
               whileHover={{ scale: 1.02, translateY: -5 }}
-              className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 shadow-xl hover:border-red-500/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] transition-all duration-300 group relative overflow-hidden"
+              className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex items-start gap-5">
-                <div className="p-4 bg-zinc-800/80 text-gray-300 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
+                <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
                   <MapPin className="h-7 w-7" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-lg mb-2">Adresse</h3>
-                  <p className="text-gray-400 leading-relaxed font-light">
+                  <h3 className="font-semibold text-gray-100 text-lg mb-2">Adresse</h3>
+                  <p className="text-gray-500 leading-relaxed font-light">
                     Nordhessen-Automobile<br/>Seidler & Osmikhovsky GbR<br />
                     Sandershäuser Straße 87a<br />
                     34123 Kassel<br />
@@ -327,16 +326,16 @@ export default function Contact() {
             {/* Phone Card */}
             <motion.div 
               whileHover={{ scale: 1.02, translateY: -5 }}
-              className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 shadow-xl hover:border-red-500/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] transition-all duration-300 group relative overflow-hidden"
+              className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex items-start gap-5">
-                <div className="p-4 bg-zinc-800/80 text-gray-300 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
+                <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
                   <Phone className="h-7 w-7" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-lg mb-2">Telefon</h3>
-                  <a href="tel:+4956193004649" className="text-gray-400 hover:text-red-400 font-light text-lg transition-colors">
+                  <h3 className="font-semibold text-gray-100 text-lg mb-2">Telefon</h3>
+                  <a href="tel:+4956193004649" className="text-gray-500 hover:text-red-500 font-light text-lg transition-colors">
                     0561 930 04 649
                   </a>
                 </div>
@@ -346,16 +345,16 @@ export default function Contact() {
             {/* Email Card */}
             <motion.div 
               whileHover={{ scale: 1.02, translateY: -5 }}
-              className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 shadow-xl hover:border-red-500/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] transition-all duration-300 group relative overflow-hidden"
+              className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex items-start gap-5">
-                <div className="p-4 bg-zinc-800/80 text-gray-300 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
+                <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
                   <Mail className="h-7 w-7" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-lg mb-2">E-Mail</h3>
-                  <a href="mailto:info@nordhessen-automobile.de" className="text-gray-400 hover:text-red-400 font-light transition-colors break-all">
+                  <h3 className="font-semibold text-gray-100 text-lg mb-2">E-Mail</h3>
+                  <a href="mailto:info@nordhessen-automobile.de" className="text-gray-500 hover:text-red-500 font-light transition-colors break-all">
                     info@nordhessen-automobile.de
                   </a>
                 </div>
@@ -365,24 +364,24 @@ export default function Contact() {
             {/* Opening Hours Card */}
             <motion.div 
               whileHover={{ scale: 1.02, translateY: -5 }}
-              className="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 shadow-xl hover:border-red-500/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] transition-all duration-300 group relative overflow-hidden"
+              className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10 flex items-start gap-5">
-                <div className="p-4 bg-zinc-800/80 text-gray-300 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
+                <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
                   <Clock className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white text-lg mb-4">Öffnungszeiten</h3>
+                  <h3 className="font-semibold text-gray-100 text-lg mb-4">Öffnungszeiten</h3>
                   <table className="w-full text-sm font-light">
                     <tbody className="space-y-3">
                       <tr>
-                        <td className="text-gray-400 py-2 border-b border-zinc-800/50">Montag - Freitag</td>
-                        <td className="text-right text-gray-300 font-medium py-2 border-b border-zinc-800/50">09:00 - 18:00</td>
+                        <td className="text-gray-500 py-2 border-b border-white/[0.06]">Montag - Freitag</td>
+                        <td className="text-right text-gray-300 font-medium py-2 border-b border-white/[0.06]">09:00 - 18:00</td>
                       </tr>
                       <tr>
-                        <td className="text-gray-400 py-2 border-b border-zinc-800/50">Samstag</td>
-                        <td className="text-right text-gray-300 font-medium py-2 border-b border-zinc-800/50">10:00 - 16:00</td>
+                        <td className="text-gray-500 py-2 border-b border-white/[0.06]">Samstag</td>
+                        <td className="text-right text-gray-300 font-medium py-2 border-b border-white/[0.06]">10:00 - 16:00</td>
                       </tr>
                       <tr>
                         <td className="text-gray-500 py-2">Sonntag</td>

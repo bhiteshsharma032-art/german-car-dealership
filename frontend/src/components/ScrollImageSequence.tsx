@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface ScrollImageSequenceProps {
   frameCount?: number;
@@ -10,9 +11,9 @@ interface ScrollImageSequenceProps {
 
 
 
-const GOLD = '#dc2626';
-const GOLD_LIGHT = '#ef4444';
-const NAVY = '#1a1a1a';
+const GOLD = '#ef4444';
+const GOLD_LIGHT = '#f87171';
+const NAVY = '#1a1a1f';
 
 export default function ScrollImageSequence({
   frameCount = 180,
@@ -21,6 +22,7 @@ export default function ScrollImageSequence({
   fileExtension = '.jpg',
   padLength = 4
 }: ScrollImageSequenceProps) {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
@@ -100,11 +102,11 @@ export default function ScrollImageSequence({
 
     const setCanvasSize = () => {
       if (!canvas || images.length === 0) return;
-      const img = images[0];
-      const ww = window.innerWidth, wh = window.innerHeight;
-      const ia = img.width / img.height, wa = ww / wh;
-      if (wa > ia) { canvas.width = ww; canvas.height = ww / ia; }
-      else { canvas.height = wh; canvas.width = wh * ia; }
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
     };
 
     setCanvasSize();
@@ -133,8 +135,41 @@ export default function ScrollImageSequence({
         }
       }
       if (img && img.complete) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const cw = canvas.width;
+        const ch = canvas.height;
+        context.clearRect(0, 0, cw, ch);
+        
+        // object-contain logic (shows full car without cropping)
+        const imgRatio = img.width / img.height;
+        const canvasRatio = cw / ch;
+        let drawWidth = cw;
+        let drawHeight = ch;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (canvasRatio > imgRatio) {
+           // height is the limiting factor
+           drawHeight = ch;
+           drawWidth = ch * imgRatio;
+           offsetX = (cw - drawWidth) / 2;
+        } else {
+           // width is the limiting factor
+           drawWidth = cw;
+           drawHeight = cw / imgRatio;
+           offsetY = (ch - drawHeight) / 2;
+        }
+
+        // Apply a gentle 1.18x scale to make the car wider/more prominent without overpowering the layout
+        const zoom = 1.18;
+        const finalWidth = drawWidth * zoom;
+        const finalHeight = drawHeight * zoom;
+        offsetX = (cw - finalWidth) / 2;
+        offsetY = (ch - finalHeight) / 2;
+
+        // Use smoothing for better quality
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
+        context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
       }
       rafRef.current = requestAnimationFrame(renderFrame);
     };
@@ -159,40 +194,44 @@ export default function ScrollImageSequence({
 
   const sections = [
     {
-      subtitle: 'ELEGANCE MEETS PERFORMANCE',
+      subtitle: t('scroll.elegance'),
       title: 'BMW\nM340i',
-      description: 'The perfect fusion of sportiness and everyday practicality. A four-door coupé that turns every drive into an experience.',
+      description: t('scroll.elegance_desc'),
       price: '',
       start: 0, fadeInEnd: 0.03, fadeOutStart: 0.22, end: 0.25,
-      posClass: 'left-8 md:left-16 bottom-40',
+      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
+      alignSm: 'right' as const,
     },
     {
-      subtitle: 'SCULPTED FOR AERODYNAMICS',
-      title: 'Design',
-      description: 'Frameless doors, flowing roofline, and the iconic kidney grille. Every detail designed to cut through the air with precision.',
+      subtitle: t('scroll.design'),
+      title: t('scroll.design_title'),
+      description: t('scroll.design_desc'),
       price: '',
       start: 0.25, fadeInEnd: 0.28, fadeOutStart: 0.47, end: 0.50,
-      posClass: 'left-8 md:left-16 bottom-40',
+      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
+      alignSm: 'right' as const,
     },
     {
-      subtitle: 'TURBOCHARGED EFFICIENCY',
-      title: 'Engine',
-      description: 'Powerful engine delivering pure driving dynamics and efficiency on every journey. Perfectly matched transmission for an exhilarating drive.',
+      subtitle: t('scroll.engine'),
+      title: t('scroll.engine_title'),
+      description: t('scroll.engine_desc'),
       price: '',
       start: 0.50, fadeInEnd: 0.53, fadeOutStart: 0.72, end: 0.75,
-      posClass: 'left-8 md:left-16 bottom-40',
+      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
+      alignSm: 'right' as const,
     },
     {
-      subtitle: 'DYNAMIC DRIVING EXPERIENCE',
-      title: 'Performance',
-      description: 'Exceptional acceleration and precise handling thanks to advanced M Sport suspension technology and variable sport steering.',
+      subtitle: t('scroll.performance'),
+      title: t('scroll.performance_title'),
+      description: t('scroll.performance_desc'),
       price: '',
       start: 0.75, fadeInEnd: 0.78, fadeOutStart: 0.87, end: 0.90,
-      posClass: 'left-8 md:left-16 bottom-40',
+      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
+      alignSm: 'right' as const,
     },
   ];
 
@@ -214,8 +253,7 @@ export default function ScrollImageSequence({
   };
 
   const currentSectionIdx = scrollProgress >= closingStart ? 4 : Math.min(Math.floor(scrollProgress * 4), 3);
-  const searchOpacity = scrollProgress > 0.12 && scrollProgress < closingStart ? Math.min((scrollProgress - 0.12) / 0.05, 1) : scrollProgress >= closingStart ? 1 - closingOpacity : 0;
-  const searchX = scrollProgress > 0.12 ? 0 : 30;
+
 
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
@@ -227,7 +265,7 @@ export default function ScrollImageSequence({
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-4">
             <div className="w-8 h-8 border-2 border-white/20 rounded-full animate-spin" style={{ borderTopColor: GOLD }} />
             <div className="text-white/60 text-xs tracking-[0.3em] uppercase">Loading {loadProgress}%</div>
-            <div className="w-40 h-[2px] bg-[#1a1a1a]/10 rounded-full overflow-hidden">
+            <div className="w-40 h-[2px] bg-[#2b2b36]/10 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-300" style={{ width: loadProgress + '%', background: GOLD }} />
             </div>
           </div>
@@ -235,7 +273,7 @@ export default function ScrollImageSequence({
 
         <canvas
           ref={canvasRef}
-          className="max-w-full max-h-full object-contain"
+          className="w-full h-full object-cover absolute inset-0"
           style={{ willChange: 'transform', transform: 'translateZ(0)' }}
         />
 
@@ -244,7 +282,7 @@ export default function ScrollImageSequence({
           {/* Floating Particles */}
           <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-yellow-500/30 rounded-full animate-pulse"
             style={{ animation: 'float 6s ease-in-out infinite' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-[#1a1a1a]/20 rounded-full animate-pulse"
+          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-[#2b2b36]/20 rounded-full animate-pulse"
             style={{ animation: 'float 8s ease-in-out infinite 1s' }}></div>
           <div className="absolute bottom-1/3 left-1/2 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"
             style={{ animation: 'float 7s ease-in-out infinite 2s' }}></div>
@@ -268,9 +306,16 @@ export default function ScrollImageSequence({
 
         {imagesLoaded && (
           <>
-            {/* ── Top Navigation ── */}
-            <div className="absolute top-0 right-0 md:left-0 flex flex-col md:flex-row justify-start md:justify-center items-end md:items-center gap-6 md:gap-10 pt-24 md:pt-20 z-10 px-6">
-              {['01 Start', '02 Design', '03 Engine', '04 Performance'].map((label, i) => {
+            {/* ── Side Navigation ── */}
+            <div className="absolute top-20 md:top-1/3 -translate-y-0 md:-translate-y-1/4 left-2 md:left-12 flex flex-col z-10 p-2 sm:p-4 md:p-6 rounded-3xl backdrop-blur-sm bg-black/10 border border-white/[0.03]">
+              {/* Vertical Track Line */}
+              <div className="absolute left-[27px] md:left-[35px] top-10 bottom-10 w-[2px] bg-white/[0.08] hidden sm:block" />
+              <div 
+                className="absolute left-[27px] md:left-[35px] top-10 w-[2px] transition-all duration-700 ease-out hidden sm:block shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
+                style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 5rem)`, background: GOLD }} 
+              />
+              
+              {[t('scroll.nav.start'), t('scroll.nav.design'), t('scroll.nav.engine'), t('scroll.nav.performance')].map((label, i) => {
                 const active = currentSectionIdx === i;
                 const handleClick = () => {
                   const container = containerRef.current;
@@ -291,21 +336,30 @@ export default function ScrollImageSequence({
                   <button
                     key={label}
                     onClick={handleClick}
-                    className="relative pb-1 md:pb-2 text-xs md:text-base tracking-[0.25em] uppercase font-semibold transition-colors duration-500 cursor-pointer hover:text-white text-right md:text-left"
-                    style={{ color: active ? GOLD : 'rgba(255,255,255,0.35)' }}
+                    className="group relative py-2 sm:py-4 md:py-6 pl-8 sm:pl-12 md:pl-16 pr-4 sm:pr-8 text-[10px] sm:text-xs md:text-base tracking-[0.15em] sm:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-left flex items-center overflow-hidden rounded-2xl"
+                    style={{ 
+                      color: active ? 'white' : 'rgba(255,255,255,0.3)',
+                      fontWeight: active ? '700' : '500',
+                    }}
                   >
-                    {label}
-                    <span
-                      className="absolute bottom-0 right-0 md:left-1/2 md:-translate-x-1/2 h-[1px] transition-all duration-500"
-                      style={{ width: active ? '100%' : '0%', background: GOLD }}
+                    {/* Hover background */}
+                    <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                    {/* Active dot indicator on the track */}
+                    <span 
+                      className={`hidden sm:block absolute left-2 md:left-4 w-3 h-3 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 scale-100 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-transparent border-white/20 scale-75 group-hover:scale-100 group-hover:border-white/40'}`}
                     />
+                    
+                    <span className="relative z-10 transition-transform duration-500 group-hover:translate-x-3 flex items-center gap-4">
+                      <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-600'}`}>
+                        {`0${i+1}`}
+                      </span>
+                      <span>{label}</span>
+                    </span>
                   </button>
                 );
               })}
             </div>
-
-            {/* ── Thin top border accent ── */}
-            <div className="absolute top-0 left-0 w-full h-[2px] z-10" style={{ background: 'linear-gradient(90deg, transparent 0%, ' + GOLD + ' 50%, transparent 100%)' }} />
 
             {/* ── Section Overlays ── */}
             {sections.map((section, index) => {
@@ -316,14 +370,14 @@ export default function ScrollImageSequence({
               return (
                 <div
                   key={index}
-                  className={'absolute z-10 max-w-md ' + section.posClass}
+                  className={'absolute z-10 ' + section.posClass}
                   style={{ opacity, transform: 'translateY(' + ty + 'px)' }}
                 >
                   {/* Gold rule + subtitle */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-[1px] w-10" style={{ background: GOLD }} />
+                  <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                    <div className="h-[1px] w-6 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
                     <span
-                      className="text-sm md:text-base tracking-[0.3em] uppercase font-semibold"
+                      className="text-[9px] sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase font-semibold"
                       style={{ color: GOLD }}
                     >
                       {section.subtitle}
@@ -332,10 +386,10 @@ export default function ScrollImageSequence({
 
                   {/* Title */}
                   <h1
-                    className="font-black leading-[0.88] mb-5 tracking-tighter text-white"
+                    className="font-black leading-[0.88] mb-2 sm:mb-4 md:mb-5 tracking-tighter text-white"
                     style={{
-                      fontSize: 'clamp(3.5rem, 7vw, 7.5rem)',
-                      textAlign: section.align,
+                      fontSize: 'clamp(1.8rem, 6vw, 7.5rem)',
+                      textAlign: 'left',
                       textShadow: '0 2px 40px rgba(0,0,0,0.8)',
                     }}
                   >
@@ -344,13 +398,13 @@ export default function ScrollImageSequence({
                     ))}
                   </h1>
 
-                  {/* Description */}
+                  {/* Description - hidden on very small to avoid clutter */}
                   <p
-                    className="text-base md:text-lg leading-relaxed"
+                    className="text-xs sm:text-sm md:text-lg leading-relaxed hidden xs:block"
                     style={{
                       color: 'rgba(255,255,255,0.75)',
                       textAlign: 'left',
-                      maxWidth: '340px',
+                      maxWidth: '320px',
                     }}
                   >
                     {section.description}
@@ -361,93 +415,7 @@ export default function ScrollImageSequence({
 
 
 
-            {/* ── Glassmorphic Search Panel ── */}
-            <div
-              className="absolute right-8 md:right-16 top-[40%] -translate-y-1/2 z-20 hidden lg:block"
-              style={{
-                opacity: searchOpacity,
-                transform: 'translateX(' + searchX + 'px)',
-                transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
-              }}
-            >
-              <div
-                className="w-[280px] border"
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  borderColor: GOLD + '30',
-                  boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 12px 48px rgba(0,0,0,0.3)',
-                }}
-              >
-                {/* Gold top accent line */}
-                <div className="h-[2px] w-full" style={{ background: 'linear-gradient(90deg, transparent, ' + GOLD + ', transparent)' }} />
 
-                <div className="p-7">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-8 flex items-center justify-center border" style={{ borderColor: GOLD + '50' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.5">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="text-white text-xs font-bold tracking-widest uppercase">Fahrzeug suchen</div>
-                      <div className="text-[9px] tracking-[0.2em] uppercase" style={{ color: GOLD }}>Find your car</div>
-                    </div>
-                  </div>
-
-                  <div className="h-px mb-6" style={{ background: GOLD + '20' }} />
-
-                  <div className="space-y-4 mb-7">
-                    {[
-                      { label: 'Marke', options: ['Alle Marken', 'BMW', 'Mercedes-Benz', 'Audi', 'Porsche', 'Volkswagen'] },
-                      { label: 'Preis bis', options: ['Kein Limit', 'Bis 30.000 €', 'Bis 50.000 €', 'Bis 75.000 €', 'Bis 100.000 €', 'Über 150.000 €'] },
-                      { label: 'Kraftstoff', options: ['Alle', 'Benzin', 'Diesel', 'Elektro', 'Hybrid'] },
-                    ].map((field) => (
-                      <div key={field.label}>
-                        <label
-                          className="block text-[9px] tracking-[0.25em] uppercase mb-2"
-                          style={{ color: GOLD }}
-                        >
-                          {field.label}
-                        </label>
-                        <select
-                          className="w-full px-4 py-2.5 text-white text-xs border focus:outline-none transition-colors appearance-none"
-                          style={{
-                            background: 'rgba(255,255,255,0.04)',
-                            borderColor: 'rgba(255,255,255,0.15)',
-                            color: 'rgba(255,255,255,0.85)',
-                          }}
-                          defaultValue=""
-                        >
-                          {field.options.map((opt, oi) => (
-                            <option key={opt} value={oi === 0 ? '' : opt} className="bg-black">{opt}</option>
-                          ))}
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => { window.location.href = '/fahrzeuge'; }}
-                    className="w-full py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase transition-all duration-300 hover:opacity-90"
-                    style={{ background: 'linear-gradient(135deg, ' + GOLD + ' 0%, ' + GOLD_LIGHT + ' 100%)', color: NAVY }}
-                  >
-                    Bestand ansehen
-                  </button>
-
-                  <div className="mt-5 pt-5 flex justify-between" style={{ borderTop: '1px solid ' + GOLD + '20' }}>
-                    {[['100%', 'Geprüft'], ['Premium', 'Qualität'], ['Top', 'Service']].map(([val, lbl]) => (
-                      <div key={lbl} className="text-center">
-                        <div className="text-white text-sm font-bold">{val}</div>
-                        <div className="text-[8px] tracking-wider uppercase" style={{ color: GOLD + 'aa' }}>{lbl}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* ── Closing CTA Section ── */}
             {closingOpacity > 0 && (
@@ -475,23 +443,21 @@ export default function ScrollImageSequence({
                     backgroundClip: 'text',
                   }}
                 >
-                  Finden Sie Ihr
+                  {t('scroll.cta.title1')}
                   <br />
-                  Traumauto
+                  {t('scroll.cta.title2')}
                 </h2>
 
                 <p className="text-white/60 text-sm md:text-base text-center max-w-md mb-10 leading-relaxed px-6">
-                  Premium-Fahrzeuge, persönliche Beratung und erstklassiger Service.
-                  <br />
-                  Entdecken Sie unsere aktuelle Kollektion.
+                  {t('scroll.cta.desc')}
                 </p>
 
                 {/* Stats row */}
                 <div className="flex gap-10 md:gap-16 mb-10">
                   {[
-                    ['100%', 'Geprüft'],
-                    ['Premium', 'Qualität'],
-                    ['Top', 'Service'],
+                    ['100%', t('scroll.cta.stat1')],
+                    [t('scroll.cta.stat2_val'), t('scroll.cta.stat2')],
+                    [t('scroll.cta.stat3_val'), t('scroll.cta.stat3')],
                   ].map(([val, lbl]) => (
                     <div key={lbl} className="text-center">
                       <div className="text-2xl md:text-3xl font-black text-white mb-1">{val}</div>
@@ -503,10 +469,10 @@ export default function ScrollImageSequence({
                 <div className="flex gap-4">
                   <button
                     onClick={() => { window.location.href = '/fahrzeuge'; }}
-                    className="px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-extrabold border transition-all duration-300 hover:bg-[#1a1a1a]/10"
+                    className="px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-extrabold border transition-all duration-300 hover:bg-[#2b2b36]/10"
                     style={{ borderColor: 'rgba(255,255,255,0.25)', color: 'white' }}
                   >
-                    Alle Modelle
+                    {t('scroll.cta.button')}
                   </button>
                 </div>
 
@@ -518,9 +484,58 @@ export default function ScrollImageSequence({
 
 
             {/* ── Bottom branding ── */}
-            <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10">
+            <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10 hidden md:block">
               <span className="text-[9px] tracking-[0.5em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.25)' }}>
                 Nordhessen Automobile
+              </span>
+            </div>
+
+            {/* ── Left Empty Space Fillers (Tech Elements) ── */}
+            <div className="absolute left-8 md:left-12 bottom-16 md:bottom-28 z-0 flex flex-col gap-10 hidden lg:flex pointer-events-none opacity-80">
+              
+              {/* Technical Target Graphic */}
+              <div className="relative w-16 h-16 opacity-60">
+                <div className="absolute inset-0 border border-white/[0.08] rounded-full" />
+                <div className="absolute inset-2 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
+                <div className="absolute inset-4 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]" />
+                </div>
+                {/* Crosshairs */}
+                <div className="absolute top-[-10px] bottom-[-10px] left-1/2 w-[1px] bg-white/[0.08]" />
+                <div className="absolute left-[-10px] right-[-10px] top-1/2 h-[1px] bg-white/[0.08]" />
+              </div>
+
+              <div className="flex gap-8 items-end">
+                {/* Coordinates */}
+                <div className="flex flex-col gap-2 border-l-2 border-red-500/40 pl-5 py-1">
+                  <span className="text-[9px] tracking-[0.4em] font-mono text-red-400 uppercase">
+                    {t('scroll.location')}
+                  </span>
+                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/70 uppercase">
+                    51.3127° N
+                  </span>
+                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/70 uppercase">
+                    9.4797° E
+                  </span>
+                </div>
+
+                {/* Data streams indicator */}
+                <div className="flex gap-2.5 pb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex flex-col gap-1.5 opacity-60">
+                      <div className="w-1 h-3 bg-white/10 rounded-sm" />
+                      <div className={`w-1 rounded-sm ${i === 1 ? 'bg-red-500 h-8 shadow-[0_0_8px_rgba(239,68,68,0.6)]' : i === 3 ? 'bg-white/50 h-5' : 'bg-white/20 h-2'}`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Ambient Background Typography ── */}
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.03] z-0 mix-blend-overlay hidden xl:block">
+              <span className="text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
+                NORDHESSEN
               </span>
             </div>
 

@@ -117,7 +117,7 @@ export function StickyActionBar() {
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-40 bg-[#1a1a1a] border-t border-zinc-800 shadow-2xl transition-all duration-300 md:hidden',
+        'fixed bottom-0 left-0 right-0 z-40 bg-white/[0.02] border-t border-white/[0.06] shadow-2xl transition-all duration-300 md:hidden',
         isVisible ? 'translate-y-0' : 'translate-y-full'
       )}
     >
@@ -135,7 +135,7 @@ export function StickyActionBar() {
             to="/kontakt"
             className="flex flex-col items-center justify-center gap-1 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
           >
-            <Mail className="w-5 h-5 text-blue-500" />
+            <Mail className="w-5 h-5 text-red-500" />
             <span className="text-xs font-semibold text-white">Anfragen</span>
           </Link>
           

@@ -5,15 +5,18 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test:email": "node test-email.js"
   },
   "dependencies": {
     "@car-dealership/shared": "*",
+    "@types/nodemailer": "^7.0.11",
     "axios": "^1.13.6",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "morgan": "^1.10.0",
+    "nodemailer": "^8.0.4",
     "uuid": "^13.0.0",
     "xml2js": "^0.6.2"
   },

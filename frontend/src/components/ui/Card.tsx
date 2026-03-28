@@ -8,17 +8,17 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', hover = false, children, ...props }, ref) => {
-    const baseStyles = 'rounded-xl overflow-hidden transition-all duration-300';
+    const baseStyles = 'rounded-2xl overflow-hidden transition-all duration-500';
 
     const variants = {
-      default: 'bg-[#1a1a1a]',
-      elevated: 'bg-[#1a1a1a] shadow-[0_2px_16px_rgba(255,255,255,0.08)]',
-      glass: 'bg-[#1a1a1a]/5 backdrop-blur-xl border border-white/10',
-      bordered: 'bg-[#1a1a1a] border border-zinc-800',
+      default: 'bg-white/[0.02] border border-white/[0.04]',
+      elevated: 'bg-[#22222a]/50 backdrop-blur-xl border border-white/[0.06] shadow-glass',
+      glass: 'bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] shadow-glass',
+      bordered: 'bg-white/[0.01] border border-white/[0.08]',
     };
 
     const hoverStyles = hover
-      ? 'hover:shadow-2xl hover:-translate-y-1 hover:shadow-red-600/30 hover:border-red-600/40 relative before:absolute before:inset-0 before:z-[-1] before:bg-gradient-to-r before:from-red-600 before:to-amber-500 before:opacity-0 hover:before:opacity-10 before:transition-opacity before:duration-500'
+      ? 'hover:shadow-glow-red hover:-translate-y-1 hover:border-[#ef4444]/30 hover:bg-white/[0.04] cursor-pointer'
       : '';
 
     return (
@@ -51,7 +51,7 @@ CardBody.displayName = 'CardBody';
 
 export const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-4 border-t border-zinc-800', className)} {...props} />
+    <div ref={ref} className={cn('p-6 pt-4 border-t border-white/[0.04]', className)} {...props} />
   )
 );
 CardFooter.displayName = 'CardFooter';

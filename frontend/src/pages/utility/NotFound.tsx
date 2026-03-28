@@ -18,7 +18,7 @@ export default function NotFound() {
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
-      <div className="min-h-screen bg-[#171717] flex items-center justify-center px-4 py-20">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center px-4 py-20">
         <div className="max-w-2xl w-full text-center">
           {/* 404 Number */}
           <div className="relative mb-8">
@@ -42,10 +42,10 @@ export default function NotFound() {
           </div>
 
           {/* Message */}
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
             Seite nicht gefunden
           </h2>
-          <p className="text-xl text-gray-400 mb-8">
+          <p className="text-xl text-gray-500 mb-8">
             Die von Ihnen gesuchte Seite existiert leider nicht oder wurde verschoben.
           </p>
 
@@ -65,13 +65,13 @@ export default function NotFound() {
 
           {/* Quick Links */}
           <Card variant="elevated" className="p-8">
-            <h3 className="text-lg font-bold text-white mb-6">Beliebte Seiten</h3>
+            <h3 className="text-lg font-bold text-gray-100 mb-6">Beliebte Seiten</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {quickLinks.map((link, index) => (
                 <Link
                   key={index}
                   to={link.href}
-                  className="flex items-center justify-center gap-2 p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 transition-colors text-gray-300 hover:text-white"
+                  className="flex items-center justify-center gap-2 p-4 rounded-lg bg-[#2a2a34] hover:bg-[#3a3a44] transition-colors text-gray-400 hover:text-gray-100"
                 >
                   {link.icon}
                   <span className="font-semibold">{link.label}</span>

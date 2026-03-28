@@ -51,7 +51,7 @@ export default function CookieConsent() {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none">
       <div className="pointer-events-auto w-full max-w-4xl">
-        <Card variant="elevated" className="p-6 shadow-2xl border-2 border-zinc-700">
+        <Card variant="elevated" className="p-6 shadow-2xl border-2 border-white/[0.06]">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-xl flex-shrink-0">
               <Cookie className="w-6 h-6 text-white" />
@@ -68,7 +68,7 @@ export default function CookieConsent() {
                   </p>
                   <p className="text-sm text-gray-400 mb-4">
                     Weitere Informationen finden Sie in unserer{' '}
-                    <Link to="/datenschutz" className="text-red-500 hover:text-red-400 underline">
+                    <Link to="/datenschutz" className="text-red-500 hover:text-[#f87171] underline">
                       Datenschutzerklärung
                     </Link>
                     .
@@ -77,7 +77,7 @@ export default function CookieConsent() {
               ) : (
                 <div className="space-y-4 mb-4">
                   {/* Necessary Cookies */}
-                  <div className="flex items-start justify-between p-4 bg-zinc-800/50 rounded-lg">
+                  <div className="flex items-start justify-between p-4 bg-white/[0.03]/50 rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-semibold text-white mb-1">Notwendige Cookies</h4>
                       <p className="text-sm text-gray-400">
@@ -89,13 +89,13 @@ export default function CookieConsent() {
                         type="checkbox"
                         checked={preferences.necessary}
                         disabled
-                        className="w-5 h-5 rounded border-zinc-600 bg-zinc-700 cursor-not-allowed"
+                        className="w-5 h-5 rounded border-white/[0.08] bg-white/[0.03] cursor-not-allowed"
                       />
                     </div>
                   </div>
 
                   {/* Analytics Cookies */}
-                  <div className="flex items-start justify-between p-4 bg-zinc-800/50 rounded-lg">
+                  <div className="flex items-start justify-between p-4 bg-white/[0.03]/50 rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-semibold text-white mb-1">Analyse-Cookies</h4>
                       <p className="text-sm text-gray-400">
@@ -107,13 +107,13 @@ export default function CookieConsent() {
                         type="checkbox"
                         checked={preferences.analytics}
                         onChange={(e) => setPreferences({ ...preferences, analytics: e.target.checked })}
-                        className="w-5 h-5 rounded border-zinc-600 bg-zinc-700 text-red-600 focus:ring-red-500 cursor-pointer"
+                        className="w-5 h-5 rounded border-white/[0.08] bg-white/[0.03] text-[#dc2626] focus:ring-[#ef4444] cursor-pointer"
                       />
                     </div>
                   </div>
 
                   {/* Marketing Cookies */}
-                  <div className="flex items-start justify-between p-4 bg-zinc-800/50 rounded-lg">
+                  <div className="flex items-start justify-between p-4 bg-white/[0.03]/50 rounded-lg">
                     <div className="flex-1">
                       <h4 className="font-semibold text-white mb-1">Marketing-Cookies</h4>
                       <p className="text-sm text-gray-400">
@@ -125,7 +125,7 @@ export default function CookieConsent() {
                         type="checkbox"
                         checked={preferences.marketing}
                         onChange={(e) => setPreferences({ ...preferences, marketing: e.target.checked })}
-                        className="w-5 h-5 rounded border-zinc-600 bg-zinc-700 text-red-600 focus:ring-red-500 cursor-pointer"
+                        className="w-5 h-5 rounded border-white/[0.08] bg-white/[0.03] text-[#dc2626] focus:ring-[#ef4444] cursor-pointer"
                       />
                     </div>
                   </div>
@@ -160,7 +160,7 @@ export default function CookieConsent() {
 
             <button
               onClick={rejectAll}
-              className="p-2 hover:bg-zinc-800 rounded-lg transition-colors flex-shrink-0"
+              className="p-2 hover:bg-white/[0.03] rounded-lg transition-colors flex-shrink-0"
               aria-label="Schließen"
             >
               <X className="w-5 h-5 text-gray-400" />

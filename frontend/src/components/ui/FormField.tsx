@@ -21,18 +21,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
               {leftIcon}
             </div>
           )}
           <input
             ref={ref}
             className={cn(
-              'w-full px-4 py-3 bg-[#1a1a1a] border border-zinc-700 rounded-lg text-white placeholder-gray-500',
-              'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+              'w-full px-4 py-3 bg-white/[0.02] border border-white/[0.08] rounded-lg text-gray-100 placeholder-gray-500',
+              'focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent',
               'transition-all duration-200',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              error && 'border-red-500 focus:ring-red-500',
+              error && 'border-red-500 focus:ring-[#ef4444]',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               className
@@ -40,13 +40,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
               {rightIcon}
             </div>
           )}
         </div>
         {error && (
-          <p className="mt-1.5 text-sm text-red-400">{error}</p>
+          <p className="mt-1.5 text-sm text-[#f87171]">{error}</p>
         )}
         {helperText && !error && (
           <p className="mt-1.5 text-sm text-gray-500">{helperText}</p>
@@ -77,17 +77,17 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           ref={ref}
           className={cn(
-            'w-full px-4 py-3 bg-[#1a1a1a] border border-zinc-700 rounded-lg text-white placeholder-gray-500',
-            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+            'w-full px-4 py-3 bg-white/[0.02] border border-white/[0.08] rounded-lg text-gray-100 placeholder-gray-500',
+            'focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent',
             'transition-all duration-200 resize-none',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            error && 'border-red-500 focus:ring-red-500',
+            error && 'border-red-500 focus:ring-[#ef4444]',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="mt-1.5 text-sm text-red-400">{error}</p>
+          <p className="mt-1.5 text-sm text-[#f87171]">{error}</p>
         )}
         {helperText && !error && (
           <p className="mt-1.5 text-sm text-gray-500">{helperText}</p>
@@ -119,11 +119,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            'w-full px-4 py-3 bg-[#1a1a1a] border border-zinc-700 rounded-lg text-white',
-            'focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
+            'w-full px-4 py-3 bg-white/[0.02] border border-white/[0.08] rounded-lg text-gray-100',
+            'focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent',
             'transition-all duration-200 cursor-pointer',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            error && 'border-red-500 focus:ring-red-500',
+            error && 'border-red-500 focus:ring-[#ef4444]',
             className
           )}
           {...props}
@@ -135,7 +135,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {error && (
-          <p className="mt-1.5 text-sm text-red-400">{error}</p>
+          <p className="mt-1.5 text-sm text-[#f87171]">{error}</p>
         )}
         {helperText && !error && (
           <p className="mt-1.5 text-sm text-gray-500">{helperText}</p>

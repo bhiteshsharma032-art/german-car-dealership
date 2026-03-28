@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { sendTradeInEmail } from '../services/emailService';
 
 // Define the interface for a trade-in request
 export interface TradeInRequest {
@@ -73,6 +74,15 @@ export const createTradeIn = async (req: Request, res: Response) => {
     };
     
     tradeInsStore.unshift(newTradeIn); // add to top
+    
+    // Send email notification
+    try {
+      await sendTradeInEmail(newTradeIn);
+      console.log('Trade-in email sent successfully');
+    } catch (emailError) {
+      console.error('Failed to send trade-in email:', emailError);
+      // Don't fail the request if email fails
+    }
     
     res.status(201).json({
       success: true,

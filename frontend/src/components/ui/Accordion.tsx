@@ -12,17 +12,17 @@ export function AccordionItem({ title, content, defaultOpen = false }: Accordion
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-zinc-800">
+    <div className="border-b border-white/[0.06]">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-5 text-left hover:text-red-500 transition-colors group"
+        className="w-full flex items-center justify-between py-5 text-left hover:text-[#f87171] transition-colors group"
       >
-        <span className="text-lg font-semibold text-white group-hover:text-red-500 transition-colors">
+        <span className="text-lg font-semibold text-gray-100 group-hover:text-[#f87171] transition-colors">
           {title}
         </span>
         <ChevronDown
           className={cn(
-            'w-5 h-5 text-gray-400 transition-transform duration-300',
+            'w-5 h-5 text-gray-500 transition-transform duration-300',
             isOpen && 'rotate-180'
           )}
         />

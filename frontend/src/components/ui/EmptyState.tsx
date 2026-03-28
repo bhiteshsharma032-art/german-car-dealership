@@ -32,10 +32,10 @@ export default function EmptyState({
   return (
     <Card variant="elevated" className="p-12">
       <div className="text-center max-w-md mx-auto">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-zinc-800/50 text-gray-500 mb-6">
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/[0.03] text-gray-500 mb-6">
           {displayIcon}
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
+        <h3 className="text-2xl font-bold text-gray-100 mb-3">{title}</h3>
         <p className="text-gray-400 mb-6 leading-relaxed">{description}</p>
         {action && (
           <Button onClick={action.onClick} size="lg">

@@ -133,7 +133,7 @@ export default function Finanzierung() {
         <meta name="description" content="Flexible Fahrzeugfinanzierung mit fairen Konditionen. Schnelle Zusage und individuelle Lösungen für Ihr Traumauto." />
       </Helmet>
 
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         {/* Hero Section */}
         <Section variant="default" withGlow>
           <div className="absolute inset-0 pointer-events-none">
@@ -153,14 +153,14 @@ export default function Finanzierung() {
                 Flexible Finanzierung
               </Badge>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-6">
                 Ihr Traumauto –{' '}
                 <span className="bg-gradient-to-r from-[#dc2626] to-[#ef4444] bg-clip-text text-transparent">
                   einfach finanziert
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-500 mb-8 leading-relaxed">
                 Faire Konditionen, schnelle Zusage und individuelle Lösungen. 
                 Wir machen Ihren Autokauf möglich – transparent und unkompliziert.
               </p>
@@ -176,22 +176,22 @@ export default function Finanzierung() {
               </div>
 
               {/* Trust Indicators */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 pt-12 border-t border-zinc-800">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 pt-12 border-t border-white/[0.06]">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-1">ab 3,99%</div>
-                  <div className="text-sm text-gray-400">effektiver Jahreszins</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">ab 3,99%</div>
+                  <div className="text-sm text-gray-500">effektiver Jahreszins</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-1">24h</div>
-                  <div className="text-sm text-gray-400">Zusage-Garantie</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">24h</div>
+                  <div className="text-sm text-gray-500">Zusage-Garantie</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-1">12-84</div>
-                  <div className="text-sm text-gray-400">Monate Laufzeit</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">12-84</div>
+                  <div className="text-sm text-gray-500">Monate Laufzeit</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-1">0€</div>
-                  <div className="text-sm text-gray-400">Bearbeitungsgebühr</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">0€</div>
+                  <div className="text-sm text-gray-500">Bearbeitungsgebühr</div>
                 </div>
               </div>
             </div>
@@ -214,8 +214,8 @@ export default function Finanzierung() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     {benefit.icon}
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{benefit.title}</h3>
-                  <p className="text-gray-400 text-sm">{benefit.description}</p>
+                  <h3 className="text-lg font-bold text-gray-100 mb-2">{benefit.title}</h3>
+                  <p className="text-gray-500 text-sm">{benefit.description}</p>
                 </Card>
               ))}
             </div>
@@ -234,23 +234,23 @@ export default function Finanzierung() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-white mb-4">Klassische Ratenfinanzierung</h3>
-                <p className="text-gray-400 mb-6 min-h-[80px]">
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">Klassische Ratenfinanzierung</h3>
+                <p className="text-gray-500 mb-6 min-h-[80px]">
                   Gleichbleibende monatliche Raten über die gesamte Vertragslaufzeit. Am Ende haben Sie das Fahrzeug komplett abbezahlt. Kein Restwertrisiko und 100% Planungssicherheit.
                 </p>
-                <ul className="space-y-3 text-gray-300">
+                <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Konstante Raten</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Fahrzeug sofort Ihr Eigentum am Ende</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Laufzeit bis zu 96 Monate</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Fahrzeug wird am Ende vollständig Ihr Eigentum</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Laufzeit bis zu 84 Monate</li>
                 </ul>
               </Card>
 
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-white mb-4">Ballonfinanzierung</h3>
-                <p className="text-gray-400 mb-6 min-h-[80px]">
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">Ballonfinanzierung</h3>
+                <p className="text-gray-500 mb-6 min-h-[80px]">
                   Äußerst niedrige monatliche Raten kombiniert mit einer Schlussrate am Ende der Laufzeit. Perfekt, wenn Sie liquide bleiben oder später umschichten möchten.
                 </p>
-                <ul className="space-y-3 text-gray-300">
+                <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Sehr geringe monatliche Belastung</li>
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Individuell definierbare Schlussrate</li>
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Anschlussfinanzierung (Schlussrate) möglich</li>
@@ -258,11 +258,11 @@ export default function Finanzierung() {
               </Card>
 
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-white mb-4">3-Wege-Finanzierung</h3>
-                <p className="text-gray-400 mb-6 min-h-[80px]">
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">3-Wege-Finanzierung</h3>
+                <p className="text-gray-500 mb-6 min-h-[80px]">
                   Die flexibelste Finanzierung am Markt. Am Laufzeitende wählen Sie: Auto kaufen, Ballon weiterfinanzieren oder einfach an uns zurückgeben!
                 </p>
-                <ul className="space-y-3 text-gray-300">
+                <ul className="space-y-3 text-gray-400">
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Absolute Entscheidungsfreiheit am Ende</li>
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Garantierter Rücknahmewert</li>
                   <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Null Wertverlustrisiko</li>
@@ -293,8 +293,8 @@ export default function Finanzierung() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                        <p className="text-gray-400">{step.description}</p>
+                        <h3 className="text-xl font-bold text-gray-100 mb-2">{step.title}</h3>
+                        <p className="text-gray-500">{step.description}</p>
                       </div>
                       <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 hidden md:block" />
                     </div>
@@ -306,12 +306,12 @@ export default function Finanzierung() {
         </Section>
 
         {/* Calculator & Form Section */}
-        <Section variant="dark">
+        <Section variant="default">
           <SectionContent>
             <div className="max-w-xl mx-auto">
               {/* Calculator */}
               <div>
-                <h2 className="text-3xl font-bold text-white mb-6">
+                <h2 className="text-3xl font-bold text-gray-100 mb-6">
                   <Calculator className="w-8 h-8 inline-block mr-3 text-red-500" />
                   Ratenrechner
                 </h2>
@@ -389,8 +389,8 @@ export default function Finanzierung() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card variant="elevated" className="p-6">
                   <Users className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-3">Persönliche Voraussetzungen</h3>
-                  <ul className="space-y-2 text-gray-300">
+                  <h3 className="text-xl font-bold text-gray-100 mb-3">Persönliche Voraussetzungen</h3>
+                  <ul className="space-y-2 text-gray-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                       <span>Mindestalter 18 Jahre</span>
@@ -412,8 +412,8 @@ export default function Finanzierung() {
 
                 <Card variant="elevated" className="p-6">
                   <FileText className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-3">Benötigte Unterlagen</h3>
-                  <ul className="space-y-2 text-gray-300">
+                  <h3 className="text-xl font-bold text-gray-100 mb-3">Benötigte Unterlagen</h3>
+                  <ul className="space-y-2 text-gray-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                       <span>Personalausweis oder Reisepass</span>
@@ -466,10 +466,10 @@ export default function Finanzierung() {
           <SectionContent>
             <div className="max-w-4xl mx-auto text-center">
               <TrendingUp className="w-16 h-16 text-red-500 mx-auto mb-6" />
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
                 Bereit für Ihr Traumauto?
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-gray-500 mb-8">
                 Entdecken Sie unsere Fahrzeuge und finden Sie Ihr perfektes Auto
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

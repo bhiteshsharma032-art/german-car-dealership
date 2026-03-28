@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import { X, Grid3x3, List, ChevronDown, SlidersHorizontal, Search, Car as CarIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { carService, Car } from '../../services/carService';
 import { SearchParams } from '../../services/inventoryService';
 import VehicleCard from '../../components/inventory/VehicleCard';
@@ -10,6 +12,9 @@ import EmptyState from '../../components/ui/EmptyState';
 import { cn } from '../../utils/cn';
 
 export default function CarList() {
+  const [searchParams] = useSearchParams();
+  const initialBrand = searchParams.get('brand');
+
   const [vehicles, setVehicles] = useState<Car[]>([]);
   const [filteredVehicles, setFilteredVehicles] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +23,7 @@ export default function CarList() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  const [filters, setFilters] = useState<SearchParams>({});
+  const [filters, setFilters] = useState<SearchParams>({ make: initialBrand || undefined });
   const [filterOptions, setFilterOptions] = useState({
     brands: [] as string[],
     models: [] as string[],
@@ -34,26 +39,31 @@ export default function CarList() {
   }, []);
 
   useEffect(() => {
+    const brand = searchParams.get('brand');
+    if (brand) {
+      setFilters(prev => ({ ...prev, make: brand }));
+    } else {
+      setFilters(prev => { const n = { ...prev }; delete n.make; return n; });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     applyFiltersAndSort();
   }, [vehicles, filters, sortBy, searchQuery]);
 
   const loadVehicles = async () => {
     setLoading(true);
-    
     try {
-      const response = await carService.getAllCars({ limit: 100 });
-      
+      const response = await carService.getAllCars({ limit: 1000 });
       if (response.success && response.data) {
         setVehicles(response.data);
         setFilteredVehicles(response.data);
       } else {
-        // Show empty state instead of error
         setVehicles([]);
         setFilteredVehicles([]);
       }
     } catch (err) {
       console.error('Error loading vehicles:', err);
-      // Show empty state instead of error
       setVehicles([]);
       setFilteredVehicles([]);
     } finally {
@@ -75,8 +85,6 @@ export default function CarList() {
 
   const applyFiltersAndSort = () => {
     let result = [...vehicles];
-
-    // Apply search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(car =>
@@ -85,159 +93,82 @@ export default function CarList() {
         `${car.brand} ${car.model}`.toLowerCase().includes(query)
       );
     }
+    if (filters.make) result = result.filter(car => car.brand === filters.make);
+    if (filters.priceFrom) result = result.filter(car => car.price >= filters.priceFrom!);
+    if (filters.priceTo) result = result.filter(car => car.price <= filters.priceTo!);
+    if (filters.yearFrom) result = result.filter(car => car.year >= filters.yearFrom!);
+    if (filters.yearTo) result = result.filter(car => car.year <= filters.yearTo!);
+    if (filters.mileageFrom) result = result.filter(car => car.mileage >= filters.mileageFrom!);
+    if (filters.mileageTo) result = result.filter(car => car.mileage <= filters.mileageTo!);
+    if (filters.fuelType) result = result.filter(car => car.fuelType === filters.fuelType);
+    if (filters.transmission) result = result.filter(car => car.transmission === filters.transmission);
+    if (filters.bodyType) result = result.filter(car => car.bodyType === filters.bodyType);
+    if (filters.powerFrom) result = result.filter(car => car.horsePower >= filters.powerFrom!);
+    if (filters.powerTo) result = result.filter(car => car.horsePower <= filters.powerTo!);
 
-    // Apply filters
-    if (filters.make) {
-      result = result.filter(car => car.brand === filters.make);
-    }
-
-    if (filters.priceFrom) {
-      result = result.filter(car => car.price >= filters.priceFrom!);
-    }
-
-    if (filters.priceTo) {
-      result = result.filter(car => car.price <= filters.priceTo!);
-    }
-
-    if (filters.yearFrom) {
-      result = result.filter(car => car.year >= filters.yearFrom!);
-    }
-
-    if (filters.yearTo) {
-      result = result.filter(car => car.year <= filters.yearTo!);
-    }
-
-    if (filters.mileageFrom) {
-      result = result.filter(car => car.mileage >= filters.mileageFrom!);
-    }
-
-    if (filters.mileageTo) {
-      result = result.filter(car => car.mileage <= filters.mileageTo!);
-    }
-
-    if (filters.fuelType) {
-      result = result.filter(car => car.fuelType === filters.fuelType);
-    }
-
-    if (filters.transmission) {
-      result = result.filter(car => car.transmission === filters.transmission);
-    }
-
-    if (filters.bodyType) {
-      result = result.filter(car => car.bodyType === filters.bodyType);
-    }
-
-    if (filters.powerFrom) {
-      result = result.filter(car => car.horsePower >= filters.powerFrom!);
-    }
-
-    if (filters.powerTo) {
-      result = result.filter(car => car.horsePower <= filters.powerTo!);
-    }
-
-    // Apply sorting
     switch (sortBy) {
-      case 'price-low':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'mileage':
-        result.sort((a, b) => a.mileage - b.mileage);
-        break;
-      case 'year':
-        result.sort((a, b) => b.year - a.year);
-        break;
+      case 'price-low': result.sort((a, b) => a.price - b.price); break;
+      case 'price-high': result.sort((a, b) => b.price - a.price); break;
+      case 'mileage': result.sort((a, b) => a.mileage - b.mileage); break;
+      case 'year': result.sort((a, b) => b.year - a.year); break;
       case 'newest':
-      default:
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
+      default: result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
     }
-
     setFilteredVehicles(result);
   };
 
   const handleFilterChange = (key: keyof SearchParams, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-    }));
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const clearFilters = () => {
-    setFilters({});
-    setSearchQuery('');
-  };
+  const clearFilters = () => { setFilters({}); setSearchQuery(''); };
 
   const removeFilter = (key: keyof SearchParams) => {
-    setFilters(prev => {
-      const newFilters = { ...prev };
-      delete newFilters[key];
-      return newFilters;
-    });
+    setFilters(prev => { const n = { ...prev }; delete n[key]; return n; });
   };
 
-  const getActiveFiltersCount = () => {
-    return Object.keys(filters).filter(key => filters[key as keyof SearchParams] !== undefined).length;
-  };
+  const getActiveFiltersCount = () => Object.keys(filters).filter(key => filters[key as keyof SearchParams] !== undefined).length;
 
   const getActiveFilterChips = () => {
     const chips: { key: keyof SearchParams; label: string }[] = [];
-
     if (filters.make) chips.push({ key: 'make', label: `Marke: ${filters.make}` });
-    if (filters.priceFrom || filters.priceTo) {
-      chips.push({
-        key: 'priceFrom',
-        label: `Preis: ${filters.priceFrom || 0} - ${filters.priceTo || '∞'} €`,
-      });
-    }
-    if (filters.yearFrom || filters.yearTo) {
-      chips.push({
-        key: 'yearFrom',
-        label: `Jahr: ${filters.yearFrom || '0'} - ${filters.yearTo || 'heute'}`,
-      });
-    }
+    if (filters.priceFrom || filters.priceTo) chips.push({ key: 'priceFrom', label: `Preis: ${filters.priceFrom || 0} - ${filters.priceTo || '∞'} €` });
+    if (filters.yearFrom || filters.yearTo) chips.push({ key: 'yearFrom', label: `Jahr: ${filters.yearFrom || '0'} - ${filters.yearTo || 'heute'}` });
     if (filters.fuelType) chips.push({ key: 'fuelType', label: `Kraftstoff: ${filters.fuelType}` });
     if (filters.transmission) chips.push({ key: 'transmission', label: `Getriebe: ${filters.transmission}` });
     if (filters.bodyType) chips.push({ key: 'bodyType', label: `Typ: ${filters.bodyType}` });
-
     return chips;
   };
 
-  // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar Skeleton */}
             <div className="hidden lg:block">
-              <div className="bg-[#1a1a1a] rounded-xl p-6 border border-zinc-800">
-                <div className="h-6 w-20 bg-zinc-800 rounded animate-pulse mb-6"></div>
+              <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl p-6 border border-white/[0.06]">
+                <div className="h-6 w-20 bg-white/[0.05] rounded animate-pulse mb-6"></div>
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="mb-6">
-                    <div className="h-5 w-24 bg-zinc-800 rounded animate-pulse mb-3"></div>
-                    <div className="h-10 w-full bg-zinc-800 rounded-lg animate-pulse"></div>
+                    <div className="h-5 w-24 bg-white/[0.05] rounded animate-pulse mb-3"></div>
+                    <div className="h-10 w-full bg-white/[0.05] rounded-xl animate-pulse"></div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Cards Skeleton */}
             <div className="lg:col-span-3">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-zinc-800">
-                    <div className="aspect-[4/3] bg-zinc-800 animate-pulse"></div>
-                    <div className="p-5 space-y-4">
-                      <div className="h-6 bg-zinc-800 rounded animate-pulse"></div>
-                      <div className="h-8 w-32 bg-zinc-800 rounded animate-pulse"></div>
+                  <div key={i} className="bg-white/[0.02] backdrop-blur-md rounded-3xl overflow-hidden border border-white/[0.06]">
+                    <div className="aspect-[4/3] bg-white/[0.05] animate-pulse"></div>
+                    <div className="p-6 space-y-5">
+                      <div className="h-6 bg-white/[0.05] rounded animate-pulse"></div>
+                      <div className="h-8 w-32 bg-white/[0.05] rounded animate-pulse"></div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="h-12 bg-zinc-800 rounded animate-pulse"></div>
-                        <div className="h-12 bg-zinc-800 rounded animate-pulse"></div>
+                        <div className="h-12 bg-white/[0.05] rounded-xl animate-pulse"></div>
+                        <div className="h-12 bg-white/[0.05] rounded-xl animate-pulse"></div>
                       </div>
-                      <div className="h-12 bg-zinc-800 rounded-lg animate-pulse"></div>
+                      <div className="h-12 bg-white/[0.05] rounded-xl animate-pulse"></div>
                     </div>
                   </div>
                 ))}
@@ -256,72 +187,65 @@ export default function CarList() {
         <meta name="description" content="Entdecken Sie unsere große Auswahl an Premium-Fahrzeugen" />
       </Helmet>
 
-      <div className="min-h-screen bg-[#0f0f0f]">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-[#0f0f0f] pt-20 pb-6">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
-                Unsere Fahrzeuge
+      <div className="min-h-screen bg-[#1a1a1f]">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#22222a] to-[#1a1a1f] pt-24 pb-8 border-b border-white/[0.04]">
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#ef4444]/30 to-transparent" />
+          <div className="max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 relative z-10 flex flex-col items-center text-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl w-full">
+              <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-100 mb-4 tracking-tight">
+                Unsere <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">Fahrzeuge</span>
               </h1>
-              <p className="text-lg text-gray-400 mb-4">
-                Entdecken Sie unsere große Auswahl an geprüften Premium-Fahrzeugen.
+              <p className="text-lg text-gray-400 mb-8 font-light max-w-xl mx-auto">
+                Entdecken Sie unsere große Auswahl an geprüften Premium-Fahrzeugen, perfekt abgestimmt auf Ihre Bedürfnisse.
               </p>
-
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+              <div className="relative group text-left">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-red-500 transition-colors" />
                 <input
                   type="text"
                   placeholder="Marke oder Modell suchen..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#1a1a1a] border border-zinc-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                  className="w-full pl-14 pr-5 py-4 bg-white/[0.02] border border-white/[0.08] rounded-2xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ef4444]/50 focus:border-[#ef4444] transition-all focus:bg-white/[0.04] shadow-glass"
                 />
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Main Content */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Results Header */}
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 py-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-1">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+              <h2 className="text-2xl font-display font-bold text-gray-100 mb-1">
                 {filteredVehicles.length} {filteredVehicles.length === 1 ? 'Fahrzeug' : 'Fahrzeuge'}
               </h2>
-              <p className="text-gray-400">
+              <p className="text-sm text-gray-400 font-light">
                 {getActiveFiltersCount() > 0 ? 'Gefilterte Ergebnisse' : 'Alle verfügbaren Fahrzeuge'}
               </p>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Sort Dropdown */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-center gap-3 flex-wrap">
               <div className="relative">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-[#1a1a1a] border border-zinc-700 rounded-lg px-4 py-2.5 pr-10 text-sm font-medium text-white hover:border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                  className="appearance-none bg-white/[0.03] border border-white/[0.08] backdrop-blur-md rounded-xl px-5 py-3 pr-10 text-sm font-medium text-gray-200 hover:border-white/[0.15] focus:outline-none focus:ring-2 focus:ring-[#ef4444]/50 cursor-pointer transition-all"
                 >
-                  <option value="newest">Neueste zuerst</option>
-                  <option value="price-low">Preis aufsteigend</option>
-                  <option value="price-high">Preis absteigend</option>
-                  <option value="mileage">Kilometerstand</option>
-                  <option value="year">Baujahr</option>
+                  <option value="newest" className="bg-[#22222a]">Neueste zuerst</option>
+                  <option value="price-low" className="bg-[#22222a]">Preis aufsteigend</option>
+                  <option value="price-high" className="bg-[#22222a]">Preis absteigend</option>
+                  <option value="mileage" className="bg-[#22222a]">Kilometerstand</option>
+                  <option value="year" className="bg-[#22222a]">Baujahr</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
               </div>
 
-              {/* View Toggle */}
-              <div className="flex bg-[#1a1a1a] rounded-lg p-1 border border-zinc-700">
+              <div className="flex bg-white/[0.03] backdrop-blur-md rounded-xl p-1 border border-white/[0.08]">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={cn(
-                    'p-2.5 rounded-md transition-all',
-                    viewMode === 'grid'
-                      ? 'bg-red-600 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-zinc-800'
+                    'p-2.5 rounded-lg transition-all',
+                    viewMode === 'grid' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
                   )}
                   aria-label="Grid view"
                 >
@@ -330,10 +254,8 @@ export default function CarList() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={cn(
-                    'p-2.5 rounded-md transition-all',
-                    viewMode === 'list'
-                      ? 'bg-red-600 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-zinc-800'
+                    'p-2.5 rounded-lg transition-all',
+                    viewMode === 'list' ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'
                   )}
                   aria-label="List view"
                 >
@@ -341,53 +263,39 @@ export default function CarList() {
                 </button>
               </div>
 
-              {/* Mobile Filter Toggle */}
               <button
                 onClick={() => setShowMobileFilters(true)}
-                className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-[#1a1a1a] text-white rounded-lg hover:bg-zinc-800 transition-all font-medium text-sm border border-zinc-700"
+                className="lg:hidden flex items-center gap-2 px-5 py-3 bg-white/[0.03] backdrop-blur-md text-gray-200 rounded-xl hover:bg-white/[0.06] transition-all font-medium text-sm border border-white/[0.08]"
               >
                 <SlidersHorizontal className="w-4 h-4" />
                 Filter
                 {getActiveFiltersCount() > 0 && (
-                  <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.4)]">
                     {getActiveFiltersCount()}
                   </span>
                 )}
               </button>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Active Filter Chips */}
           {getActiveFiltersCount() > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="flex flex-wrap gap-2 mb-8">
               {getActiveFilterChips().map((chip) => (
-                <div
-                  key={chip.key}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#1a1a1a] text-gray-300 rounded-lg text-sm font-medium border border-zinc-700"
-                >
+                <div key={chip.key} className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-300 rounded-xl text-sm font-medium border border-[#ef4444]/30">
                   <span>{chip.label}</span>
-                  <button
-                    onClick={() => removeFilter(chip.key)}
-                    className="hover:text-white transition-colors"
-                    aria-label={`Remove ${chip.label} filter`}
-                  >
+                  <button onClick={() => removeFilter(chip.key)} className="hover:text-red-100 transition-colors bg-white/5 rounded-full p-0.5" aria-label={`Remove ${chip.label} filter`}>
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
-              <button
-                onClick={clearFilters}
-                className="text-sm text-red-500 hover:text-red-400 font-medium px-3 py-1.5 transition-colors"
-              >
+              <button onClick={clearFilters} className="text-sm text-gray-400 hover:text-white font-medium px-4 py-2 transition-colors">
                 Alle zurücksetzen
               </button>
-            </div>
+            </motion.div>
           )}
 
-          {/* Main Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Desktop Filter Sidebar */}
-            <aside className="hidden lg:block sticky top-24 self-start">
+          <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-8">
+            <aside className="hidden lg:block lg:col-span-1 xl:col-span-1 sticky top-24 self-start">
               <FilterSidebar
                 filters={filters}
                 onFilterChange={handleFilterChange}
@@ -396,55 +304,48 @@ export default function CarList() {
               />
             </aside>
 
-            {/* Vehicle Grid */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 xl:col-span-4">
               {filteredVehicles.length === 0 ? (
                 <EmptyState
                   icon={<CarIcon className="w-12 h-12" />}
                   title="Keine Fahrzeuge gefunden"
                   description="Versuchen Sie, Ihre Suchkriterien anzupassen oder alle Filter zurückzusetzen."
-                  action={{
-                    label: 'Filter zurücksetzen',
-                    onClick: clearFilters,
-                  }}
+                  action={{ label: 'Filter zurücksetzen', onClick: clearFilters }}
                 />
               ) : (
-                <div
-                  className={cn(
-                    'grid gap-6',
-                    viewMode === 'grid'
-                      ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
-                      : 'grid-cols-1'
-                  )}
-                >
-                  {filteredVehicles.map((vehicle) => (
-                    <VehicleCard
-                      key={vehicle.id}
-                      id={vehicle.id}
-                      make={vehicle.brand}
-                      model={vehicle.model}
-                      title={`${vehicle.brand} ${vehicle.model}`}
-                      price={{
-                        amount: vehicle.price,
-                        formatted: `${vehicle.price.toLocaleString('de-DE')} €`,
-                      }}
-                      mileage={{
-                        formatted: `${vehicle.mileage.toLocaleString('de-DE')} km`,
-                      }}
-                      firstRegistration={`${vehicle.year}-01-01`}
-                      power={{
-                        formatted: `${vehicle.horsePower} PS`,
-                      }}
-                      fuelType={vehicle.fuelType}
-                      transmission={vehicle.transmission}
-                      image={vehicle.images[0]}
-                      images={vehicle.images}
-                      isNew={new Date(vehicle.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000}
-                      isExclusive={vehicle.isExclusive}
-                      hasFinancing={true}
-                    />
-                  ))}
-                </div>
+                <motion.div layout className={cn('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1')}>
+                  <AnimatePresence mode="popLayout">
+                    {filteredVehicles.map((vehicle, index) => (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                        transition={{ duration: 0.4, delay: index * 0.05 }}
+                        key={vehicle.id}
+                      >
+                        <VehicleCard
+                          id={vehicle.id}
+                          make={vehicle.brand}
+                          model={vehicle.model}
+                          title={`${vehicle.brand} ${vehicle.model}`}
+                          price={{ amount: vehicle.price, formatted: `${vehicle.price.toLocaleString('de-DE')} €` }}
+                          mileage={{ formatted: `${vehicle.mileage.toLocaleString('de-DE')} km` }}
+                          firstRegistration={`${vehicle.year}-01-01`}
+                          power={{ formatted: `${vehicle.horsePower} PS` }}
+                          fuelType={vehicle.fuelType}
+                          transmission={vehicle.transmission}
+                          image={vehicle.images[0]}
+                          images={vehicle.images}
+                          isNew={new Date(vehicle.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000}
+                          isExclusive={vehicle.isExclusive}
+                          hasFinancing={true}
+                          viewMode={viewMode}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
               )}
             </div>
           </div>
@@ -453,42 +354,25 @@ export default function CarList() {
         {/* Mobile Filter Drawer */}
         {showMobileFilters && (
           <div className="lg:hidden fixed inset-0 z-50 flex">
-            <div
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              onClick={() => setShowMobileFilters(false)}
-            />
-            <div className="relative ml-auto w-full max-w-sm bg-[#171717] flex flex-col h-full">
-              <div className="flex items-center justify-between p-6 border-b border-zinc-800">
-                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
+            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="relative ml-auto w-full max-w-sm bg-[#1a1a1f]/95 backdrop-blur-xl flex flex-col h-full border-l border-white/[0.08]">
+              <div className="flex items-center justify-between p-6 border-b border-white/[0.08]">
+                <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-red-500" />
                   Filter
                 </h2>
-                <button
-                  onClick={() => setShowMobileFilters(false)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
-                >
+                <button onClick={() => setShowMobileFilters(false)} className="w-8 h-8 flex items-center justify-center bg-white/[0.05] rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.1] transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6">
-                <FilterSidebar
-                  filters={filters}
-                  onFilterChange={handleFilterChange}
-                  onClearFilters={clearFilters}
-                  filterOptions={filterOptions}
-                />
+              <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+                <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onClearFilters={clearFilters} filterOptions={filterOptions} />
               </div>
-
-              <div className="p-6 border-t border-zinc-800 flex gap-3">
-                <Button variant="secondary" onClick={clearFilters} className="flex-1">
-                  Zurücksetzen
-                </Button>
-                <Button onClick={() => setShowMobileFilters(false)} className="flex-1">
-                  Anwenden
-                </Button>
+              <div className="p-6 border-t border-white/[0.08] flex gap-3 bg-[#22222a]">
+                <Button variant="secondary" onClick={clearFilters} className="flex-1 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1]">Zurücksetzen</Button>
+                <Button onClick={() => setShowMobileFilters(false)} className="flex-1 rounded-xl bg-red-500 hover:bg-[#dc2626] text-white">Anwenden</Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
       </div>

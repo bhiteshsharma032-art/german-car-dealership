@@ -16,7 +16,7 @@ const Skeleton = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 Skeleton.displayName = 'Skeleton';
 
 export const SkeletonCard = () => (
-  <div className="bg-[#1a1a1a] rounded-lg shadow-sm overflow-hidden border border-zinc-800">
+  <div className="bg-white/[0.02] rounded-lg shadow-sm overflow-hidden border border-white/[0.06]">
     <Skeleton className="aspect-video" />
     <div className="p-4 space-y-3">
       <Skeleton className="h-4 w-3/4" />

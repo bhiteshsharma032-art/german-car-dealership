@@ -60,7 +60,7 @@ export default function AdminLogin() {
           </div>
 
           {/* Login Card */}
-          <div className="bg-[#1a1a1a] rounded-2xl shadow-2xl p-8">
+          <div className="bg-[#2b2b36] rounded-2xl shadow-2xl p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />

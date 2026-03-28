@@ -181,7 +181,7 @@ export default function FAQ() {
         <meta name="description" content="Antworten auf häufig gestellte Fragen zu Fahrzeugkauf, Finanzierung, Garantie und mehr." />
       </Helmet>
 
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         {/* Hero Section */}
         <Section variant="default" withGlow>
           <SectionContent>
@@ -191,14 +191,14 @@ export default function FAQ() {
                 Häufige Fragen
               </Badge>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-6">
                 Wie können wir{' '}
                 <span className="bg-gradient-to-r from-[#dc2626] to-[#ef4444] bg-clip-text text-transparent">
                   Ihnen helfen?
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-500 mb-8 leading-relaxed">
                 Finden Sie schnell Antworten auf die häufigsten Fragen rund um 
                 Fahrzeugkauf, Finanzierung und Service.
               </p>
@@ -211,7 +211,7 @@ export default function FAQ() {
                   placeholder="Frage suchen..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-[#1a1a1a] border border-zinc-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="w-full pl-12 pr-4 py-4 bg-white/[0.02] border border-white/[0.06] rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ef4444] focus:border-transparent"
                 />
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function FAQ() {
                   className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
                     activeCategory === category.id
                       ? 'bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white shadow-lg'
-                      : 'bg-[#1a1a1a] text-gray-300 hover:bg-[#262626]'
+                      : 'bg-white/[0.02] text-gray-400 hover:bg-white/[0.03] border border-white/[0.06]'
                   }`}
                 >
                   {category.icon}
@@ -252,8 +252,8 @@ export default function FAQ() {
               ) : (
                 <Card variant="elevated" className="p-12 text-center">
                   <HelpCircle className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">Keine Ergebnisse gefunden</h3>
-                  <p className="text-gray-400">
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">Keine Ergebnisse gefunden</h3>
+                  <p className="text-gray-500">
                     Versuchen Sie es mit anderen Suchbegriffen oder wählen Sie eine andere Kategorie.
                   </p>
                 </Card>
@@ -278,9 +278,9 @@ export default function FAQ() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <Phone className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Telefon</h3>
-                  <p className="text-gray-400 text-sm mb-4">Mo-Fr: 09:00-18:00 Uhr</p>
-                  <a href="tel:+4956193004649" className="text-red-500 hover:text-red-400 font-semibold">
+                  <h3 className="text-lg font-bold text-gray-100 mb-2">Telefon</h3>
+                  <p className="text-gray-500 text-sm mb-4">Mo-Fr: 09:00-18:00 Uhr</p>
+                  <a href="tel:+4956193004649" className="text-red-500 hover:text-[#f87171] font-semibold">
                     0561 930 04 649
                   </a>
                 </Card>
@@ -289,9 +289,9 @@ export default function FAQ() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <Mail className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">E-Mail</h3>
-                  <p className="text-gray-400 text-sm mb-4">Antwort innerhalb 24h</p>
-                  <a href="mailto:info@nordhessen-automobile.de" className="text-red-500 hover:text-red-400 font-semibold break-all">
+                  <h3 className="text-lg font-bold text-gray-100 mb-2">E-Mail</h3>
+                  <p className="text-gray-500 text-sm mb-4">Antwort innerhalb 24h</p>
+                  <a href="mailto:info@nordhessen-automobile.de" className="text-red-500 hover:text-[#f87171] font-semibold break-all">
                     info@nordhessen-automobile.de
                   </a>
                 </Card>
@@ -300,8 +300,8 @@ export default function FAQ() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     <MessageCircle className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Kontaktformular</h3>
-                  <p className="text-gray-400 text-sm mb-4">Detaillierte Anfragen</p>
+                  <h3 className="text-lg font-bold text-gray-100 mb-2">Kontaktformular</h3>
+                  <p className="text-gray-500 text-sm mb-4">Detaillierte Anfragen</p>
                   <Link to="/kontakt">
                     <Button variant="outline" size="sm">
                       Zum Formular
@@ -317,7 +317,7 @@ export default function FAQ() {
         <Section variant="default">
           <SectionContent>
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold text-white mb-8">Weitere hilfreiche Links</h2>
+              <h2 className="text-3xl font-bold text-gray-100 mb-8">Weitere hilfreiche Links</h2>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/finanzierung">
                   <Button variant="outline" size="lg">

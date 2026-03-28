@@ -99,7 +99,7 @@ export default function ScrollVideo({ videoUrl = '/Bmw.mp4' }: ScrollVideoProps)
       className="relative w-full"
       style={{ height: '500vh' }}
     >
-      <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden bg-black">
+      <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden bg-[#1e1e24]">
         <video
           ref={videoRef}
           className="w-full h-full object-cover"

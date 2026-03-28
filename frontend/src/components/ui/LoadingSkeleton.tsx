@@ -22,7 +22,7 @@ export function LoadingSkeleton({ className, variant = 'card' }: LoadingSkeleton
 
 export function CarCardSkeleton() {
   return (
-    <div className="bg-[#1a1a1a] rounded-xl shadow-lg overflow-hidden animate-fadeIn border border-zinc-800">
+    <div className="bg-white/[0.02] rounded-xl shadow-lg overflow-hidden animate-fadeIn border border-white/[0.06]">
       <LoadingSkeleton className="aspect-video" />
       <div className="p-5 space-y-4">
         <LoadingSkeleton variant="text" className="w-3/4" />
@@ -43,7 +43,7 @@ export function CarCardSkeleton() {
 
 export function LuxuryLoader() {
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[#1a1a1f] flex items-center justify-center z-50">
       <div className="relative">
         {/* Outer rotating ring with red glow */}
         <div className="absolute inset-0 animate-spin-slow">
@@ -89,7 +89,7 @@ export function LuxuryLoader() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-red-500 rounded-full animate-pulse-slow opacity-60"></div>
         <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-red-400 rounded-full animate-pulse-slow opacity-40" style={{ animationDelay: '0.5s' }}></div>
-        <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse-slow opacity-50" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse-slow opacity-50" style={{ animationDelay: '1s' }}></div>
         <div className="absolute bottom-1/4 right-1/3 w-1 h-1 bg-red-400 rounded-full animate-pulse-slow opacity-30" style={{ animationDelay: '1.5s' }}></div>
       </div>
     </div>

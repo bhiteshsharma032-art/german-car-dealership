@@ -123,7 +123,7 @@ export default function AdminTradeIns() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'new':
-        return <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">Neu</span>;
+        return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">Neu</span>;
       case 'reviewed':
         return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">Geprüft</span>;
       case 'contacted':
@@ -131,7 +131,7 @@ export default function AdminTradeIns() {
       case 'completed':
         return <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">Abgeschlossen</span>;
       default:
-        return <span className="px-2 py-1 bg-[#0a0a0a] text-gray-200 text-xs rounded-full font-medium">{status}</span>;
+        return <span className="px-2 py-1 bg-[#1a1a20] text-gray-200 text-xs rounded-full font-medium">{status}</span>;
     }
   };
 
@@ -146,7 +146,7 @@ export default function AdminTradeIns() {
           <h1 className="text-3xl font-bold text-white">Inzahlungnahmen</h1>
           <button
             onClick={loadTradeIns}
-            className="inline-flex items-center justify-center px-4 py-2 bg-[#1a1a1a] border text-gray-300 rounded-lg hover:bg-zinc-900 border border-zinc-800 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center px-4 py-2 bg-[#2b2b36] border text-gray-300 rounded-lg hover:bg-zinc-900 border border-zinc-800 transition-colors shadow-sm"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Aktualisieren
@@ -154,7 +154,7 @@ export default function AdminTradeIns() {
         </div>
 
         {/* Filters */}
-        <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 space-y-4">
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -186,7 +186,7 @@ export default function AdminTradeIns() {
             <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
           </div>
         ) : (
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-zinc-900 border border-zinc-800">
@@ -198,7 +198,7 @@ export default function AdminTradeIns() {
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
                   </tr>
                 </thead>
-                <tbody className="bg-[#1a1a1a] divide-y divide-gray-200">
+                <tbody className="bg-[#2b2b36] divide-y divide-gray-200">
                   {filteredTradeIns.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
@@ -246,7 +246,7 @@ export default function AdminTradeIns() {
                                 setSelectedTradeIn(t);
                                 setViewModalOpen(true);
                               }}
-                              className="px-3 py-1.5 bg-[#0a0a0a] text-gray-300 hover:bg-zinc-800 rounded transition-colors text-sm font-medium"
+                              className="px-3 py-1.5 bg-[#1a1a20] text-gray-300 hover:bg-zinc-800 rounded transition-colors text-sm font-medium"
                             >
                               Ansehen
                             </button>
@@ -271,15 +271,15 @@ export default function AdminTradeIns() {
 
       {/* Detail Modal */}
       {viewModalOpen && selectedTradeIn && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 overflow-y-auto">
-          <div className="bg-[#1a1a1a] rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
-            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-[#1a1a1a] rounded-t-xl z-10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1e1e24]/60 overflow-y-auto">
+          <div className="bg-[#2b2b36] rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col my-8">
+            <div className="p-6 border-b flex justify-between items-center sticky top-0 bg-[#2b2b36] rounded-t-xl z-10">
               <h2 className="text-2xl font-bold text-white">
                 Inzahlungnahme Details
               </h2>
               <button
                 onClick={() => setViewModalOpen(false)}
-                className="text-gray-400 hover:text-gray-400 bg-[#0a0a0a] hover:bg-zinc-800 rounded-full p-2 transition-colors"
+                className="text-gray-400 hover:text-gray-400 bg-[#1a1a20] hover:bg-zinc-800 rounded-full p-2 transition-colors"
               >
                 ✕
               </button>

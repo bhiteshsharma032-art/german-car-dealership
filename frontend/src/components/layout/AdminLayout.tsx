@@ -51,7 +51,7 @@ export default function AdminLayout() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a20] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
       </div>
     );
@@ -74,7 +74,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#1a1a20]">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -179,7 +179,7 @@ export default function AdminLayout() {
             <button
               onClick={handleLogout}
               className={cn(
-                'flex items-center px-4 py-3 w-full rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors min-h-[44px]',
+                'flex items-center px-4 py-3 w-full rounded-lg text-gray-300 hover:bg-red-500 hover:text-white transition-colors min-h-[44px]',
                 sidebarCollapsed ? 'lg:justify-center lg:px-2' : 'space-x-3'
               )}
               title={sidebarCollapsed ? 'Abmelden' : undefined}
@@ -199,7 +199,7 @@ export default function AdminLayout() {
         sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'
       )}>
         {/* Top bar */}
-        <header className="bg-[#1a1a1a] shadow-md shadow-black/20 sticky top-0 z-10 border-b border-zinc-800">
+        <header className="bg-[#2b2b36] shadow-md shadow-black/20 sticky top-0 z-10 border-b border-zinc-800">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <button
               className="lg:hidden text-gray-400 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"

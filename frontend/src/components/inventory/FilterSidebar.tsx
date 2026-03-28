@@ -50,18 +50,23 @@ export default function FilterSidebar({
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== '');
 
+  const inputClasses = "w-full px-4 py-3 bg-white/[0.03] backdrop-blur-md border border-white/[0.08] rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 hover:bg-white/[0.06] transition-all duration-300";
+
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl border border-zinc-800/50 p-6">
+    <div className="bg-white/[0.02] backdrop-blur-3xl rounded-3xl border border-white/[0.08] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative overflow-hidden group">
+      {/* Decorative top glow */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <SlidersHorizontal className="w-5 h-5 text-red-600" />
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
+          <SlidersHorizontal className="w-5 h-5 text-red-500" />
           Filter
         </h2>
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
-            className="text-sm text-red-600 hover:text-red-500 font-medium transition-colors"
+            className="text-sm text-[#f87171] hover:text-red-300 font-medium transition-colors"
           >
             Zurücksetzen
           </button>
@@ -78,23 +83,23 @@ export default function FilterSidebar({
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Von</label>
+                <label className="block text-xs text-gray-500 mb-1">Von</label>
                 <input
                   type="number"
                   placeholder="0"
                   value={filters.priceFrom || ''}
                   onChange={(e) => onFilterChange('priceFrom', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                  className={inputClasses}
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Bis</label>
+                <label className="block text-xs text-gray-500 mb-1">Bis</label>
                 <input
                   type="number"
                   placeholder="200000"
                   value={filters.priceTo || ''}
                   onChange={(e) => onFilterChange('priceTo', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                  className={inputClasses}
                 />
               </div>
             </div>
@@ -106,7 +111,7 @@ export default function FilterSidebar({
                     onFilterChange('priceFrom', range.min);
                     onFilterChange('priceTo', range.max === 999999 ? undefined : range.max);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-[#0f0f0f] rounded-lg transition-all"
+                  className="w-full text-left px-3 py-2 text-sm text-gray-400 hover:text-[#f87171] hover:bg-red-500/10 rounded-lg transition-all"
                 >
                   {range.label}
                 </button>
@@ -125,7 +130,7 @@ export default function FilterSidebar({
           <select
             value={filters.make || ''}
             onChange={(e) => onFilterChange('make', e.target.value || undefined)}
-            className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+            className={inputClasses}
           >
             <option value="">Alle Marken</option>
             {filterOptions.brands.map(brand => (
@@ -142,23 +147,23 @@ export default function FilterSidebar({
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">Von</label>
               <input
                 type="number"
                 placeholder="2015"
                 value={filters.yearFrom || ''}
                 onChange={(e) => onFilterChange('yearFrom', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                className={inputClasses}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">Bis</label>
               <input
                 type="number"
                 placeholder="2024"
                 value={filters.yearTo || ''}
                 onChange={(e) => onFilterChange('yearTo', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -172,23 +177,23 @@ export default function FilterSidebar({
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">Von</label>
               <input
                 type="number"
                 placeholder="0"
                 value={filters.mileageFrom || ''}
                 onChange={(e) => onFilterChange('mileageFrom', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                className={inputClasses}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">Bis</label>
               <input
                 type="number"
                 placeholder="200000"
                 value={filters.mileageTo || ''}
                 onChange={(e) => onFilterChange('mileageTo', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-[#0f0f0f] border border-zinc-800 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -203,7 +208,7 @@ export default function FilterSidebar({
           <select
             value={filters.fuelType || ''}
             onChange={(e) => onFilterChange('fuelType', e.target.value || undefined)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            className={inputClasses}
           >
             <option value="">Alle Kraftstoffarten</option>
             {filterOptions.fuelTypes.map(fuel => (
@@ -221,7 +226,7 @@ export default function FilterSidebar({
           <select
             value={filters.transmission || ''}
             onChange={(e) => onFilterChange('transmission', e.target.value || undefined)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            className={inputClasses}
           >
             <option value="">Alle Getriebe</option>
             {filterOptions.transmissions.map(trans => (
@@ -239,7 +244,7 @@ export default function FilterSidebar({
           <select
             value={filters.bodyType || ''}
             onChange={(e) => onFilterChange('bodyType', e.target.value || undefined)}
-            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+            className={inputClasses}
           >
             <option value="">Alle Fahrzeugtypen</option>
             {filterOptions.bodyTypes.map(body => (
@@ -256,23 +261,23 @@ export default function FilterSidebar({
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">Von</label>
               <input
                 type="number"
                 placeholder="0"
                 value={filters.powerFrom || ''}
                 onChange={(e) => onFilterChange('powerFrom', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className={inputClasses}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">Bis</label>
               <input
                 type="number"
                 placeholder="500"
                 value={filters.powerTo || ''}
                 onChange={(e) => onFilterChange('powerTo', e.target.value ? parseInt(e.target.value) : undefined)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className={inputClasses}
               />
             </div>
           </div>
@@ -292,22 +297,22 @@ interface FilterSectionProps {
 
 function FilterSection({ title, isExpanded, onToggle, count, children }: FilterSectionProps) {
   return (
-    <div className="border-b border-zinc-800 pb-4">
+    <div className="border-b border-white/[0.06] pb-4">
       <button
         onClick={onToggle}
-        className="flex items-center justify-between w-full text-left focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-2 -m-2"
+        className="flex items-center justify-between w-full text-left focus:outline-none focus:ring-2 focus:ring-[#ef4444] rounded p-2 -m-2"
         aria-expanded={isExpanded}
       >
-        <span className="text-sm font-semibold text-white">
+        <span className="text-sm font-semibold text-gray-200">
           {title}
           {count !== undefined && count > 0 && (
-            <span className="text-xs text-gray-400 font-normal ml-2">({count})</span>
+            <span className="text-xs text-gray-500 font-normal ml-2">({count})</span>
           )}
         </span>
         {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
+          <ChevronUp className="w-4 h-4 text-gray-500" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+          <ChevronDown className="w-4 h-4 text-gray-500" />
         )}
       </button>
       {isExpanded && (

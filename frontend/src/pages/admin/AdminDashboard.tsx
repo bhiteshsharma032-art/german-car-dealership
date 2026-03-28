@@ -87,10 +87,10 @@ export default function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 border-l-4 border-red-500">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Car className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-red-100 rounded-lg">
+                <Car className="h-6 w-6 text-red-600" />
               </div>
               <TrendingUp className="h-5 w-5 text-green-500" />
             </div>
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
             <p className="text-3xl font-bold text-white">{stats.totalCars}</p>
           </div>
 
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 border-l-4 border-amber-500">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 border-l-4 border-amber-500">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-amber-100 rounded-lg">
                 <Star className="h-6 w-6 text-amber-600" />
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             <p className="text-3xl font-bold text-white">{stats.exclusiveDeals}</p>
           </div>
 
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 border-l-4 border-green-500">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-green-100 rounded-lg">
                 <Euro className="h-6 w-6 text-green-600" />
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
             <p className="text-3xl font-bold text-white">{formatPrice(stats.avgPrice)}</p>
           </div>
 
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 border-l-4 border-purple-500">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 border-l-4 border-purple-500">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Plus className="h-6 w-6 text-purple-600" />
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Inventory by Brand */}
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-bold mb-6 text-white">Bestand nach Marke</h2>
             <div className="space-y-4">
               {Object.entries(stats.byBrand)
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Price Distribution */}
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-bold mb-6 text-white">Preisverteilung</h2>
             <div className="space-y-4">
               {Object.entries(stats.priceRanges).map(([range, count]) => {
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6">
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-bold mb-4 text-white">Schnellaktionen</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
             </Link>
             <Link
               to="/admin/fahrzeuge"
-              className="flex items-center justify-center gap-3 px-6 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              className="flex items-center justify-center gap-3 px-6 py-4 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-md"
             >
               <Car className="h-5 w-5" />
               Alle Fahrzeuge verwalten
@@ -218,7 +218,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-[#1a1a1a] rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm overflow-hidden">
           <div className="p-6 border-b">
             <h2 className="text-xl font-bold text-white">Zuletzt hinzugefügt</h2>
           </div>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-[#1a1a1a] divide-y divide-gray-200">
+              <tbody className="bg-[#2b2b36] divide-y divide-gray-200">
                 {recentCars.map((car) => (
                   <tr key={car.id} className="hover:bg-zinc-900 border border-zinc-800">
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/admin/fahrzeuge/${car.id}/bearbeiten`}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
+                        className="text-red-600 hover:text-red-900 mr-4"
                       >
                         <Edit className="h-5 w-5 inline" />
                       </Link>
@@ -297,12 +297,12 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-blue-900 mb-1">Lange im Bestand</h3>
-                <p className="text-sm text-blue-800">
+                <h3 className="font-semibold text-red-900 mb-1">Lange im Bestand</h3>
+                <p className="text-sm text-red-800">
                   2 Fahrzeuge sind über 1 Jahr im Bestand
                 </p>
               </div>

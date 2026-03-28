@@ -13,14 +13,14 @@ export default function AdminCarAdd() {
         <div className="flex items-center gap-4">
           <Link
             to="/admin/fahrzeuge"
-            className="p-2 hover:bg-[#0a0a0a] rounded-lg transition-colors"
+            className="p-2 hover:bg-[#1a1a20] rounded-lg transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <h1 className="text-3xl font-bold text-white">Neues Fahrzeug hinzufügen</h1>
         </div>
 
-        <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-8">
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm p-8">
           <div className="max-w-4xl mx-auto">
             {/* Section: Grundinformationen */}
             <div className="mb-8">

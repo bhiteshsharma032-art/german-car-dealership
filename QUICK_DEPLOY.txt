@@ -1,0 +1,73 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║   🚀 NORDHESSEN AUTOMOBILE - VERCEL DEPLOYMENT              ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────┐
+│  STEP 1: DEPLOY                                              │
+└──────────────────────────────────────────────────────────────┘
+
+   1. Go to: https://vercel.com/new
+   2. Import your Git repository
+   3. Click "Deploy"
+   4. Wait 2-3 minutes ⏱️
+
+┌──────────────────────────────────────────────────────────────┐
+│  STEP 2: ADD ENVIRONMENT VARIABLES                           │
+└──────────────────────────────────────────────────────────────┘
+
+   Go to: Project Settings → Environment Variables
+
+   Copy & paste these:
+
+   MOBILEDE_API_USERNAME=dlr_dimitriosmikhovsky
+   MOBILEDE_API_PASSWORD=kovoExT0mG3Y
+   MOBILEDE_CUSTOMER_ID=712285
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=dealer2024
+   JWT_SECRET=change-this-to-random-string
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-gmail-app-password
+   CONTACT_EMAIL=info@nordhessen-automobile.de
+   NODE_ENV=production
+
+   Then click "Redeploy" 🔄
+
+┌──────────────────────────────────────────────────────────────┐
+│  STEP 3: TEST YOUR SITE                                      │
+└──────────────────────────────────────────────────────────────┘
+
+   Visit: https://your-project.vercel.app
+
+   Test these pages:
+   ✓ Homepage
+   ✓ /fahrzeuge (vehicles)
+   ✓ /kontakt (contact)
+   ✓ /api/health (API)
+
+┌──────────────────────────────────────────────────────────────┐
+│  OPTIONAL: ADD CUSTOM DOMAIN                                 │
+└──────────────────────────────────────────────────────────────┘
+
+   1. Settings → Domains
+   2. Add: nordhessen-automobile.de
+   3. Follow DNS instructions
+   4. Wait 24-48 hours
+
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║   ✅ DONE! Your site is live!                               ║
+║                                                              ║
+║   📚 For detailed guide, see: VERCEL_DEPLOYMENT_GUIDE.md    ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+TOTAL TIME: ~5 minutes ⚡
+
+NEED HELP? Check these files:
+  • DEPLOY_NOW.md
+  • VERCEL_DEPLOYMENT_GUIDE.md
+  • DEPLOYMENT_SUMMARY.md

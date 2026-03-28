@@ -11,6 +11,7 @@ import adminRouter from './routes/admin';
 import inventoryRouter from './routes/inventory';
 import mobileDeRouter from './routes/mobilede';
 import tradeInsRouter from './routes/tradeIns';
+import contactRouter from './routes/contact';
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/inventory', inventoryRouter);     // Mobile.de Live Inventory (ONLY SOURCE)
 app.use('/api/mobilede', mobileDeRouter);       // Mobile.de API testing
 app.use('/api/trade-ins', tradeInsRouter);
+app.use('/api/contact', contactRouter);         // Contact and financing forms
 
 
 // Error handling middleware (must be last)

@@ -19,7 +19,7 @@ export default function AdminCarEdit() {
 
         <h1 className="text-3xl font-bold mb-8">Fahrzeug bearbeiten (ID: {id})</h1>
 
-        <div className="bg-[#1a1a1a] rounded-lg shadow p-6">
+        <div className="bg-[#2b2b36] rounded-lg shadow p-6">
           <p className="text-gray-400">Formular wird implementiert...</p>
         </div>
       </div>

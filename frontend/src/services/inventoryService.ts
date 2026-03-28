@@ -87,8 +87,24 @@ export interface InventoryResponse {
 }
 
 class InventoryService {
-  async getInventory(limit: number = 50, params?: SearchParams): Promise<InventoryResponse> {
+  private cache: InventoryResponse | null = null;
+  private lastFetch: number = 0;
+  private CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+  async getInventory(limit: number = 1000, params?: SearchParams): Promise<InventoryResponse> {
     try {
+      const isSimpleQuery = !params || Object.keys(params).length === 0;
+      
+      // Use cache if fetching standard inventory without complex filters
+      if (isSimpleQuery && this.cache && (Date.now() - this.lastFetch < this.CACHE_TTL)) {
+        console.log('⚡ Using cached inventory data from mobile.de');
+        return {
+          ...this.cache,
+          data: this.cache.data.slice(0, limit),
+          limit
+        };
+      }
+
       console.log('📡 Fetching inventory from mobile.de API...');
       
       const response = await api.get('/inventory', {
@@ -99,14 +115,22 @@ class InventoryService {
       });
 
       if (response.data.success) {
-        console.log(`✅ Loaded ${response.data.data.length} vehicles from mobile.de`);
-        return {
+        console.log(`✅ Loaded ${response.data.data?.length || 0} vehicles from mobile.de`);
+        const result = {
           success: true,
           data: response.data.data || [],
           total: response.data.total,
           page: response.data.page,
           limit: response.data.limit,
         };
+
+        // Cache the successful base response
+        if (isSimpleQuery && result.data.length > 0) {
+          this.cache = result;
+          this.lastFetch = Date.now();
+        }
+
+        return result;
       }
 
       return {
@@ -148,7 +172,7 @@ class InventoryService {
   }
 
   async searchVehicles(params: SearchParams): Promise<InventoryResponse> {
-    return this.getInventory(params.limit || 50, params);
+    return this.getInventory(params.limit || 1000, params);
   }
 }
 

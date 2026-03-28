@@ -161,7 +161,7 @@ export default function Service() {
         <meta name="description" content="Entdecken Sie unsere umfassenden Services: Qualitätsprüfung, Garantie, Finanzierung, Inzahlungnahme und persönlicher Service." />
       </Helmet>
 
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         {/* Hero Section */}
         <Section variant="default" withGlow>
           <SectionContent>
@@ -171,14 +171,14 @@ export default function Service() {
                 Premium Service
               </Badge>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-6">
                 Mehr als nur{' '}
                 <span className="bg-gradient-to-r from-[#dc2626] to-[#ef4444] bg-clip-text text-transparent">
                   ein Autokauf
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-500 mb-8 leading-relaxed">
                 Entdecken Sie unsere umfassenden Services und Vorteile, die Ihren 
                 Fahrzeugkauf zu einem rundum sorglosen Erlebnis machen.
               </p>
@@ -206,8 +206,8 @@ export default function Service() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <Card key={index} variant="elevated" className="p-6 text-center">
-                  <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
-                  <div className="text-gray-400">{stat.label}</div>
+                  <div className="text-4xl font-bold text-gray-100 mb-2">{stat.value}</div>
+                  <div className="text-gray-500">{stat.label}</div>
                 </Card>
               ))}
             </div>
@@ -230,11 +230,11 @@ export default function Service() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mb-4">
                     {service.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-                  <p className="text-gray-400 mb-4">{service.description}</p>
+                  <h3 className="text-xl font-bold text-gray-100 mb-2">{service.title}</h3>
+                  <p className="text-gray-500 mb-4">{service.description}</p>
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-400">
                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                         <span>{feature}</span>
                       </li>
@@ -262,8 +262,8 @@ export default function Service() {
                   <div className="w-16 h-16 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                     {advantage.icon}
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{advantage.title}</h3>
-                  <p className="text-gray-400 text-sm">{advantage.description}</p>
+                  <h3 className="text-lg font-bold text-gray-100 mb-2">{advantage.title}</h3>
+                  <p className="text-gray-500 text-sm">{advantage.description}</p>
                 </Card>
               ))}
             </div>
@@ -284,8 +284,8 @@ export default function Service() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card variant="elevated" className="p-8">
                   <Zap className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-4">Schnell & Unkompliziert</h3>
-                  <p className="text-gray-400 leading-relaxed">
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Schnell & Unkompliziert</h3>
+                  <p className="text-gray-500 leading-relaxed">
                     Von der ersten Anfrage bis zur Fahrzeugübergabe – wir machen den Prozess 
                     so einfach und schnell wie möglich. Keine unnötige Bürokratie, keine 
                     versteckten Kosten.
@@ -294,8 +294,8 @@ export default function Service() {
 
                 <Card variant="elevated" className="p-8">
                   <Shield className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-4">Sicher & Transparent</h3>
-                  <p className="text-gray-400 leading-relaxed">
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Sicher & Transparent</h3>
+                  <p className="text-gray-500 leading-relaxed">
                     Alle Fahrzeuge sind geprüft und dokumentiert. Sie erhalten vollständige 
                     Transparenz über Zustand, Historie und Ausstattung. Keine bösen 
                     Überraschungen.
@@ -304,8 +304,8 @@ export default function Service() {
 
                 <Card variant="elevated" className="p-8">
                   <Users className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-4">Persönlich & Kompetent</h3>
-                  <p className="text-gray-400 leading-relaxed">
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Persönlich & Kompetent</h3>
+                  <p className="text-gray-500 leading-relaxed">
                     Unser erfahrenes Team steht Ihnen mit Rat und Tat zur Seite. Individuelle 
                     Beratung, die auf Ihre Bedürfnisse zugeschnitten ist.
                   </p>
@@ -313,8 +313,8 @@ export default function Service() {
 
                 <Card variant="elevated" className="p-8">
                   <Award className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-4">Erfahren & Vertrauenswürdig</h3>
-                  <p className="text-gray-400 leading-relaxed">
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Erfahren & Vertrauenswürdig</h3>
+                  <p className="text-gray-500 leading-relaxed">
                     Seit über 15 Jahren sind wir Ihr Partner für Premium-Fahrzeuge. Tausende 
                     zufriedene Kunden sprechen für unsere Qualität und Zuverlässigkeit.
                   </p>
@@ -342,14 +342,14 @@ export default function Service() {
                       <Star key={i} className="w-5 h-5 text-amber-500 fill-current" />
                     ))}
                   </div>
-                  <p className="text-gray-300 mb-4 italic">"{testimonial.text}"</p>
+                  <p className="text-gray-400 mb-4 italic">"{testimonial.text}"</p>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full flex items-center justify-center">
                       <span className="text-white font-bold">{testimonial.name.charAt(0)}</span>
                     </div>
                     <div>
-                      <div className="font-semibold text-white">{testimonial.name}</div>
-                      <div className="text-sm text-gray-400">Verifizierter Kunde</div>
+                      <div className="font-semibold text-gray-100">{testimonial.name}</div>
+                      <div className="text-sm text-gray-500">Verifizierter Kunde</div>
                     </div>
                   </div>
                 </Card>
@@ -363,10 +363,10 @@ export default function Service() {
           <SectionContent>
             <div className="max-w-4xl mx-auto text-center">
               <TrendingUp className="w-16 h-16 text-red-500 mx-auto mb-6" />
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
                 Überzeugt? Dann starten Sie jetzt!
               </h2>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-xl text-gray-500 mb-8">
                 Entdecken Sie unsere Premium-Fahrzeuge oder lassen Sie sich persönlich beraten
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

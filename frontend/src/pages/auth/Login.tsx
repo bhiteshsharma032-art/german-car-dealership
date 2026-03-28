@@ -50,7 +50,7 @@ export default function Login() {
           </div>
 
           {/* Login Card */}
-          <div className="bg-[#1a1a1a] rounded-2xl shadow-xl p-8">
+          <div className="bg-[#2b2b36] rounded-2xl shadow-xl p-8">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
               <p className="mt-2 text-gray-400">Sign in to your account</p>
@@ -144,7 +144,7 @@ export default function Login() {
                   <div className="w-full border-t border-zinc-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#1a1a1a] text-gray-500">Don't have an account?</span>
+                  <span className="px-2 bg-[#2b2b36] text-gray-500">Don't have an account?</span>
                 </div>
               </div>
             </div>
@@ -153,7 +153,7 @@ export default function Login() {
             <div className="mt-6">
               <Link
                 to="/signup"
-                className="w-full flex justify-center py-3 px-4 border-2 border-zinc-700 rounded-lg shadow-sm text-sm font-medium text-gray-300 bg-[#1a1a1a] hover:bg-zinc-900 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition-colors"
+                className="w-full flex justify-center py-3 px-4 border-2 border-zinc-700 rounded-lg shadow-sm text-sm font-medium text-gray-300 bg-[#2b2b36] hover:bg-zinc-900 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition-colors"
               >
                 Create New Account
               </Link>

@@ -100,7 +100,7 @@ export const carService = {
       console.log('🚗 CarService: Fetching LIVE mobile.de inventory (NO MOCK DATA)');
       
       // Use mobile.de inventory service ONLY
-      const response = await inventoryService.getInventory(filters?.limit || 50);
+      const response = await inventoryService.getInventory(filters?.limit || 1000);
       
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch cars from mobile.de');

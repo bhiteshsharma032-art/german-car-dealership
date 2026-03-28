@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,7 +16,7 @@ import {
   Shield,
   Phone,
   Mail,
-  MessageCircle,
+
   MapPin,
   CheckCircle,
   Heart,
@@ -83,27 +84,27 @@ export default function CarDetail() {
     }
   };
 
-  const estimatedMonthly = vehicle ? Math.round((vehicle.price * 0.02) / 12) : 0;
+
 
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
-            <div className="h-8 w-64 bg-zinc-800 rounded mb-8"></div>
+            <div className="h-8 w-64 bg-white/[0.05] rounded mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <div className="aspect-video bg-zinc-800 rounded-xl mb-4"></div>
+                <div className="aspect-video bg-white/[0.05] rounded-3xl mb-4"></div>
                 <div className="grid grid-cols-4 gap-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="aspect-video bg-zinc-800 rounded-lg"></div>
+                    <div key={i} className="aspect-video bg-white/[0.05] rounded-xl"></div>
                   ))}
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="h-12 bg-zinc-800 rounded"></div>
-                <div className="h-32 bg-zinc-800 rounded"></div>
+                <div className="h-12 bg-white/[0.05] rounded-xl"></div>
+                <div className="h-32 bg-white/[0.05] rounded-2xl"></div>
               </div>
             </div>
           </div>
@@ -115,19 +116,19 @@ export default function CarDetail() {
   // Error State
   if (error || !vehicle) {
     return (
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <Card variant="elevated" className="max-w-2xl mx-auto p-8 text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">Fahrzeug nicht gefunden</h2>
-            <p className="text-gray-400 mb-6">
+          <Card variant="elevated" className="max-w-2xl mx-auto p-10 text-center border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-6" />
+            <h2 className="text-3xl font-display font-bold text-gray-100 mb-3">Fahrzeug nicht gefunden</h2>
+            <p className="text-gray-400 mb-8 font-light">
               Das gesuchte Fahrzeug ist nicht verfügbar oder wurde bereits verkauft.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button onClick={() => navigate('/fahrzeuge')}>
+              <Button onClick={() => navigate('/fahrzeuge')} className="bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
                 Zur Fahrzeugübersicht
               </Button>
-              <Button variant="secondary" onClick={() => navigate('/kontakt')}>
+              <Button variant="secondary" onClick={() => navigate('/kontakt')} className="bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1] text-gray-200 rounded-xl">
                 Kontakt aufnehmen
               </Button>
             </div>
@@ -144,19 +145,19 @@ export default function CarDetail() {
         <meta name="description" content={vehicle.description} />
       </Helmet>
 
-      <div className="min-h-screen bg-[#171717] pt-20">
+      <div className="min-h-screen bg-[#1a1a1f] pt-20">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center gap-2 text-sm text-gray-400">
-            <Link to="/" className="hover:text-white transition-colors">
+          <nav className="flex items-center gap-2 text-sm text-gray-500">
+            <Link to="/" className="hover:text-red-400 transition-colors">
               Startseite
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <Link to="/fahrzeuge" className="hover:text-white transition-colors">
+            <Link to="/fahrzeuge" className="hover:text-red-400 transition-colors">
               Fahrzeuge
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-white">{vehicle.brand} {vehicle.model}</span>
+            <span className="text-gray-100">{vehicle.brand} {vehicle.model}</span>
           </nav>
         </div>
 
@@ -165,44 +166,51 @@ export default function CarDetail() {
             {/* Left Column - Gallery & Details */}
             <div className="lg:col-span-2 space-y-8">
               {/* Image Gallery */}
-              <div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                 {/* Main Image */}
-                <div className="relative aspect-video bg-zinc-900 rounded-xl overflow-hidden mb-4 group">
+                <div className="relative aspect-video bg-white/[0.02] border border-white/[0.06] rounded-3xl overflow-hidden mb-4 group shadow-glass">
                   {vehicle.images && vehicle.images.length > 0 ? (
                     <>
-                      <img
-                        src={vehicle.images[selectedImageIndex]}
-                        alt={`${vehicle.brand} ${vehicle.model}`}
-                        className="w-full h-full object-cover cursor-zoom-in"
-                        onClick={() => setShowLightbox(true)}
-                      />
+                      <AnimatePresence mode="wait">
+                        <motion.img
+                          key={selectedImageIndex}
+                          src={vehicle.images[selectedImageIndex]}
+                          alt={`${vehicle.brand} ${vehicle.model}`}
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-full h-full object-contain cursor-zoom-in bg-black/60 backdrop-blur-sm"
+                          onClick={() => setShowLightbox(true)}
+                        />
+                      </AnimatePresence>
                       
                       {/* Navigation Arrows */}
                       {vehicle.images.length > 1 && (
                         <>
                           <button
                             onClick={prevImage}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                            className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/60 hover:scale-110 border border-white/10 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
                           >
-                            <ChevronLeft className="w-6 h-6 text-white" />
+                            <ChevronLeft className="w-8 h-8 text-white mr-1" />
                           </button>
                           <button
                             onClick={nextImage}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100"
+                            className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/60 hover:scale-110 border border-white/10 transition-all opacity-0 group-hover:opacity-100 shadow-xl"
                           >
-                            <ChevronRight className="w-6 h-6 text-white" />
+                            <ChevronRight className="w-8 h-8 text-white ml-1" />
                           </button>
                         </>
                       )}
 
                       {/* Image Counter */}
-                      <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 backdrop-blur-sm rounded-lg text-white text-sm">
+                      <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/50 backdrop-blur-md rounded-xl text-white text-sm font-medium tracking-widest border border-white/10 shadow-lg">
                         {selectedImageIndex + 1} / {vehicle.images.length}
                       </div>
                     </>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="w-24 h-24 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-24 h-24 text-gray-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 17H4C3.44772 17 3 16.5523 3 16V12L5.4 6.8C5.55 6.3 6 6 6.5 6H17.5C18 6 18.45 6.3 18.6 6.8L21 12V16C21 16.5523 20.5523 17 20 17H19M5 17C5 18.1046 5.89543 19 7 19C8.10457 19 9 18.1046 9 17M5 17C5 15.8954 5.89543 15 7 15C8.10457 15 9 15.8954 9 17M19 17C19 18.1046 18.1046 19 17 19C15.8954 19 15 18.1046 15 17M19 17C19 15.8954 18.1046 15 17 15C15.8954 15 15 15.8954 15 17M9 17H15" />
                       </svg>
                     </div>
@@ -211,16 +219,16 @@ export default function CarDetail() {
 
                 {/* Thumbnail Grid */}
                 {vehicle.images && vehicle.images.length > 1 && (
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
                     {vehicle.images.map((image, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
                         className={cn(
-                          'aspect-video rounded-lg overflow-hidden border-2 transition-all',
+                          'aspect-video rounded-xl overflow-hidden border-2 transition-all hover:scale-105',
                           selectedImageIndex === index
-                            ? 'border-red-500'
-                            : 'border-transparent hover:border-zinc-600'
+                            ? 'border-[#ef4444] shadow-glow-red'
+                            : 'border-transparent opacity-60 hover:opacity-100 hover:border-white/20'
                         )}
                       >
                         <img
@@ -232,31 +240,31 @@ export default function CarDetail() {
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Vehicle Title & Badges */}
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                      {vehicle.brand} {vehicle.model}
+                    <h1 className="text-3xl md:text-5xl font-display font-bold text-gray-100 mb-2 tracking-tight">
+                      {vehicle.brand} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">{vehicle.model}</span>
                     </h1>
-                    <p className="text-lg text-gray-400">{vehicle.description}</p>
+                    <p className="text-lg text-gray-400 font-light">{vehicle.description}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={() => setIsFavorite(!isFavorite)}
-                      className="w-12 h-12 bg-[#1a1a1a] rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-700"
+                      className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass"
                     >
                       <Heart
                         className={cn(
                           'w-5 h-5 transition-colors',
-                          isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-400'
+                          isFavorite ? 'text-red-500 fill-[#ef4444] drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'text-gray-400'
                         )}
                       />
                     </button>
-                    <button className="w-12 h-12 bg-[#1a1a1a] rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-all border border-zinc-700">
-                      <Share2 className="w-5 h-5 text-gray-400" />
+                    <button className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass">
+                      <Share2 className="w-5 h-5 text-gray-400 hover:text-white" />
                     </button>
                   </div>
                 </div>
@@ -282,7 +290,7 @@ export default function CarDetail() {
               {/* Key Facts Grid */}
               <Card variant="elevated">
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-white mb-6">Fahrzeugdaten</h2>
+                  <h2 className="text-xl font-bold text-gray-100 mb-6">Fahrzeugdaten</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     <FactItem
                       icon={<Calendar className="w-5 h-5" />}
@@ -337,8 +345,8 @@ export default function CarDetail() {
               {vehicle.description && (
                 <Card variant="elevated">
                   <div className="p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">Beschreibung</h2>
-                    <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                    <h2 className="text-xl font-bold text-gray-100 mb-4">Beschreibung</h2>
+                    <p className="text-gray-400 leading-relaxed whitespace-pre-line">
                       {vehicle.description}
                     </p>
                   </div>
@@ -349,10 +357,10 @@ export default function CarDetail() {
               {vehicle.features && vehicle.features.length > 0 && (
                 <Card variant="elevated">
                   <div className="p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">Ausstattung</h2>
+                    <h2 className="text-xl font-bold text-gray-100 mb-4">Ausstattung</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {vehicle.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2 text-gray-300">
+                        <div key={index} className="flex items-center gap-2 text-gray-400">
                           <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                           <span>{feature}</span>
                         </div>
@@ -366,85 +374,68 @@ export default function CarDetail() {
             {/* Right Column - Sticky CTA */}
             <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
               {/* Price Card */}
-              <Card variant="elevated">
-                <div className="p-6">
-                  <div className="text-sm text-gray-400 mb-1">Preis</div>
-                  <div className="text-4xl font-bold text-white mb-4">
+              <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 shadow-glass relative overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/10 rounded-full blur-3xl group-hover:bg-red-500/20 transition-all duration-500" />
+                <div className="relative z-10">
+                  <div className="text-sm text-gray-400 mb-2 font-medium tracking-wide uppercase">Preis</div>
+                  <div className="text-5xl font-display font-bold text-gray-100 mb-8 tracking-tight">
                     {vehicle.price.toLocaleString('de-DE')} €
                   </div>
-                  <div className="text-sm text-gray-400 mb-6">
-                    ab <span className="text-white font-semibold text-lg">{estimatedMonthly} €/Monat</span>
-                  </div>
 
-                  <div className="space-y-3">
-                    <Button size="lg" className="w-full">
-                      <Phone className="w-5 h-5" />
-                      Jetzt anrufen
-                    </Button>
-                    <Button variant="secondary" size="lg" className="w-full">
-                      <Mail className="w-5 h-5" />
-                      Anfrage senden
-                    </Button>
-                    <Button variant="outline" size="lg" className="w-full">
-                      <MessageCircle className="w-5 h-5" />
-                      WhatsApp
-                    </Button>
+                  <div className="space-y-4">
+                    <a href="tel:+4956193004649" className="block w-full border-0 p-0 m-0">
+                      <Button size="lg" className="w-full h-14 bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+                        <Phone className="w-5 h-5 pointer-events-none" />
+                        Jetzt anrufen
+                      </Button>
+                    </a>
                   </div>
                 </div>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card variant="elevated">
-                <div className="p-6 space-y-3">
-                  <h3 className="font-semibold text-white mb-4">Weitere Optionen</h3>
-                  <button className="w-full text-left px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-white transition-all">
-                    💰 Finanzierung anfragen
-                  </button>
-                  <button className="w-full text-left px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-white transition-all">
-                    🔄 Inzahlungnahme anfragen
-                  </button>
-                </div>
-              </Card>
+              </div>
 
               {/* Trust Badges */}
-              <Card variant="elevated">
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-300">Geprüfte Qualität</span>
+              <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-6 shadow-glass hover:border-white/[0.15] transition-all duration-500">
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                      <CheckCircle className="w-5 h-5 text-red-500" />
+                    </div>
+                    <span className="text-sm text-gray-300 font-medium">Geprüfte Qualität</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-300">Garantie inklusive</span>
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                      <Shield className="w-5 h-5 text-red-500" />
+                    </div>
+                    <span className="text-sm text-gray-300 font-medium">Garantie inklusive</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span className="text-sm text-gray-300">Faire Preise</span>
+                  <div className="flex items-center gap-4 group cursor-default">
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                      <CheckCircle className="w-5 h-5 text-red-500" />
+                    </div>
+                    <span className="text-sm text-gray-300 font-medium">Faire Preise</span>
                   </div>
                 </div>
-              </Card>
+              </div>
 
               {/* Location */}
-              <Card variant="elevated">
-                <div className="p-6">
-                  <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-red-500" />
-                    Standort
-                  </h3>
-                  <p className="text-gray-300 text-sm mb-2">Nordhessen-Automobile Seidler & Osmikhovsky GbR</p>
-                  <p className="text-gray-400 text-sm">
-                    Sandershäuser Straße 87a<br />
-                    34123 Kassel
-                  </p>
-                </div>
-              </Card>
+              <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-6 shadow-glass">
+                <h3 className="font-display font-semibold text-gray-100 mb-4 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-red-500" />
+                  Standort
+                </h3>
+                <p className="text-gray-300 text-sm mb-2 font-medium">Nordhessen-Automobile Seidler & Osmikhovsky GbR</p>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  Sandershäuser Straße 87a<br />
+                  34123 Kassel
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Similar Vehicles */}
           {similarVehicles.length > 0 && (
             <div className="mt-16">
-              <h2 className="text-3xl font-bold text-white mb-8">Ähnliche Fahrzeuge</h2>
+              <h2 className="text-3xl font-bold text-gray-100 mb-8">Ähnliche Fahrzeuge</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {similarVehicles.map((car) => (
                   <VehicleCard
@@ -477,40 +468,51 @@ export default function CarDetail() {
         </div>
 
         {/* Lightbox */}
-        {showLightbox && vehicle.images && vehicle.images.length > 0 && (
-          <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-            <button
-              onClick={() => setShowLightbox(false)}
-              className="absolute top-4 right-4 w-12 h-12 bg-[#1a1a1a]/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#1a1a1a]/20 transition-all"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
+        <AnimatePresence>
+          {showLightbox && vehicle.images && vehicle.images.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center">
+              <button
+                onClick={() => setShowLightbox(false)}
+                className="absolute top-6 right-6 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
 
-            <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#1a1a1a]/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#1a1a1a]/20 transition-all"
-            >
-              <ChevronLeft className="w-6 h-6 text-white" />
-            </button>
+              {vehicle.images.length > 1 && (
+                <button
+                  onClick={prevImage}
+                  className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                >
+                  <ChevronLeft className="w-8 h-8 text-white mr-1" />
+                </button>
+              )}
 
-            <img
-              src={vehicle.images[selectedImageIndex]}
-              alt={`${vehicle.brand} ${vehicle.model}`}
-              className="max-w-[90vw] max-h-[90vh] object-contain"
-            />
+              <motion.img
+                key={selectedImageIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                src={vehicle.images[selectedImageIndex]}
+                alt={`${vehicle.brand} ${vehicle.model}`}
+                className="max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl"
+              />
 
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#1a1a1a]/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#1a1a1a]/20 transition-all"
-            >
-              <ChevronRight className="w-6 h-6 text-white" />
-            </button>
+              {vehicle.images.length > 1 && (
+                <button
+                  onClick={nextImage}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                >
+                  <ChevronRight className="w-8 h-8 text-white ml-1" />
+                </button>
+              )}
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-[#1a1a1a]/10 backdrop-blur-sm rounded-lg text-white">
-              {selectedImageIndex + 1} / {vehicle.images.length}
-            </div>
-          </div>
-        )}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl text-white font-medium tracking-widest border border-white/20">
+                {selectedImageIndex + 1} / {vehicle.images.length}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );
@@ -525,11 +527,11 @@ interface FactItemProps {
 function FactItem({ icon, label, value }: FactItemProps) {
   return (
     <div>
-      <div className="flex items-center gap-2 text-gray-400 mb-1">
+      <div className="flex items-center gap-2 text-gray-500 mb-1">
         {icon}
         <span className="text-sm">{label}</span>
       </div>
-      <div className="text-white font-semibold">{value}</div>
+      <div className="text-gray-100 font-semibold">{value}</div>
     </div>
   );
 }

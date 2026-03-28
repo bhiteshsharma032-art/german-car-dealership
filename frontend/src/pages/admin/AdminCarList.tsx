@@ -157,7 +157,7 @@ export default function AdminCarList() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-[#1a1a1a] rounded-lg shadow-sm p-6 space-y-4">
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
@@ -192,8 +192,8 @@ export default function AdminCarList() {
                 className={cn(
                   'flex-1 px-4 py-2 rounded-lg font-medium transition-colors',
                   statusFilter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-[#0a0a0a] text-gray-300 hover:bg-zinc-800'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-[#1a1a20] text-gray-300 hover:bg-zinc-800'
                 )}
               >
                 Alle ({cars.length})
@@ -204,7 +204,7 @@ export default function AdminCarList() {
                   'flex-1 px-4 py-2 rounded-lg font-medium transition-colors',
                   statusFilter === 'exclusive'
                     ? 'bg-amber-600 text-white'
-                    : 'bg-[#0a0a0a] text-gray-300 hover:bg-zinc-800'
+                    : 'bg-[#1a1a20] text-gray-300 hover:bg-zinc-800'
                 )}
               >
                 Exklusiv ({cars.filter((c) => c.isExclusive).length})
@@ -215,8 +215,8 @@ export default function AdminCarList() {
 
         {/* Bulk Actions */}
         {selectedCars.size > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
-            <span className="text-blue-900 font-medium">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+            <span className="text-red-900 font-medium">
               {selectedCars.size} ausgewählt
             </span>
             <button
@@ -235,7 +235,7 @@ export default function AdminCarList() {
             <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
           </div>
         ) : (
-          <div className="bg-[#1a1a1a] rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-[#2b2b36] rounded-lg shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-zinc-900 border border-zinc-800">
@@ -274,7 +274,7 @@ export default function AdminCarList() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-[#1a1a1a] divide-y divide-gray-200">
+                <tbody className="bg-[#2b2b36] divide-y divide-gray-200">
                   {paginatedCars.map((car) => (
                     <tr key={car.id} className="hover:bg-zinc-900 border border-zinc-800">
                       <td className="px-6 py-4">
@@ -308,8 +308,8 @@ export default function AdminCarList() {
                             car.condition === 'Neu'
                               ? 'bg-green-100 text-green-800'
                               : car.condition === 'Jahreswagen'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-[#0a0a0a] text-gray-200'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-[#1a1a20] text-gray-200'
                           )}
                         >
                           {car.condition}
@@ -328,7 +328,7 @@ export default function AdminCarList() {
                           <Link
                             to={`/fahrzeug/${car.id}`}
                             target="_blank"
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Ansehen"
                           >
                             <Eye className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function AdminCarList() {
                   <button
                     onClick={() => setPage(page - 1)}
                     disabled={page === 1}
-                    className="p-2 rounded-lg border hover:bg-[#0a0a0a] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg border hover:bg-[#1a1a20] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
@@ -379,7 +379,7 @@ export default function AdminCarList() {
                         'px-4 py-2 rounded-lg font-medium transition-colors',
                         page === i + 1
                           ? 'bg-amber-600 text-white'
-                          : 'border hover:bg-[#0a0a0a]'
+                          : 'border hover:bg-[#1a1a20]'
                       )}
                     >
                       {i + 1}
@@ -388,7 +388,7 @@ export default function AdminCarList() {
                   <button
                     onClick={() => setPage(page + 1)}
                     disabled={page === totalPages}
-                    className="p-2 rounded-lg border hover:bg-[#0a0a0a] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg border hover:bg-[#1a1a20] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
@@ -404,10 +404,10 @@ export default function AdminCarList() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4">
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+              className="fixed inset-0 bg-[#1e1e24] bg-opacity-50 transition-opacity"
               onClick={() => setDeleteModalOpen(false)}
             />
-            <div className="relative bg-[#1a1a1a] rounded-lg max-w-md w-full p-6 shadow-xl">
+            <div className="relative bg-[#2b2b36] rounded-lg max-w-md w-full p-6 shadow-xl">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 p-3 bg-red-100 rounded-full">
                   <Trash2 className="h-6 w-6 text-red-600" />
@@ -440,7 +440,7 @@ export default function AdminCarList() {
                 </div>
                 <button
                   onClick={() => setDeleteModalOpen(false)}
-                  className="flex-shrink-0 p-1 hover:bg-[#0a0a0a] rounded transition-colors"
+                  className="flex-shrink-0 p-1 hover:bg-[#1a1a20] rounded transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>

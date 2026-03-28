@@ -15,10 +15,10 @@ export function LazyImage({ src, alt, className, fallback }: LazyImageProps) {
   const defaultFallback = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&auto=format&fit=crop';
 
   return (
-    <div className={cn('relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200', className)}>
+    <div className={cn('relative overflow-hidden bg-gradient-to-br from-[#22222a] to-[#2a2a34]', className)}>
       {/* Loading shimmer */}
       {!loaded && !error && (
-        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:400%_100%]" />
+        <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-[#2a2a34] via-[#22222a] to-[#2a2a34] bg-[length:400%_100%]" />
       )}
       
       {/* Actual image */}

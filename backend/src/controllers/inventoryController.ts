@@ -185,9 +185,9 @@ function getFirstImage(images: any): string | null {
     const representations = Array.isArray(firstImage['ad:representation']) ? 
                            firstImage['ad:representation'] : [firstImage['ad:representation']];
     
-    // Look for L (Large) size first, then XL, then M, then S
-    const largeImage = representations.find((rep: any) => rep.$?.size === 'L') ||
-                      representations.find((rep: any) => rep.$?.size === 'XL') ||
+    // Look for XL (Extra Large) size first, then L, then M, then S
+    const largeImage = representations.find((rep: any) => rep.$?.size === 'XL') ||
+                      representations.find((rep: any) => rep.$?.size === 'L') ||
                       representations.find((rep: any) => rep.$?.size === 'M') ||
                       representations[0];
     
@@ -209,9 +209,9 @@ function getAllImages(images: any): string[] {
       const representations = Array.isArray(image['ad:representation']) ? 
                              image['ad:representation'] : [image['ad:representation']];
       
-      // Get the largest representation for each image (prefer L, then XL, then M, then S)
-      const largeImage = representations.find((rep: any) => rep.$?.size === 'L') ||
-                        representations.find((rep: any) => rep.$?.size === 'XL') ||
+      // Get the largest representation for each image (prefer XL, then L, then M, then S)
+      const largeImage = representations.find((rep: any) => rep.$?.size === 'XL') ||
+                        representations.find((rep: any) => rep.$?.size === 'L') ||
                         representations.find((rep: any) => rep.$?.size === 'M') ||
                         representations[0];
       
@@ -228,6 +228,49 @@ function getAllImages(images: any): string[] {
   });
   
   return allImages;
+}
+
+// Helper to fetch all pages concurrently up to a specified limit
+async function fetchAllMobileDeVehicles(baseParams: Record<string, any>, limit: number = 200) {
+  // Fetch page 1
+  const params = { ...baseParams, 'max-results': 20, 'page.number': 1 };
+  const result = await makeMobileDeRequest('/search', params);
+  
+  if (!result.success) return { success: false, error: result.error };
+
+  const parsed = await parseXMLResponse(result.data);
+  const searchResult = parsed['search:search-result'];
+  const total = parseInt(searchResult['search:total'] || '0');
+  
+  let ads = searchResult['search:ads']?.['ad:ad'] || [];
+  let adsArray = Array.isArray(ads) ? ads : [ads];
+  let vehicles = adsArray.filter((ad: any) => ad).map(transformVehicle);
+
+  const maxVehicles = Math.min(total, limit);
+  const remainingVehicles = maxVehicles - vehicles.length;
+  
+  if (remainingVehicles > 0) {
+    const pagesToFetch = Math.ceil(remainingVehicles / 20);
+    // Fetch sequentially to avoid rate limiting
+    for (let i = 2; i <= pagesToFetch + 1; i++) {
+      const pageParams = { ...baseParams, 'max-results': 20, 'page.number': i };
+      const res = await makeMobileDeRequest('/search', pageParams);
+      
+      if (res.success) {
+        const parsedPage = await parseXMLResponse(res.data);
+        const sr = parsedPage['search:search-result'];
+        const pageAds = sr['search:ads']?.['ad:ad'] || [];
+        const pageAdsArray = Array.isArray(pageAds) ? pageAds : [pageAds];
+        const pageVehicles = pageAdsArray.filter((ad: any) => ad).map(transformVehicle);
+        vehicles = [...vehicles, ...pageVehicles];
+      } else {
+        console.warn(`⚠️ Failed to fetch page ${i} from mobile.de:`, res.error);
+        break; // Stop fetching if we hit a rate limit or error
+      }
+    }
+  }
+
+  return { success: true, vehicles: vehicles.slice(0, limit), total };
 }
 
 export class InventoryController {
@@ -282,27 +325,19 @@ export class InventoryController {
     try {
       console.log('🚗 Fetching inventory from mobile.de...');
       
-      const pageSize = parseInt(req.query.pageSize as string) || 50;
-      const result = await makeMobileDeRequest('/search', {
-        customerNumber: MOBILE_DE_CONFIG.customerId,
-        pageSize: pageSize
-      });
+      const pageSize = parseInt((req.query.pageSize || req.query.limit) as string) || 200;
       
+      const result = await fetchAllMobileDeVehicles({
+        customerNumber: MOBILE_DE_CONFIG.customerId
+      }, pageSize);
+
       if (result.success) {
-        const parsed = await parseXMLResponse(result.data);
-        const searchResult = parsed['search:search-result'];
-        const ads = searchResult['search:ads']?.['ad:ad'] || [];
-        
-        // Handle both single ad and array of ads
-        const adsArray = Array.isArray(ads) ? ads : [ads];
-        const vehicles = adsArray.filter(ad => ad).map(transformVehicle);
-        
         res.json({
           success: true,
-          data: vehicles,
-          total: parseInt(searchResult['search:total'] || '0'),
+          data: result.vehicles,
+          total: result.total,
           customerNumber: MOBILE_DE_CONFIG.customerId,
-          message: `Successfully fetched ${vehicles.length} vehicles`
+          message: `Successfully fetched ${result.vehicles!.length} vehicles`
         });
       } else {
         res.status(result.error?.status || 500).json({
@@ -332,10 +367,9 @@ export class InventoryController {
   async searchVehicles(req: Request, res: Response) {
     try {
       console.log('🔍 Searching vehicles on mobile.de...');
-      
+      const limit = parseInt((req.query.pageSize || req.query.limit) as string) || 200;
       const searchParams: any = {
-        customerNumber: MOBILE_DE_CONFIG.customerId,
-        pageSize: parseInt(req.query.pageSize as string) || 20
+        customerNumber: MOBILE_DE_CONFIG.customerId
       };
       
       // Add search filters
@@ -344,22 +378,15 @@ export class InventoryController {
       if (req.query.priceFrom) searchParams.priceFrom = req.query.priceFrom;
       if (req.query.priceTo) searchParams.priceTo = req.query.priceTo;
       
-      const result = await makeMobileDeRequest('/search', searchParams);
+      const result = await fetchAllMobileDeVehicles(searchParams, limit);
       
       if (result.success) {
-        const parsed = await parseXMLResponse(result.data);
-        const searchResult = parsed['search:search-result'];
-        const ads = searchResult['search:ads']?.['ad:ad'] || [];
-        
-        const adsArray = Array.isArray(ads) ? ads : [ads];
-        const vehicles = adsArray.filter(ad => ad).map(transformVehicle);
-        
         res.json({
           success: true,
-          data: vehicles,
-          total: parseInt(searchResult['search:total'] || '0'),
+          data: result.vehicles,
+          total: result.total,
           customerNumber: MOBILE_DE_CONFIG.customerId,
-          searchParams: req.query
+          message: `Successfully fetched ${result.vehicles!.length} vehicles`
         });
       } else {
         res.status(result.error?.status || 500).json({
@@ -367,7 +394,7 @@ export class InventoryController {
           data: [],
           total: 0,
           error: result.error,
-          searchParams: req.query
+          message: 'Failed to fetch search results from mobile.de'
         });
       }
     } catch (error: any) {

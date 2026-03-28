@@ -100,7 +100,7 @@ export default function ChatBot() {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center',
-          'bg-gradient-luxury hover:shadow-xl transform hover:scale-110',
+          'bg-gradient-to-r from-red-600 to-red-500 hover:shadow-xl hover:shadow-red-500/50 transform hover:scale-110',
           'text-white font-semibold',
           isOpen && 'rotate-180'
         )}
@@ -115,10 +115,10 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-80 h-96 bg-black/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 flex flex-col animate-scaleIn">
+        <div className="fixed bottom-24 right-6 z-40 w-80 sm:w-96 h-[500px] bg-[#1a1a1f]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-yellow-500/80 to-amber-600/80 backdrop-blur-sm text-white p-4 rounded-t-2xl flex items-center gap-3 border-b border-white/20">
-            <div className="w-8 h-8 bg-[#1a1a1a]/20 rounded-full flex items-center justify-center">
+          <div className="bg-gradient-to-r from-red-600 to-red-500 text-white p-4 flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <Bot className="h-5 w-5" />
             </div>
             <div>
@@ -138,22 +138,22 @@ export default function ChatBot() {
                 )}
               >
                 {message.sender === 'bot' && (
-                  <div className="w-6 h-6 bg-yellow-500/30 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-yellow-500/50">
-                    <Bot className="h-3 w-3 text-yellow-500" />
+                  <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-red-500/50">
+                    <Bot className="h-3 w-3 text-red-500" />
                   </div>
                 )}
                 <div
                   className={cn(
-                    'max-w-[70%] p-3 rounded-2xl text-sm backdrop-blur-sm',
+                    'max-w-[70%] p-3 rounded-2xl text-sm',
                     message.sender === 'user'
-                      ? 'bg-yellow-500/80 text-white rounded-br-md border border-yellow-400/50'
-                      : 'bg-[#1a1a1a]/10 text-white rounded-bl-md border border-white/20'
+                      ? 'bg-red-500 text-white rounded-br-md'
+                      : 'bg-[#2b2b36] text-white rounded-bl-md border border-white/10'
                   )}
                 >
                   {message.text}
                 </div>
                 {message.sender === 'user' && (
-                  <div className="w-6 h-6 bg-yellow-500/80 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <User className="h-3 w-3 text-white" />
                   </div>
                 )}
@@ -162,11 +162,11 @@ export default function ChatBot() {
             
             {/* Loading indicator */}
             {isLoading && (
-              <div className="flex gap-2 justify-start animate-fadeIn">
-                <div className="w-6 h-6 bg-yellow-500/30 backdrop-blur-sm rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-yellow-500/50">
-                  <Bot className="h-3 w-3 text-yellow-500" />
+              <div className="flex gap-2 justify-start">
+                <div className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-red-500/50">
+                  <Bot className="h-3 w-3 text-red-500" />
                 </div>
-                <div className="bg-[#1a1a1a]/10 backdrop-blur-sm p-3 rounded-2xl rounded-bl-md border border-white/20">
+                <div className="bg-[#2b2b36] p-3 rounded-2xl rounded-bl-md border border-white/10">
                   <div className="flex items-center gap-2 text-white/70">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span className="text-sm">Tippt...</span>
@@ -179,7 +179,7 @@ export default function ChatBot() {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-white/20">
+          <div className="p-4 border-t border-white/10 bg-[#1a1a1f]">
             <div className="flex gap-2">
               <input
                 ref={inputRef}
@@ -188,7 +188,7 @@ export default function ChatBot() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Schreiben Sie Ihre Nachricht..."
-                className="flex-1 px-3 py-2 bg-[#1a1a1a]/10 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-sm text-white placeholder-white/50"
+                className="flex-1 px-4 py-2 bg-[#2b2b36] border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm text-white placeholder-white/50"
                 disabled={isLoading}
               />
               <button
@@ -196,7 +196,7 @@ export default function ChatBot() {
                 disabled={!inputText.trim() || isLoading}
                 className={cn(
                   'w-10 h-10 rounded-xl flex items-center justify-center transition-all',
-                  'bg-yellow-500/80 backdrop-blur-sm text-white hover:bg-yellow-500 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed border border-yellow-400/50'
+                  'bg-red-500 text-white hover:bg-red-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
                 )}
                 aria-label="Nachricht senden"
               >

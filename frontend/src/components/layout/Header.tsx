@@ -1,30 +1,27 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Car, Menu, X, Phone, Mail, Clock, Globe } from 'lucide-react';
+import { Menu, X, Phone, Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const location = useLocation();
   const { language, setLanguage, t } = useLanguage();
 
   const navigation = [
-    { navKey: 'nav.home', href: '/' },
-    { navKey: 'nav.vehicles', href: '/fahrzeuge' },
-    { navKey: 'nav.financing', href: '/finanzierung' },
-    { navKey: 'nav.tradein', href: '/inzahlungnahme' },
-
-
-    { navKey: 'nav.contact', href: '/kontakt' },
+    { label: t('nav.home'), href: '/' },
+    { label: t('nav.vehicles'), href: '/fahrzeuge' },
+    { label: t('nav.history'), href: '/geschichte' },
+    { label: t('nav.about'), href: '/#philosophie' },
   ];
 
-  // Handle scroll for sticky header
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 100);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -32,12 +29,10 @@ export default function Header() {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -53,202 +48,229 @@ export default function Header() {
 
   return (
     <>
-      {/* Top Info Strip - Only on non-home pages */}
-      {!isHome && (
-        <div className="bg-[#0f0f0f] border-b border-zinc-900">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-2 text-xs">
-              <div className="hidden md:flex items-center gap-6 text-gray-400">
-                <a href="tel:+4956193004649" className="flex items-center gap-2 hover:text-red-500 transition-colors">
-                  <Phone className="h-3.5 w-3.5" />
-                  <span>0561 930 04 649</span>
-                </a>
-                <a href="mailto:info@nordhessen-automobile.de" className="flex items-center gap-2 hover:text-red-500 transition-colors">
-                  <Mail className="h-3.5 w-3.5" />
-                  <span>info@nordhessen-automobile.de</span>
-                </a>
-              </div>
-              <div className="flex items-center gap-6 text-gray-400 ml-auto">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>Mo-Fr: 9:00-18:00 Uhr</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Main Header */}
-      <header
+      <motion.header
+        initial={false}
+        animate={{
+          backdropFilter: scrolled ? 'blur(30px) saturate(200%)' : 'blur(0px)',
+        }}
         className={cn(
-          'w-full top-0 z-50 transition-all duration-300',
-          isHome ? 'absolute' : 'sticky',
-          scrolled && !isHome ? 'bg-[#1a1a1a]/95 backdrop-blur-xl shadow-lg' : ''
+          'w-full sticky top-0 z-50 transition-all duration-500',
+          scrolled
+            ? 'bg-black/80 backdrop-blur-md shadow-glass border-b border-white/[0.06]'
+            : isHome
+              ? 'bg-black/80 backdrop-blur-md'
+              : 'bg-[#1a1a1f] border-b border-white/[0.04]'
         )}
         style={{
           background: isHome && !scrolled
-            ? 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, transparent 100%)'
-            : !isHome && !scrolled
-            ? '#1a1a1a'
+            ? 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)'
             : undefined,
         }}
       >
-        <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <nav className="container mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
-              <img 
-                src="/logo.jpeg" 
-                alt="Nordhessen Automobile" 
-                className="h-16 w-auto"
-                onError={(e) => {
-                  // Fallback to icon if image not found
-                  e.currentTarget.style.display = 'none';
-                  const parent = e.currentTarget.parentElement;
-                  if (parent && !parent.querySelector('.fallback-icon')) {
-                    const icon = document.createElement('div');
-                    icon.className = 'fallback-icon';
-                    icon.innerHTML = '<svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17H4C3.44772 17 3 16.5523 3 16V12L5.4 6.8C5.55 6.3 6 6 6.5 6H17.5C18 6 18.45 6.3 18.6 6.8L21 12V16C21 16.5523 20.5523 17 20 17H19M5 17C5 18.1046 5.89543 19 7 19C8.10457 19 9 18.1046 9 17M5 17C5 15.8954 5.89543 15 7 15C8.10457 15 9 15.8954 9 17M19 17C19 18.1046 18.1046 19 17 19C15.8954 19 15 18.1046 15 17M19 17C19 15.8954 18.1046 15 17 15C15.8954 15 15 15.8954 15 17M9 17H15"/></svg>';
-                    parent.insertBefore(icon, parent.firstChild);
-                  }
-                }}
-              />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400 group-hover:from-red-500 group-hover:to-red-400 transition-all duration-500 tracking-tight drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                Nordhessen Automobile
-              </span>
+            <Link 
+              to="/" 
+              className="flex items-center group focus:outline-none rounded-xl focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-[#1a1a1f]"
+            >
+              {!logoError ? (
+                <img
+                  src="/logo.png"
+                  alt="Nordhessen Automobile"
+                  className="h-10 md:h-12 w-auto scale-150 origin-left ml-4 transition-transform duration-300 group-hover:scale-[1.6]"
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center text-white font-bold text-lg ml-4">
+                  N
+                </div>
+              )}
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+            <div className="hidden md:flex items-center space-x-1">
               {navigation.map((item) => {
                 const active = isActive(item.href);
                 return (
-                  <Link
-                    key={item.navKey}
-                    to={item.href}
-                    className="relative px-3 py-2 text-sm font-medium transition-colors group rounded-md"
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="relative px-4 py-2.5 text-sm font-medium transition-all duration-300 rounded-xl group"
                   >
                     <span className={cn(
                       'relative z-10 transition-colors duration-300',
-                      active ? 'text-white font-semibold flex items-center' : 'text-gray-300 group-hover:text-red-400'
+                      active ? 'text-white' : 'text-gray-400 group-hover:text-white'
                     )}>
-                      {active && <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2 shadow-[0_0_8px_rgba(220,38,38,0.8)]" />}
-                      <span>{t(item.navKey)}</span>
+                      {item.label}
                     </span>
-                    
+
                     {active && (
                       <motion.div
                         layoutId="header-active-tab"
-                        className="absolute inset-0 bg-red-600/10 border-b-2 border-red-600 z-0 rounded-t-sm"
+                        className="absolute inset-0 z-0 rounded-xl"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.08))',
+                          border: '1px solid rgba(239,68,68,0.3)',
+                          boxShadow: '0 0 15px rgba(239,68,68,0.15)',
+                        }}
                         initial={false}
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
-                  </Link>
+
+                    {!active && (
+                      <div className="absolute inset-0 rounded-xl bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    )}
+                  </a>
                 );
               })}
-              
-              {/* Language Toggle */}
-              <button
-                onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-                className="flex items-center gap-1.5 ml-4 px-3 py-1.5 rounded-md bg-zinc-800/50 hover:bg-zinc-700/50 text-gray-300 hover:text-white transition-all border border-zinc-700"
-                aria-label="Toggle language"
+
+              {/* Language Selector */}
+              <div className="relative ml-3 flex items-center rounded-xl transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06]">
+                <Globe className="w-3.5 h-3.5 ml-3 pointer-events-none absolute text-gray-500" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as any)}
+                  className="pl-8 pr-3 py-2 bg-transparent text-xs font-semibold uppercase appearance-none cursor-pointer focus:outline-none text-gray-400 hover:text-white tracking-wider"
+                  aria-label="Select language"
+                >
+                  <option value="de" className="bg-[#12121c] text-gray-100">DE</option>
+                  <option value="en" className="bg-[#12121c] text-gray-100">EN</option>
+                  <option value="pt" className="bg-[#12121c] text-gray-100">PT</option>
+                  <option value="fr" className="bg-[#12121c] text-gray-100">FR</option>
+                  <option value="es" className="bg-[#12121c] text-gray-100">ES</option>
+                  <option value="it" className="bg-[#12121c] text-gray-100">IT</option>
+                </select>
+              </div>
+
+            {/* Call to Action Button */}
+              <a 
+                href="tel:+4956193004649" 
+                className="ml-5 h-[36px] px-5 rounded-lg flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-red-500 border border-red-500/30 bg-red-500/10 hover:bg-red-500 hover:text-white transition-all duration-300"
               >
-                <Globe className="w-4 h-4" />
-                <span className="text-sm font-semibold uppercase">{language}</span>
-              </button>
+                <Phone className="w-3 h-3 mr-2" />
+                {t('header.consultation')}
+              </a>
             </div>
 
-            {/* Mobile Actions Container */}
-            <div className="flex items-center gap-4 md:hidden">
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-3 md:hidden">
+              <div className="relative flex items-center">
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as any)}
+                  className="pl-6 pr-2 py-1 text-xs font-bold uppercase bg-transparent appearance-none cursor-pointer focus:outline-none text-gray-400 hover:text-white tracking-wider"
+                >
+                  <option value="de" className="bg-[#12121c] text-gray-100">DE</option>
+                  <option value="en" className="bg-[#12121c] text-gray-100">EN</option>
+                  <option value="pt" className="bg-[#12121c] text-gray-100">PT</option>
+                  <option value="fr" className="bg-[#12121c] text-gray-100">FR</option>
+                  <option value="es" className="bg-[#12121c] text-gray-100">ES</option>
+                  <option value="it" className="bg-[#12121c] text-gray-100">IT</option>
+                </select>
+                <Globe className="w-3.5 h-3.5 absolute left-1 pointer-events-none text-gray-500" />
+              </div>
               <button
-                onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-                className="flex items-center gap-1 p-2 rounded-md text-gray-300 hover:text-white"
+                type="button"
+                className="p-2 rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center text-white hover:bg-white/[0.06] transition-all duration-300 border border-white/[0.06]"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
               >
-                <Globe className="w-4 h-4" />
-                <span className="text-xs font-bold uppercase">{language}</span>
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </button>
-              {/* Mobile menu button - 44px touch target */}
-            <button
-              type="button"
-              className="md:hidden p-2 rounded-md text-white hover:bg-gray-800 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
             </div>
           </div>
         </nav>
-      </header>
+      </motion.header>
 
       {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Mobile Menu Drawer - Slide from right */}
+      {/* Mobile Menu Drawer */}
       <div
         className={cn(
-          'fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-black z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl border-l border-gray-800',
+          'fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-[#22222a]/95 backdrop-blur-3xl z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] md:hidden border-l border-white/[0.08]',
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">
           {/* Drawer Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-700">
+          <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
             <div className="flex items-center space-x-2">
-              <Car className="h-6 w-6 text-red-500" />
-              <span className="font-bold text-white">Menü</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">N</span>
+              </div>
+              <span className="font-display font-bold text-white">{t('header.menu')}</span>
             </div>
             <button
               type="button"
-              className="p-2 rounded-md text-gray-300 hover:bg-gray-800 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 rounded-xl text-gray-500 hover:bg-white/[0.06] min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
               onClick={() => setMobileMenuOpen(false)}
               aria-label="Close menu"
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Drawer Navigation Links */}
-          <nav className="flex-1 overflow-y-auto py-4">
-            <div className="flex flex-col">
-              {navigation.map((item) => (
-                <Link
-                  key={item.navKey}
-                  to={item.href}
-                  className={cn(
-                    'px-6 py-4 text-base font-medium transition-colors min-h-[44px] flex items-center',
-                    isActive(item.href)
-                      ? 'text-red-500 bg-red-900/20 border-r-4 border-red-500'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-red-400'
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
+          <nav className="flex-1 overflow-y-auto py-3">
+            <div className="flex flex-col gap-1 px-3">
+              {navigation.map((item, index) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={mobileMenuOpen ? { opacity: 1, x: 0 } : {}}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
                 >
-                  {t(item.navKey)}
-                </Link>
+                  <a
+                    href={item.href}
+                    className={cn(
+                      'px-4 py-4 text-base font-medium transition-all duration-300 min-h-[44px] flex items-center rounded-xl',
+                      isActive(item.href)
+                        ? 'text-white bg-red-500/10 border border-red-500/20'
+                        : 'text-gray-400 hover:bg-white/[0.04] hover:text-white'
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {isActive(item.href) && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-3 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                    )}
+                    {item.label}
+                  </a>
+                </motion.div>
               ))}
             </div>
           </nav>
 
           {/* Drawer Footer */}
-          <div className="p-4 border-t border-gray-700 bg-black">
-            <p className="text-sm text-gray-300 text-center">
-              Nordhessen Automobile
-            </p>
-            <p className="text-xs text-gray-400 text-center mt-1">
-              0561 930 04 649
-            </p>
+          <div className="p-5 border-t border-white/[0.06]">
+            <div className="glass-card p-4 text-center">
+              <p className="text-sm font-display font-semibold text-white mb-1">
+                Nordhessen Automobile
+              </p>
+              <a href="tel:+4956193004649" className="text-xs text-red-400 hover:text-red-300 transition-colors">
+                0561 930 04 649
+              </a>
+            </div>
           </div>
         </div>
       </div>
