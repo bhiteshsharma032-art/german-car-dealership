@@ -158,11 +158,41 @@ export default function Geschichte() {
           {/* Background */}
           <div className="absolute inset-0">
             <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
-            <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-red-500/8 rounded-full blur-[120px] pointer-events-none" />
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-red-500/10 rounded-full blur-[120px] pointer-events-none" 
+            />
             <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none" />
+            
+            {/* Speed Light Streaks mimicking passing cars */}
+            <motion.div
+              initial={{ x: '-100vw', opacity: 0 }}
+              animate={{ x: '100vw', opacity: [0, 1, 0] }}
+              transition={{ duration: 2.5, ease: 'linear', repeat: Infinity, repeatDelay: 3 }}
+              className="absolute top-[30%] left-0 w-[50vw] h-1 bg-gradient-to-r from-transparent via-red-500/60 to-transparent blur-[2px] transform -rotate-[10deg] pointer-events-none"
+            />
+            <motion.div
+              initial={{ x: '-100vw', opacity: 0 }}
+              animate={{ x: '100vw', opacity: [0, 1, 0] }}
+              transition={{ duration: 3.5, ease: 'linear', repeat: Infinity, repeatDelay: 2, delay: 1 }}
+              className="absolute top-[70%] left-0 w-[40vw] h-[2px] bg-gradient-to-r from-transparent via-white/50 to-transparent blur-[1px] transform -rotate-[15deg] pointer-events-none"
+            />
           </div>
           {/* Top gradient line */}
           <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+          {/* Scrolling background text */}
+          <div className="absolute top-[60%] -translate-y-1/2 left-0 w-full overflow-hidden whitespace-nowrap opacity-[0.03] pointer-events-none select-none z-0 mix-blend-overlay">
+            <motion.div
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ repeat: Infinity, ease: 'linear', duration: 40 }}
+              className="inline-flex text-[15rem] font-black tracking-tighter text-white"
+            >
+              <span className="px-10">TRUST • PERFORMANCE • QUALITY • EXCELLENCE</span>
+              <span className="px-10">TRUST • PERFORMANCE • QUALITY • EXCELLENCE</span>
+            </motion.div>
+          </div>
 
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-4xl mx-auto text-center">

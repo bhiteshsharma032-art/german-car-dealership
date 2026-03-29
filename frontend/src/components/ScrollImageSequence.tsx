@@ -307,11 +307,11 @@ export default function ScrollImageSequence({
         {imagesLoaded && (
           <>
             {/* ── Side Navigation ── */}
-            <div className="absolute top-20 md:top-1/3 -translate-y-0 md:-translate-y-1/4 left-2 md:left-12 flex flex-col z-10 p-2 sm:p-4 md:p-6 rounded-3xl backdrop-blur-sm bg-black/10 border border-white/[0.03]">
-              {/* Vertical Track Line */}
-              <div className="absolute left-[27px] md:left-[35px] top-10 bottom-10 w-[2px] bg-white/[0.08] hidden sm:block" />
+            <div className="absolute top-20 w-full md:w-auto md:top-1/3 -translate-y-0 md:-translate-y-1/4 left-0 md:left-12 flex flex-row md:flex-col justify-center z-10 p-2 sm:p-4 md:p-6 rounded-none md:rounded-3xl backdrop-blur-sm md:bg-black/10 border-none md:border md:border-white/[0.03]">
+              {/* Vertical Track Line (desktop only) */}
+              <div className="absolute left-[27px] md:left-[35px] top-10 bottom-10 w-[2px] bg-white/[0.08] hidden md:block" />
               <div 
-                className="absolute left-[27px] md:left-[35px] top-10 w-[2px] transition-all duration-700 ease-out hidden sm:block shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
+                className="absolute left-[27px] md:left-[35px] top-10 w-[2px] transition-all duration-700 ease-out hidden md:block shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
                 style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 5rem)`, background: GOLD }} 
               />
               
@@ -336,22 +336,22 @@ export default function ScrollImageSequence({
                   <button
                     key={label}
                     onClick={handleClick}
-                    className="group relative py-2 sm:py-4 md:py-6 pl-8 sm:pl-12 md:pl-16 pr-4 sm:pr-8 text-[10px] sm:text-xs md:text-base tracking-[0.15em] sm:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-left flex items-center overflow-hidden rounded-2xl"
+                    className="group relative py-2 sm:py-4 md:py-6 px-3 md:pl-16 md:pr-8 text-[10px] sm:text-xs md:text-base tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center overflow-hidden rounded-lg md:rounded-2xl"
                     style={{ 
-                      color: active ? 'white' : 'rgba(255,255,255,0.3)',
-                      fontWeight: active ? '700' : '500',
+                      color: active ? 'white' : 'rgba(255,255,255,0.4)',
+                      fontWeight: active ? '800' : '600',
                     }}
                   >
                     {/* Hover background */}
                     <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                    {/* Active dot indicator on the track */}
+                    {/* Active dot indicator on the track (desktop) */}
                     <span 
-                      className={`hidden sm:block absolute left-2 md:left-4 w-3 h-3 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 scale-100 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-transparent border-white/20 scale-75 group-hover:scale-100 group-hover:border-white/40'}`}
+                      className={`hidden md:block absolute left-2 md:left-4 w-3 h-3 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 scale-100 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-transparent border-white/20 scale-75 group-hover:scale-100 group-hover:border-white/40'}`}
                     />
                     
-                    <span className="relative z-10 transition-transform duration-500 group-hover:translate-x-3 flex items-center gap-4">
-                      <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-600'}`}>
+                    <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-3 flex flex-col md:flex-row items-center gap-1 md:gap-4">
+                      <span className={`font-black text-[10px] md:text-base transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-600 hidden md:block'}`}>
                         {`0${i+1}`}
                       </span>
                       <span>{label}</span>
@@ -386,9 +386,9 @@ export default function ScrollImageSequence({
 
                   {/* Title */}
                   <h1
-                    className="font-black leading-[0.88] mb-2 sm:mb-4 md:mb-5 tracking-tighter text-white"
+                    className="font-black leading-[0.88] mb-3 sm:mb-4 md:mb-5 tracking-tighter text-white"
                     style={{
-                      fontSize: 'clamp(1.8rem, 6vw, 7.5rem)',
+                      fontSize: 'clamp(3.5rem, 10vw, 7.5rem)',
                       textAlign: 'left',
                       textShadow: '0 2px 40px rgba(0,0,0,0.8)',
                     }}
@@ -398,13 +398,13 @@ export default function ScrollImageSequence({
                     ))}
                   </h1>
 
-                  {/* Description - hidden on very small to avoid clutter */}
+                  {/* Description - visible on mobile to fill blank space */}
                   <p
-                    className="text-xs sm:text-sm md:text-lg leading-relaxed hidden xs:block"
+                    className="text-sm md:text-lg leading-relaxed block"
                     style={{
-                      color: 'rgba(255,255,255,0.75)',
+                      color: 'rgba(255,255,255,0.85)',
                       textAlign: 'left',
-                      maxWidth: '320px',
+                      maxWidth: '380px',
                     }}
                   >
                     {section.description}
