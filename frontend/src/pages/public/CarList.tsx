@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import { X, Grid3x3, List, ChevronDown, SlidersHorizontal, Search, Car as CarIcon } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { carService, Car } from '../../services/carService';
 import { SearchParams } from '../../services/inventoryService';
@@ -12,6 +13,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import { cn } from '../../utils/cn';
 
 export default function CarList() {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialBrand = searchParams.get('brand');
 
@@ -131,12 +133,12 @@ export default function CarList() {
 
   const getActiveFilterChips = () => {
     const chips: { key: keyof SearchParams; label: string }[] = [];
-    if (filters.make) chips.push({ key: 'make', label: `Marke: ${filters.make}` });
-    if (filters.priceFrom || filters.priceTo) chips.push({ key: 'priceFrom', label: `Preis: ${filters.priceFrom || 0} - ${filters.priceTo || '∞'} €` });
-    if (filters.yearFrom || filters.yearTo) chips.push({ key: 'yearFrom', label: `Jahr: ${filters.yearFrom || '0'} - ${filters.yearTo || 'heute'}` });
-    if (filters.fuelType) chips.push({ key: 'fuelType', label: `Kraftstoff: ${filters.fuelType}` });
-    if (filters.transmission) chips.push({ key: 'transmission', label: `Getriebe: ${filters.transmission}` });
-    if (filters.bodyType) chips.push({ key: 'bodyType', label: `Typ: ${filters.bodyType}` });
+    if (filters.make) chips.push({ key: 'make', label: `${t('inv.chip.make')}: ${filters.make}` });
+    if (filters.priceFrom || filters.priceTo) chips.push({ key: 'priceFrom', label: `${t('inv.chip.price')}: ${filters.priceFrom || 0} - ${filters.priceTo || '∞'} €` });
+    if (filters.yearFrom || filters.yearTo) chips.push({ key: 'yearFrom', label: `${t('inv.chip.year')}: ${filters.yearFrom || '0'} - ${filters.yearTo || t('inv.chip.today')}` });
+    if (filters.fuelType) chips.push({ key: 'fuelType', label: `${t('inv.chip.fuel')}: ${filters.fuelType}` });
+    if (filters.transmission) chips.push({ key: 'transmission', label: `${t('inv.chip.gear')}: ${filters.transmission}` });
+    if (filters.bodyType) chips.push({ key: 'bodyType', label: `${t('inv.chip.type')}: ${filters.bodyType}` });
     return chips;
   };
 
@@ -183,8 +185,8 @@ export default function CarList() {
   return (
     <>
       <Helmet>
-        <title>Fahrzeuge - Nordhessen Automobile</title>
-        <meta name="description" content="Entdecken Sie unsere große Auswahl an Premium-Fahrzeugen" />
+        <title>{t('nav.vehicles')} - Nordhessen Automobile</title>
+        <meta name="description" content={t('inv.subtitle')} />
       </Helmet>
 
       <div className="min-h-screen bg-[#1a1a1f]">
@@ -193,16 +195,16 @@ export default function CarList() {
           <div className="max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 relative z-10 flex flex-col items-center text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl w-full">
               <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-100 mb-4 tracking-tight">
-                Unsere <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">Fahrzeuge</span>
+                {t('inv.title').replace('Fahrzeuge', '')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">{t('inv.cars')}</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 font-light max-w-xl mx-auto">
-                Entdecken Sie unsere große Auswahl an geprüften Premium-Fahrzeugen, perfekt abgestimmt auf Ihre Bedürfnisse.
+                {t('inv.subtitle')}
               </p>
               <div className="relative group text-left">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-red-500 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Marke oder Modell suchen..."
+                  placeholder={t('inv.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-14 pr-5 py-4 bg-white/[0.02] border border-white/[0.08] rounded-2xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ef4444]/50 focus:border-[#ef4444] transition-all focus:bg-white/[0.04] shadow-glass"
@@ -217,10 +219,10 @@ export default function CarList() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
               <h2 className="text-2xl font-display font-bold text-gray-100 mb-1">
-                {filteredVehicles.length} {filteredVehicles.length === 1 ? 'Fahrzeug' : 'Fahrzeuge'}
+                {filteredVehicles.length} {filteredVehicles.length === 1 ? t('inv.car') : t('inv.cars')}
               </h2>
               <p className="text-sm text-gray-400 font-light">
-                {getActiveFiltersCount() > 0 ? 'Gefilterte Ergebnisse' : 'Alle verfügbaren Fahrzeuge'}
+                {getActiveFiltersCount() > 0 ? t('inv.filtered') : t('inv.all')}
               </p>
             </motion.div>
 
@@ -231,11 +233,11 @@ export default function CarList() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="appearance-none bg-white/[0.03] border border-white/[0.08] backdrop-blur-md rounded-xl px-5 py-3 pr-10 text-sm font-medium text-gray-200 hover:border-white/[0.15] focus:outline-none focus:ring-2 focus:ring-[#ef4444]/50 cursor-pointer transition-all"
                 >
-                  <option value="newest" className="bg-[#22222a]">Neueste zuerst</option>
-                  <option value="price-low" className="bg-[#22222a]">Preis aufsteigend</option>
-                  <option value="price-high" className="bg-[#22222a]">Preis absteigend</option>
-                  <option value="mileage" className="bg-[#22222a]">Kilometerstand</option>
-                  <option value="year" className="bg-[#22222a]">Baujahr</option>
+                  <option value="newest" className="bg-[#22222a]">{t('inv.sort.newest')}</option>
+                  <option value="price-low" className="bg-[#22222a]">{t('inv.sort.price_asc')}</option>
+                  <option value="price-high" className="bg-[#22222a]">{t('inv.sort.price_desc')}</option>
+                  <option value="mileage" className="bg-[#22222a]">{t('inv.sort.mileage')}</option>
+                  <option value="year" className="bg-[#22222a]">{t('inv.sort.year')}</option>
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
               </div>
@@ -268,7 +270,7 @@ export default function CarList() {
                 className="lg:hidden flex items-center gap-2 px-5 py-3 bg-white/[0.03] backdrop-blur-md text-gray-200 rounded-xl hover:bg-white/[0.06] transition-all font-medium text-sm border border-white/[0.08]"
               >
                 <SlidersHorizontal className="w-4 h-4" />
-                Filter
+                {t('inv.filter')}
                 {getActiveFiltersCount() > 0 && (
                   <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.4)]">
                     {getActiveFiltersCount()}
@@ -289,7 +291,7 @@ export default function CarList() {
                 </div>
               ))}
               <button onClick={clearFilters} className="text-sm text-gray-400 hover:text-white font-medium px-4 py-2 transition-colors">
-                Alle zurücksetzen
+                {t('inv.reset')}
               </button>
             </motion.div>
           )}
@@ -308,9 +310,9 @@ export default function CarList() {
               {filteredVehicles.length === 0 ? (
                 <EmptyState
                   icon={<CarIcon className="w-12 h-12" />}
-                  title="Keine Fahrzeuge gefunden"
-                  description="Versuchen Sie, Ihre Suchkriterien anzupassen oder alle Filter zurückzusetzen."
-                  action={{ label: 'Filter zurücksetzen', onClick: clearFilters }}
+                  title={t('inv.empty.title')}
+                  description={t('inv.empty.desc')}
+                  action={{ label: t('inv.empty.action'), onClick: clearFilters }}
                 />
               ) : (
                 <motion.div layout className={cn('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1')}>
@@ -359,7 +361,7 @@ export default function CarList() {
               <div className="flex items-center justify-between p-6 border-b border-white/[0.08]">
                 <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-red-500" />
-                  Filter
+                  {t('inv.filter')}
                 </h2>
                 <button onClick={() => setShowMobileFilters(false)} className="w-8 h-8 flex items-center justify-center bg-white/[0.05] rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.1] transition-colors">
                   <X className="w-5 h-5" />
@@ -369,8 +371,8 @@ export default function CarList() {
                 <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onClearFilters={clearFilters} filterOptions={filterOptions} />
               </div>
               <div className="p-6 border-t border-white/[0.08] flex gap-3 bg-[#22222a]">
-                <Button variant="secondary" onClick={clearFilters} className="flex-1 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1]">Zurücksetzen</Button>
-                <Button onClick={() => setShowMobileFilters(false)} className="flex-1 rounded-xl bg-red-500 hover:bg-[#dc2626] text-white">Anwenden</Button>
+                <Button variant="secondary" onClick={clearFilters} className="flex-1 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1]">{t('inv.reset')}</Button>
+                <Button onClick={() => setShowMobileFilters(false)} className="flex-1 rounded-xl bg-red-500 hover:bg-[#dc2626] text-white">{t('inv.apply')}</Button>
               </div>
             </motion.div>
           </div>

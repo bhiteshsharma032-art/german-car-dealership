@@ -1,0 +1,185 @@
+const fs = require('fs');
+
+const path = require('path');
+const file = path.join(__dirname, 'frontend/src/contexts/LanguageContext.tsx');
+let content = fs.readFileSync(file, 'utf8');
+
+const additions = {
+  de: {
+    'inv.title': 'Unsere Fahrzeuge',
+    'inv.subtitle': 'Entdecken Sie unsere große Auswahl an geprüften Premium-Fahrzeugen, perfekt abgestimmt auf Ihre Bedürfnisse.',
+    'inv.search': 'Marke oder Modell suchen...',
+    'inv.cars': 'Fahrzeuge',
+    'inv.car': 'Fahrzeug',
+    'inv.filtered': 'Gefilterte Ergebnisse',
+    'inv.all': 'Alle verfügbaren Fahrzeuge',
+    'inv.sort.newest': 'Neueste zuerst',
+    'inv.sort.price_asc': 'Preis aufsteigend',
+    'inv.sort.price_desc': 'Preis absteigend',
+    'inv.sort.mileage': 'Kilometerstand',
+    'inv.sort.year': 'Baujahr',
+    'inv.filter': 'Filter',
+    'inv.reset': 'Alle zurücksetzen',
+    'inv.apply': 'Anwenden',
+    'inv.empty.title': 'Keine Fahrzeuge gefunden',
+    'inv.empty.desc': 'Versuchen Sie, Ihre Suchkriterien anzupassen oder alle Filter zurückzusetzen.',
+    'inv.empty.action': 'Filter zurücksetzen',
+    'inv.chip.make': 'Marke',
+    'inv.chip.price': 'Preis',
+    'inv.chip.year': 'Jahr',
+    'inv.chip.fuel': 'Kraftstoff',
+    'inv.chip.gear': 'Getriebe',
+    'inv.chip.type': 'Typ',
+    'inv.chip.today': 'heute'
+  },
+  en: {
+    'inv.title': 'Our Vehicles',
+    'inv.subtitle': 'Discover our large selection of tested premium vehicles, perfectly tailored to your needs.',
+    'inv.search': 'Search make or model...',
+    'inv.cars': 'Vehicles',
+    'inv.car': 'Vehicle',
+    'inv.filtered': 'Filtered results',
+    'inv.all': 'All available vehicles',
+    'inv.sort.newest': 'Newest first',
+    'inv.sort.price_asc': 'Price ascending',
+    'inv.sort.price_desc': 'Price descending',
+    'inv.sort.mileage': 'Mileage',
+    'inv.sort.year': 'Year',
+    'inv.filter': 'Filter',
+    'inv.reset': 'Reset all',
+    'inv.apply': 'Apply',
+    'inv.empty.title': 'No vehicles found',
+    'inv.empty.desc': 'Try adjusting your search criteria or reset all filters.',
+    'inv.empty.action': 'Reset filters',
+    'inv.chip.make': 'Make',
+    'inv.chip.price': 'Price',
+    'inv.chip.year': 'Year',
+    'inv.chip.fuel': 'Fuel',
+    'inv.chip.gear': 'Gearbox',
+    'inv.chip.type': 'Type',
+    'inv.chip.today': 'today'
+  },
+  pt: {
+    'inv.title': 'Os Nossos Veículos',
+    'inv.subtitle': 'Descubra a nossa grande seleção de veículos premium testados, perfeitamente adaptados às suas necessidades.',
+    'inv.search': 'Pesquisar marca ou modelo...',
+    'inv.cars': 'Veículos',
+    'inv.car': 'Veículo',
+    'inv.filtered': 'Resultados filtrados',
+    'inv.all': 'Todos os veículos disponíveis',
+    'inv.sort.newest': 'Mais recentes',
+    'inv.sort.price_asc': 'Preço ascendente',
+    'inv.sort.price_desc': 'Preço descendente',
+    'inv.sort.mileage': 'Quilometragem',
+    'inv.sort.year': 'Ano',
+    'inv.filter': 'Filtro',
+    'inv.reset': 'Repor tudo',
+    'inv.apply': 'Aplicar',
+    'inv.empty.title': 'Nenhum veículo encontrado',
+    'inv.empty.desc': 'Tente ajustar os seus critérios de pesquisa ou reponha todos os filtros.',
+    'inv.empty.action': 'Repor filtros',
+    'inv.chip.make': 'Marca',
+    'inv.chip.price': 'Preço',
+    'inv.chip.year': 'Ano',
+    'inv.chip.fuel': 'Combustível',
+    'inv.chip.gear': 'Caixa',
+    'inv.chip.type': 'Tipo',
+    'inv.chip.today': 'hoje'
+  },
+  fr: {
+    'inv.title': 'Nos Véhicules',
+    'inv.subtitle': 'Découvrez notre large sélection de véhicules premium testés, parfaitement adaptés à vos besoins.',
+    'inv.search': 'Rechercher marque ou modèle...',
+    'inv.cars': 'Véhicules',
+    'inv.car': 'Véhicule',
+    'inv.filtered': 'Résultats filtrés',
+    'inv.all': 'Tous les véhicules disponibles',
+    'inv.sort.newest': 'Les plus récents',
+    'inv.sort.price_asc': 'Prix croissant',
+    'inv.sort.price_desc': 'Prix décroissant',
+    'inv.sort.mileage': 'Kilométrage',
+    'inv.sort.year': 'Année',
+    'inv.filter': 'Filtre',
+    'inv.reset': 'Tout réinitialiser',
+    'inv.apply': 'Appliquer',
+    'inv.empty.title': 'Aucun véhicule trouvé',
+    'inv.empty.desc': 'Essayez d\'ajuster vos critères de recherche ou réinitialisez tous les filtres.',
+    'inv.empty.action': 'Réinitialiser les filtres',
+    'inv.chip.make': 'Marque',
+    'inv.chip.price': 'Prix',
+    'inv.chip.year': 'Année',
+    'inv.chip.fuel': 'Carburant',
+    'inv.chip.gear': 'Boîte',
+    'inv.chip.type': 'Type',
+    'inv.chip.today': 'aujourd\'hui'
+  },
+  es: {
+    'inv.title': 'Nuestros Vehículos',
+    'inv.subtitle': 'Descubra nuestra amplia selección de vehículos premium comprobados, perfectamente adaptados a sus necesidades.',
+    'inv.search': 'Buscar marca o modelo...',
+    'inv.cars': 'Vehículos',
+    'inv.car': 'Vehículo',
+    'inv.filtered': 'Resultados filtrados',
+    'inv.all': 'Todos los vehículos disponibles',
+    'inv.sort.newest': 'Más recientes',
+    'inv.sort.price_asc': 'Precio ascendente',
+    'inv.sort.price_desc': 'Precio descendente',
+    'inv.sort.mileage': 'Kilometraje',
+    'inv.sort.year': 'Año',
+    'inv.filter': 'Filtro',
+    'inv.reset': 'Restablecer todo',
+    'inv.apply': 'Aplicar',
+    'inv.empty.title': 'No se encontraron vehículos',
+    'inv.empty.desc': 'Intente ajustar sus criterios de búsqueda o restablezca todos los filtros.',
+    'inv.empty.action': 'Restablecer filtros',
+    'inv.chip.make': 'Marca',
+    'inv.chip.price': 'Precio',
+    'inv.chip.year': 'Año',
+    'inv.chip.fuel': 'Combustible',
+    'inv.chip.gear': 'Caja',
+    'inv.chip.type': 'Tipo',
+    'inv.chip.today': 'hoy'
+  },
+  it: {
+    'inv.title': 'I Nostri Veicoli',
+    'inv.subtitle': 'Scopri la nostra vasta selezione di veicoli premium testati, perfettamente su misura per le tue esigenze.',
+    'inv.search': 'Cerca marca o modello...',
+    'inv.cars': 'Veicoli',
+    'inv.car': 'Veicolo',
+    'inv.filtered': 'Risultati filtrati',
+    'inv.all': 'Tutti i veicoli disponibili',
+    'inv.sort.newest': 'Più recenti',
+    'inv.sort.price_asc': 'Prezzo crescente',
+    'inv.sort.price_desc': 'Prezzo decrescente',
+    'inv.sort.mileage': 'Chilometraggio',
+    'inv.sort.year': 'Anno',
+    'inv.filter': 'Filtro',
+    'inv.reset': 'Reimposta tutto',
+    'inv.apply': 'Applica',
+    'inv.empty.title': 'Nessun veicolo trovato',
+    'inv.empty.desc': 'Prova ad adattare i criteri di ricerca o reimposta tutti i filtri.',
+    'inv.empty.action': 'Reimposta filtri',
+    'inv.chip.make': 'Marca',
+    'inv.chip.price': 'Prezzo',
+    'inv.chip.year': 'Anno',
+    'inv.chip.fuel': 'Carburante',
+    'inv.chip.gear': 'Cambio',
+    'inv.chip.type': 'Tipo',
+    'inv.chip.today': 'oggi'
+  }
+};
+
+for (const lang in additions) {
+  const blockStartMarker = `${lang}: {`;
+  const insertionPoint = content.indexOf(blockStartMarker) + blockStartMarker.length;
+  
+  let newStrings = '\n';
+  for (const key in additions[lang]) {
+    newStrings += `    '${key}': '${additions[lang][key].replace(/'/g, "\\'")}',\n`;
+  }
+  
+  content = content.slice(0, insertionPoint) + newStrings + content.slice(insertionPoint);
+}
+
+fs.writeFileSync(file, content, 'utf8');
+console.log('Translations inserted successfully!');
