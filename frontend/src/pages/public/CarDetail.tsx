@@ -159,14 +159,14 @@ export default function CarDetail() {
           </nav>
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Gallery & Details */}
             <div className="lg:col-span-2 space-y-8">
               {/* Image Gallery */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                 {/* Main Image */}
-                <div className="relative aspect-video bg-white/[0.02] border border-white/[0.06] rounded-3xl overflow-hidden mb-4 group shadow-glass">
+                <div className="relative aspect-[4/3] md:aspect-video bg-white/[0.02] border border-white/[0.06] rounded-3xl overflow-hidden mb-4 group shadow-glass">
                   {vehicle.images && vehicle.images.length > 0 ? (
                     <>
                       <AnimatePresence mode="wait">
@@ -502,7 +502,7 @@ export default function CarDetail() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-xl flex items-center justify-center">
               <button
                 onClick={() => setShowLightbox(false)}
-                className="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110 z-50 cursor-pointer"
               >
                 <X className="w-6 h-6 text-white" />
               </button>
@@ -510,7 +510,7 @@ export default function CarDetail() {
               {vehicle.images.length > 1 && (
                 <button
                   onClick={prevImage}
-                  className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                  className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110 z-50 cursor-pointer"
                 >
                   <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 text-white mr-1" />
                 </button>
@@ -530,13 +530,13 @@ export default function CarDetail() {
               {vehicle.images.length > 1 && (
                 <button
                   onClick={nextImage}
-                  className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                  className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110 z-50 cursor-pointer"
                 >
                   <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-white ml-1" />
                 </button>
               )}
 
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl text-white font-medium tracking-widest border border-white/20 text-sm md:text-base">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl text-white font-medium tracking-widest border border-white/20 text-sm md:text-base z-50">
                 {selectedImageIndex + 1} / {vehicle.images.length}
               </div>
             </motion.div>
