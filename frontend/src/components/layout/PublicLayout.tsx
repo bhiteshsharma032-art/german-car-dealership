@@ -34,7 +34,7 @@ export default function PublicLayout() {
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1.5 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="fixed bottom-6 right-6 z-[100] flex items-center justify-center w-14 h-14 text-white rounded-2xl transition-shadow duration-500 group cursor-pointer shadow-glass"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex items-center justify-center w-12 h-12 md:w-14 md:h-14 text-white rounded-2xl transition-shadow duration-500 group cursor-pointer shadow-glass"
           style={{
             background: 'linear-gradient(135deg, #ef4444, #dc2626)',
             boxShadow: '0 0 30px rgba(239,68,68,0.3), 0 8px 32px rgba(0,0,0,0.4)',

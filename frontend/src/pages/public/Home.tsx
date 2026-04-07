@@ -233,17 +233,17 @@ export default function Home() {
             </p>
           </FadeUp>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12">
+          <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center justify-center gap-4 sm:gap-12 w-full">
             {availableBrands.map((brand, i) => (
-              <FadeUp key={brand.name} delay={i * 0.1}>
+              <FadeUp key={brand.name} delay={i * 0.1} className="w-full lg:w-64">
                 <Magnetic>
                   <Link
                     to={`/fahrzeuge?brand=${brand.name}`}
-                    className="group relative w-44 sm:w-56 lg:w-64 aspect-square rounded-[2.5rem] p-10 sm:p-12 lg:p-14 flex flex-col items-center justify-center transition-all duration-500 border border-white/[0.08] hover:border-red-500/40 bg-[#141414]/90 hover:bg-[#1a1a1a] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(239,68,68,0.15)] focus:outline-none focus:ring-2 focus:ring-red-500/50 overflow-hidden"
+                    className="group relative w-full lg:w-64 aspect-square rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-14 flex flex-col items-center justify-center transition-all duration-500 border border-white/[0.08] hover:border-red-500/40 bg-[#141414]/90 hover:bg-[#1a1a1a] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(239,68,68,0.15)] focus:outline-none focus:ring-2 focus:ring-red-500/50 overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                     
-                    <div className="relative z-10 h-20 sm:h-24 lg:h-28 w-full flex items-center justify-center mb-6">
+                    <div className="relative z-10 h-16 sm:h-28 w-full flex items-center justify-center mb-4 sm:mb-6">
                       <img
                         src={brand.logo}
                         alt={brand.name}
@@ -255,7 +255,7 @@ export default function Home() {
                       />
                     </div>
                     
-                    <span className="relative z-10 mt-auto text-xs font-bold uppercase tracking-[0.3em] text-gray-400 group-hover:text-white transition-colors duration-300">
+                    <span className="relative z-10 mt-auto text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-gray-500 group-hover:text-white transition-colors duration-300">
                       {brand.name}
                     </span>
                   </Link>
@@ -301,14 +301,15 @@ export default function Home() {
               }
             ].map((service, i) => (
               <FadeUp key={service.title} delay={i * 0.15} className="h-full">
-                <div className="group relative h-full bg-[#181818] rounded-3xl p-10 border border-white/[0.05] hover:border-red-500/30 transition-all duration-500 hover:bg-[#1c1c1c]">
-                  <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-red-500 group-hover:border-red-500 transition-all duration-500">
+                <div className="group relative h-full bg-[#181818] rounded-[2rem] p-8 sm:p-10 border border-white/[0.05] hover:border-red-500/30 transition-all duration-500 hover:bg-[#1c1c1c] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6 sm:mb-8 group-hover:scale-110 group-hover:bg-red-500 group-hover:border-red-500 transition-all duration-500">
                     <div className="text-red-500 group-hover:text-white transition-colors duration-500">
                       {service.icon}
                     </div>
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">{service.title}</h3>
-                  <p className="text-gray-400 leading-relaxed font-light">{service.desc}</p>
+                  <h3 className="relative z-10 text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">{service.title}</h3>
+                  <p className="relative z-10 text-sm sm:text-base text-gray-400 leading-relaxed font-light">{service.desc}</p>
                 </div>
               </FadeUp>
             ))}
@@ -377,17 +378,20 @@ export default function Home() {
                     id={vehicle.id}
                     make={vehicle.brand}
                     model={vehicle.model}
-                    title={`${vehicle.brand} ${vehicle.model}`}
+                    title={vehicle.title || `${vehicle.brand} ${vehicle.model}`}
                     price={{
                       amount: vehicle.price,
-                      formatted: `${vehicle.price.toLocaleString('de-DE')} €`,
+                      formatted: vehicle.priceFormatted || `${vehicle.price.toLocaleString('de-DE')} €`,
                     }}
+                    netPrice={vehicle.netPrice}
+                    netPriceFormatted={vehicle.netPriceFormatted}
+                    isVatable={vehicle.isVatable}
                     mileage={{
-                      formatted: `${vehicle.mileage.toLocaleString('de-DE')} km`,
+                      formatted: vehicle.mileageFormatted || `${vehicle.mileage.toLocaleString('de-DE')} km`,
                     }}
                     firstRegistration={`${vehicle.year}-01-01`}
                     power={{
-                      formatted: `${vehicle.horsePower} PS`,
+                      formatted: vehicle.powerFormatted || `${vehicle.horsePower} PS`,
                     }}
                     fuelType={vehicle.fuelType}
                     transmission={vehicle.transmission}
@@ -432,7 +436,7 @@ export default function Home() {
               <div className="relative h-[500px] sm:h-[600px] w-full">
                 {heroCars.length >= 2 ? (
                   <>
-                    <div className="absolute top-0 right-0 w-[85%] h-[350px] sm:h-[400px] rounded-[2rem] overflow-hidden border border-white/[0.04] shadow-2xl z-20 group">
+                    <div className="absolute top-0 right-0 w-[90%] sm:w-[85%] h-[300px] sm:h-[400px] rounded-[2rem] overflow-hidden border border-white/[0.04] shadow-2xl z-20 group">
                       <div className="absolute inset-0 bg-red-500 mix-blend-overlay opacity-0 group-hover:opacity-10 transition-opacity duration-700 z-10" />
                       <img 
                         src={heroCars[0].images[0]} 
@@ -440,7 +444,7 @@ export default function Home() {
                         className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
                       />
                     </div>
-                    <div className="absolute bottom-0 left-0 w-[75%] h-[280px] sm:h-[320px] rounded-[2rem] overflow-hidden border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-30 group ring-4 ring-[#0c0c0c]">
+                    <div className="absolute bottom-4 left-0 w-[80%] sm:w-[75%] h-[240px] sm:h-[320px] rounded-[2rem] overflow-hidden border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-30 group ring-4 ring-[#0c0c0c]">
                       <div className="absolute inset-0 bg-red-500 mix-blend-overlay opacity-0 group-hover:opacity-10 transition-opacity duration-700 z-10" />
                       <img 
                         src={heroCars[1].images[0]} 
@@ -464,13 +468,13 @@ export default function Home() {
                 )}
                 
                 {/* Floating Tech Label */}
-                <div className="absolute top-1/2 -translate-y-1/2 -left-2 sm:-left-6 z-40 backdrop-blur-xl bg-[#0a0a0a]/90 border border-white/10 p-4 sm:p-5 rounded-3xl flex items-center gap-4 sm:gap-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border border-red-500/30 flex items-center justify-center bg-red-500/10">
-                    <ShieldCheck className="text-red-500 w-5 h-5 sm:w-6 sm:h-6" />
+                <div className="absolute top-1/2 -translate-y-1/2 -left-1 sm:-left-6 z-40 backdrop-blur-xl bg-[#0a0a0a]/90 border border-white/10 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl flex items-center gap-3 sm:gap-5 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border border-red-500/30 flex items-center justify-center bg-red-500/10">
+                    <ShieldCheck className="text-red-500 w-4 h-4 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <div className="text-white font-bold text-[13px] sm:text-[15px] tracking-widest uppercase mb-1">{t('home.features.q.title').split(' ')[0]}</div>
-                    <div className="text-white/50 text-[9px] sm:text-[10px] tracking-[0.3em] uppercase">{t('home.features.q.title').split(' ').slice(1).join(' ')}</div>
+                    <div className="text-white font-bold text-[11px] sm:text-[15px] tracking-widest uppercase mb-0.5 sm:mb-1">{t('home.features.q.title').split(' ')[0]}</div>
+                    <div className="text-white/50 text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] uppercase">{t('home.features.q.title').split(' ').slice(1).join(' ')}</div>
                   </div>
                 </div>
               </div>
@@ -484,7 +488,7 @@ export default function Home() {
                 </span>
               </FadeUp>
               <FadeUp delay={0.1}>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black text-white mb-8 tracking-tighter leading-[1.1]">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black text-white mb-6 sm:mb-8 tracking-tighter leading-[1.1]">
                   {t('home.phi.title')}
                 </h2>
               </FadeUp>

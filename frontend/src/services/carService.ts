@@ -7,12 +7,18 @@ export interface Car {
   model: string;
   year: number;
   price: number;
+  priceFormatted: string;
+  netPrice: number | null;
+  netPriceFormatted: string | null;
+  isVatable: boolean;
   mileage: number;
+  mileageFormatted: string;
   fuelType: string;
   transmission: string;
   bodyType: string;
   engineSize: number;
   horsePower: number;
+  powerFormatted: string;
   color: string;
   exteriorColor: string;
   interiorColor: string;
@@ -22,9 +28,12 @@ export interface Car {
   condition: string;
   previousOwners: number;
   lastService?: string;
-  warranty: boolean;
-  warrantyMonths?: number;
+  title: string;
   description: string;
+  seller?: {
+    name: string;
+    type: string;
+  };
   createdAt: string | Date;
   updatedAt: string | Date;
 }
@@ -63,30 +72,83 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Transform mobile.de vehicle to our Car interface
+// Translate common mobile.de API English values to German
+const FUEL_DE: Record<string, string> = {
+  'Petrol': 'Benzin', 'Diesel': 'Diesel', 'Electric': 'Elektro',
+  'Hybrid': 'Hybrid', 'LPG': 'Autogas (LPG)', 'CNG': 'Erdgas (CNG)',
+  'Hydrogen': 'Wasserstoff', 'Ethanol': 'Ethanol',
+  'Electric/Petrol': 'Elektro/Benzin', 'Electric/Diesel': 'Elektro/Diesel',
+  'Hybrid (petrol/electric)': 'Hybrid (Benzin/Elektro)',
+  'Hybrid (diesel/electric)': 'Hybrid (Diesel/Elektro)',
+  'Gasoline': 'Benzin', 'Diesel fuel': 'Diesel',
+};
+const TRANS_DE: Record<string, string> = {
+  'Automatic': 'Automatik', 'Manual': 'Schaltgetriebe',
+  'Semi-automatic': 'Halbautomatik', 'Manual gearbox': 'Schaltgetriebe',
+  'Automatic transmission': 'Automatik',
+};
+const COLOR_DE: Record<string, string> = {
+  'Black': 'Schwarz', 'White': 'Weiß', 'Silver': 'Silber', 'Grey': 'Grau',
+  'Blue': 'Blau', 'Red': 'Rot', 'Green': 'Grün', 'Brown': 'Braun',
+  'Beige': 'Beige', 'Gold': 'Gold', 'Orange': 'Orange', 'Yellow': 'Gelb',
+  'Purple': 'Violett', 'Bronze': 'Bronze',
+};
+const CONDITION_DE: Record<string, string> = {
+  'Used': 'Gebraucht', 'New': 'Neuwagen', 'Demonstration': 'Vorführwagen',
+  "Employee's car": 'Jahreswagen', 'Pre-registered': 'Tageszulassung',
+  'Used vehicle': 'Gebraucht', 'New vehicle': 'Neuwagen',
+};
+
+const toDE = (val: string, map: Record<string, string>): string => {
+  if (!val) return val;
+  let trimmed = val.trim();
+  // Strip mobile.de attr.* prefixes (e.g. attr.fuel.Hybrid)
+  if (trimmed.startsWith('attr.')) {
+     trimmed = trimmed.substring(trimmed.lastIndexOf('.') + 1);
+  }
+  // Try exact match first
+  if (map[trimmed]) return map[trimmed];
+  // Try case-insensitive match
+  const match = Object.entries(map).find(([en]) => en.toLowerCase() === trimmed.toLowerCase());
+  return match ? match[1] : trimmed;
+};
+
+// Transform mobile.de vehicle to our Car interface — use REAL API data, no hardcoded defaults
 const transformMobileDeVehicle = (vehicle: InventoryVehicle): Car => {
+  const fuelType = vehicle.fuelType || 'Benzin';
+  const transmission = vehicle.transmission || 'Automatik';
+  const color = vehicle.color || 'Unknown';
+  const condition = vehicle.condition || 'Gebraucht';
+
   return {
     id: vehicle.id,
     brand: vehicle.make,
     model: vehicle.model,
     year: vehicle.firstRegistration ? new Date(vehicle.firstRegistration).getFullYear() : new Date().getFullYear(),
     price: vehicle.price.amount,
+    priceFormatted: vehicle.price.formatted,
+    netPrice: vehicle.price.netAmount || null,
+    netPriceFormatted: vehicle.price.netFormatted || null,
+    isVatable: vehicle.price.isVatable || false,
     mileage: vehicle.mileage?.value || 0,
-    fuelType: 'Benzin', // Default, could be enhanced with more API data
-    transmission: 'Automatik', // Default, could be enhanced with more API data
-    bodyType: 'Limousine', // Default, could be enhanced with more API data
-    engineSize: 0, // Not available in mobile.de API
+    mileageFormatted: vehicle.mileage?.formatted || '0 km',
+    fuelType: toDE(fuelType, FUEL_DE),
+    transmission: toDE(transmission, TRANS_DE),
+    bodyType: vehicle.bodyType || 'Limousine',
+    engineSize: 0,
     horsePower: vehicle.power?.hp || 0,
-    color: 'Schwarz', // Default
-    exteriorColor: 'Schwarz', // Default
-    interiorColor: 'Schwarz', // Default
-    features: [], // Could be enhanced with more API data
-    images: vehicle.images || (vehicle.image ? [vehicle.image] : []), // Use all images or fallback to single image
-    isExclusive: vehicle.price.amount > 50000, // Mark expensive cars as exclusive
-    condition: 'Gebraucht',
-    previousOwners: 1,
-    warranty: true,
-    description: vehicle.title,
+    powerFormatted: vehicle.power?.formatted || '',
+    color: toDE(color, COLOR_DE),
+    exteriorColor: toDE(color, COLOR_DE),
+    interiorColor: toDE(vehicle.interiorColor || 'Unknown', COLOR_DE),
+    features: (vehicle.features || []).filter(f => f && f !== 'Unknown'),
+    images: vehicle.images || (vehicle.image ? [vehicle.image] : []),
+    isExclusive: vehicle.price.amount > 50000,
+    condition: toDE(condition, CONDITION_DE),
+    previousOwners: typeof vehicle.owners === 'number' ? vehicle.owners : 1,
+    title: vehicle.title,
+    description: vehicle.description || vehicle.title,
+    seller: vehicle.seller,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -180,15 +242,9 @@ export const carService = {
   // Get car by ID from mobile.de ONLY
   getCarById: async (id: string): Promise<Car> => {
     try {
-      console.log('🔍 CarService: Getting car by ID from mobile.de (NO MOCK DATA)');
+      console.log('🔍 CarService: Getting car by ID from mobile.de Ad API...');
       
-      const response = await inventoryService.getInventory(100);
-      
-      if (!response.success) {
-        throw new Error('Car not found in mobile.de inventory');
-      }
-
-      const vehicle = response.data.find(v => v.id === id);
+      const vehicle = await inventoryService.getVehicleById(id);
       
       if (!vehicle) {
         throw new Error('Car not found in mobile.de inventory');

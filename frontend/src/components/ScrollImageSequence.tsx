@@ -199,7 +199,7 @@ export default function ScrollImageSequence({
       description: t('scroll.elegance_desc'),
       price: '',
       start: 0, fadeInEnd: 0.03, fadeOutStart: 0.22, end: 0.25,
-      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -209,7 +209,7 @@ export default function ScrollImageSequence({
       description: t('scroll.design_desc'),
       price: '',
       start: 0.25, fadeInEnd: 0.28, fadeOutStart: 0.47, end: 0.50,
-      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -219,7 +219,7 @@ export default function ScrollImageSequence({
       description: t('scroll.engine_desc'),
       price: '',
       start: 0.50, fadeInEnd: 0.53, fadeOutStart: 0.72, end: 0.75,
-      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -229,7 +229,7 @@ export default function ScrollImageSequence({
       description: t('scroll.performance_desc'),
       price: '',
       start: 0.75, fadeInEnd: 0.78, fadeOutStart: 0.87, end: 0.90,
-      posClass: 'left-4 right-4 bottom-6 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -245,10 +245,11 @@ export default function ScrollImageSequence({
   const smoothStep = (t: number) => t * t * (3 - 2 * t);
   const getSectionOpacity = (s: typeof sections[0]) => {
     const p = scrollProgress;
-    if (p <= s.start) return s.start === 0 ? 1 : 0;
-    if (p < s.fadeInEnd) return s.start === 0 ? 1 : smoothStep((p - s.start) / (s.fadeInEnd - s.start));
-    if (p <= s.fadeOutStart) return 1;
-    if (p < s.end) return 1 - smoothStep((p - s.fadeOutStart) / (s.end - s.fadeOutStart));
+    const { start = 0, fadeInEnd = 0, fadeOutStart = 0, end = 0 } = s;
+    if (p <= start) return start === 0 ? 1 : 0;
+    if (p < fadeInEnd) return start === 0 ? 1 : smoothStep((p - start) / (fadeInEnd - start));
+    if (p <= fadeOutStart) return 1;
+    if (p < end) return 1 - smoothStep((p - fadeOutStart) / (end - fadeOutStart));
     return 0;
   };
 
@@ -258,9 +259,21 @@ export default function ScrollImageSequence({
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
       <div
-        className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden"
+        className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden -mt-20 md:mt-0"
         style={{ background: NAVY }}
       >
+        {/* Top HUD Indicators (Mobile only) */}
+        <div className="absolute top-[12vh] right-6 z-10 flex flex-col items-end gap-1.5 md:hidden pointer-events-none opacity-40">
+           <div className="flex gap-1">
+             {[...Array(8)].map((_, i) => (
+                <div key={i} className={`w-[2px] h-4 ${i < 5 ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]' : 'bg-white/20'}`} />
+             ))}
+           </div>
+           <span className="text-[6px] tracking-[0.4em] font-mono text-white/50 uppercase">System Integrity: 98%</span>
+           <div className="w-16 h-[1px] bg-white/10" />
+           <span className="text-[6px] tracking-[0.3em] font-mono text-white/30 uppercase">Node Kass-021</span>
+        </div>
+
         {!imagesLoaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-4">
             <div className="w-8 h-8 border-2 border-white/20 rounded-full animate-spin" style={{ borderTopColor: GOLD }} />
@@ -277,15 +290,23 @@ export default function ScrollImageSequence({
           style={{ willChange: 'transform', transform: 'translateZ(0)' }}
         />
 
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-50 md:opacity-30 pointer-events-none">
+          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent animate-pulse" />
+          <span className="text-[7px] tracking-[0.5em] uppercase text-white/50 font-bold">{t('scroll.down')}</span>
+        </div>
+
         {/* Futuristic Animated Background Elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden z-5">
           {/* Floating Particles */}
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-yellow-500/30 rounded-full animate-pulse"
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-red-500/30 rounded-full animate-pulse"
             style={{ animation: 'float 6s ease-in-out infinite' }}></div>
-          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-[#2b2b36]/20 rounded-full animate-pulse"
-            style={{ animation: 'float 8s ease-in-out infinite 1s' }}></div>
-          <div className="absolute bottom-1/3 left-1/2 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"
+          <div className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-white/10 rounded-full animate-pulse"
+            style={{ animation: 'float 9s ease-in-out infinite 0.5s' }}></div>
+          <div className="absolute bottom-1/3 left-1/2 w-1.5 h-1.5 bg-red-500/20 rounded-full animate-pulse"
             style={{ animation: 'float 7s ease-in-out infinite 2s' }}></div>
+          <div className="absolute top-1/3 left-1/3 w-1 h-1 bg-white/20 rounded-full animate-pulse"
+            style={{ animation: 'float 10s ease-in-out infinite 1.5s' }}></div>
 
           {/* Geometric Lines */}
           <div className="absolute top-1/4 right-0 w-32 h-px bg-gradient-to-l from-yellow-500/30 to-transparent"
@@ -300,14 +321,20 @@ export default function ScrollImageSequence({
             style={{ animation: 'fadeInOut 5s ease-in-out infinite 2s' }}></div>
 
           {/* Scanning Lines */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent"
+          <div className="absolute top-[10vh] left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/10 to-transparent"
             style={{ animation: 'scanDown 8s linear infinite' }}></div>
+          <div className="absolute top-[15vh] left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent"
+            style={{ animation: 'scanDown 12s linear infinite 4s' }}></div>
+          <div className="absolute top-0 left-[20%] w-[1px] h-full bg-gradient-to-b from-transparent via-red-500/5 to-transparent" 
+            style={{ animation: 'slideRight 15s linear infinite' }}></div>
+          <div className="absolute top-0 right-[20%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/5 to-transparent" 
+            style={{ animation: 'slideRight 20s linear infinite reverse' }}></div>
         </div>
 
         {imagesLoaded && (
           <>
             {/* ── Side Navigation ── */}
-            <div className="absolute top-20 w-full md:w-auto md:top-1/3 -translate-y-0 md:-translate-y-1/4 left-0 md:left-12 flex flex-row md:flex-col justify-center z-10 p-2 sm:p-4 md:p-6 rounded-none md:rounded-3xl backdrop-blur-sm md:bg-black/10 border-none md:border md:border-white/[0.03]">
+            <div className="absolute top-[22vh] md:top-1/3 w-[94%] left-[3%] md:left-12 md:w-auto -translate-y-0 md:-translate-y-1/4 flex flex-row md:flex-col justify-between md:justify-center z-20 p-1.5 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-xl bg-white/[0.03] md:bg-black/10 border border-white/[0.08] md:border-white/[0.03] shadow-2xl">
               {/* Vertical Track Line (desktop only) */}
               <div className="absolute left-[27px] md:left-[35px] top-10 bottom-10 w-[2px] bg-white/[0.08] hidden md:block" />
               <div 
@@ -336,10 +363,10 @@ export default function ScrollImageSequence({
                   <button
                     key={label}
                     onClick={handleClick}
-                    className="group relative py-2 sm:py-4 md:py-6 px-3 md:pl-16 md:pr-8 text-[10px] sm:text-xs md:text-base tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center overflow-hidden rounded-lg md:rounded-2xl"
+                    className="group relative py-2.5 md:py-6 px-3 md:pl-16 md:pr-8 text-[9px] sm:text-xs md:text-base tracking-[0.15em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center overflow-hidden rounded-xl md:rounded-2xl flex-1"
                     style={{ 
-                      color: active ? 'white' : 'rgba(255,255,255,0.4)',
-                      fontWeight: active ? '800' : '600',
+                      color: active ? 'white' : 'rgba(255,255,255,0.5)',
+                      fontWeight: active ? '900' : '600',
                     }}
                   >
                     {/* Hover background */}
@@ -351,7 +378,7 @@ export default function ScrollImageSequence({
                     />
                     
                     <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-3 flex flex-col md:flex-row items-center gap-1 md:gap-4">
-                      <span className={`font-black text-[10px] md:text-base transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-600 hidden md:block'}`}>
+                      <span className={`font-black text-[10px] md:text-base transition-colors duration-500 ${active ? 'text-red-500 opacity-100' : 'text-gray-600 opacity-60'}`}>
                         {`0${i+1}`}
                       </span>
                       <span>{label}</span>
@@ -370,15 +397,20 @@ export default function ScrollImageSequence({
               return (
                 <div
                   key={index}
-                  className={'absolute z-10 ' + section.posClass}
-                  style={{ opacity, transform: 'translateY(' + ty + 'px)' }}
+                  className={'absolute z-10 px-4 py-6 md:p-0 ' + section.posClass}
+                  style={{ 
+                    opacity, 
+                    transform: 'translateY(' + ty + 'px)',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+                    borderRadius: '2rem',
+                  }}
                 >
                   {/* Gold rule + subtitle */}
-                  <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                    <div className="h-[1px] w-6 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
+                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="h-[2px] w-8 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
                     <span
-                      className="text-[9px] sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase font-semibold"
-                      style={{ color: GOLD }}
+                      className="text-[10px] sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] uppercase font-black"
+                      style={{ color: GOLD, textShadow: '0 0 10px rgba(239,68,68,0.3)' }}
                     >
                       {section.subtitle}
                     </span>
@@ -386,25 +418,26 @@ export default function ScrollImageSequence({
 
                   {/* Title */}
                   <h1
-                    className="font-black leading-[0.88] mb-3 sm:mb-4 md:mb-5 tracking-tighter text-white"
+                    className="font-black leading-[0.88] mb-3 sm:mb-4 md:mb-5 tracking-tighter text-white drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]"
                     style={{
-                      fontSize: 'clamp(3.5rem, 10vw, 7.5rem)',
+                      fontSize: 'clamp(2.5rem, 12vw, 7.5rem)',
                       textAlign: 'left',
-                      textShadow: '0 2px 40px rgba(0,0,0,0.8)',
+                      textShadow: '0 2px 40px rgba(0,0,0,0.9)',
                     }}
                   >
-                    {section.title.split('\n').map((line, li) => (
+                    {(section.title || '').split('\n').map((line, li) => (
                       <span key={li} style={{ display: 'block' }}>{line}</span>
                     ))}
                   </h1>
 
                   {/* Description - visible on mobile to fill blank space */}
                   <p
-                    className="text-sm md:text-lg leading-relaxed block"
+                    className="text-xs sm:text-sm md:text-lg leading-relaxed block font-medium"
                     style={{
-                      color: 'rgba(255,255,255,0.85)',
+                      color: 'rgba(255,255,255,0.9)',
                       textAlign: 'left',
                       maxWidth: '380px',
+                      textShadow: '0 1px 1px rgba(0,0,0,0.5)',
                     }}
                   >
                     {section.description}
@@ -491,37 +524,47 @@ export default function ScrollImageSequence({
             </div>
 
             {/* ── Left Empty Space Fillers (Tech Elements) ── */}
-            <div className="absolute left-8 md:left-12 bottom-16 md:bottom-28 z-0 flex flex-col gap-10 hidden lg:flex pointer-events-none opacity-80">
+            <div className="absolute left-6 md:left-12 top-[35vh] md:bottom-28 z-0 flex flex-col gap-8 md:gap-10 pointer-events-none opacity-60 md:opacity-80">
               
               {/* Technical Target Graphic */}
-              <div className="relative w-16 h-16 opacity-60">
+              <div className="relative w-12 h-12 md:w-16 md:h-16 opacity-40 md:opacity-60">
                 <div className="absolute inset-0 border border-white/[0.08] rounded-full" />
-                <div className="absolute inset-2 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
-                <div className="absolute inset-4 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
+                <div className="absolute inset-1.5 md:inset-2 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
+                <div className="absolute inset-3.5 md:inset-4 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]" />
+                  <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]" />
                 </div>
                 {/* Crosshairs */}
                 <div className="absolute top-[-10px] bottom-[-10px] left-1/2 w-[1px] bg-white/[0.08]" />
                 <div className="absolute left-[-10px] right-[-10px] top-1/2 h-[1px] bg-white/[0.08]" />
               </div>
+              
+              {/* Technical Scan Marker (Mobile Only) */}
+              <div className="flex md:hidden flex-col gap-1.5 border-l border-white/20 pl-4 py-1">
+                 <span className="text-[7px] tracking-[0.4em] font-mono text-white/30 uppercase">Scan Active</span>
+                 <div className="flex gap-1">
+                   {[...Array(3)].map((_, i) => (
+                     <div key={i} className="w-1 h-1 bg-red-500/50 rounded-full animate-pulse" style={{ animationDelay: i * 200 + 'ms' }} />
+                   ))}
+                 </div>
+              </div>
 
               <div className="flex gap-8 items-end">
                 {/* Coordinates */}
                 <div className="flex flex-col gap-2 border-l-2 border-red-500/40 pl-5 py-1">
-                  <span className="text-[9px] tracking-[0.4em] font-mono text-red-400 uppercase">
+                  <span className="text-[8px] md:text-[9px] tracking-[0.4em] font-mono text-red-500/60 uppercase">
                     {t('scroll.location')}
                   </span>
-                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/70 uppercase">
+                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/50 uppercase">
                     51.3127° N
                   </span>
-                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/70 uppercase">
+                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/50 uppercase">
                     9.4797° E
                   </span>
                 </div>
 
                 {/* Data streams indicator */}
-                <div className="flex gap-2.5 pb-2">
+                <div className="hidden sm:flex gap-2.5 pb-2">
                   {[...Array(5)].map((_, i) => (
                     <div key={i} className="flex flex-col gap-1.5 opacity-60">
                       <div className="w-1 h-3 bg-white/10 rounded-sm" />
@@ -533,8 +576,8 @@ export default function ScrollImageSequence({
             </div>
 
             {/* ── Ambient Background Typography ── */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.03] z-0 mix-blend-overlay hidden xl:block">
-              <span className="text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] md:-translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.04] md:opacity-[0.03] z-0 mix-blend-overlay">
+              <span className="text-[6rem] sm:text-[10rem] md:text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
                 NORDHESSEN
               </span>
             </div>

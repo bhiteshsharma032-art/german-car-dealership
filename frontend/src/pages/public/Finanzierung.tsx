@@ -20,8 +20,10 @@ import Card from '../../components/ui/Card';
 import { Input, Select } from '../../components/ui/FormField';
 import Badge from '../../components/ui/Badge';
 import Accordion from '../../components/ui/Accordion';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Finanzierung() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -51,86 +53,86 @@ export default function Finanzierung() {
   const benefits = [
     {
       icon: <Zap className="w-6 h-6" />,
-      title: 'Schnelle Zusage',
-      description: 'Finanzierungsentscheidung innerhalb von 24 Stunden',
+      title: t('fin.benefits.1.title'),
+      description: t('fin.benefits.1.desc'),
     },
     {
       icon: <Euro className="w-6 h-6" />,
-      title: 'Faire Konditionen',
-      description: 'Transparente Zinssätze ab 3,99% effektiv',
+      title: t('fin.benefits.2.title'),
+      description: t('fin.benefits.2.desc'),
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: 'Flexible Laufzeiten',
-      description: '12 bis 84 Monate nach Ihren Wünschen',
+      title: t('fin.benefits.3.title'),
+      description: t('fin.benefits.3.desc'),
     },
     {
       icon: <Lock className="w-6 h-6" />,
-      title: 'Diskret & Sicher',
-      description: 'Ihre Daten sind bei uns in sicheren Händen',
+      title: t('fin.benefits.4.title'),
+      description: t('fin.benefits.4.desc'),
     },
   ];
 
   const steps = [
     {
       number: '01',
-      title: 'Fahrzeug auswählen',
-      description: 'Wählen Sie Ihr Wunschfahrzeug aus unserem Bestand oder lassen Sie sich beraten.',
+      title: t('fin.steps.1.title'),
+      description: t('fin.steps.1.desc'),
     },
     {
       number: '02',
-      title: 'Finanzierung anfragen',
-      description: 'Füllen Sie unser Formular aus oder kontaktieren Sie uns direkt.',
+      title: t('fin.steps.2.title'),
+      description: t('fin.steps.2.desc'),
     },
     {
       number: '03',
-      title: 'Angebot erhalten',
-      description: 'Wir erstellen Ihnen ein individuelles Finanzierungsangebot.',
+      title: t('fin.steps.3.title'),
+      description: t('fin.steps.3.desc'),
     },
     {
       number: '04',
-      title: 'Vertragsabschluss',
-      description: 'Nach Ihrer Zusage kümmern wir uns um alle Formalitäten.',
+      title: t('fin.steps.4.title'),
+      description: t('fin.steps.4.desc'),
     },
     {
       number: '05',
-      title: 'Fahrzeug übergeben',
-      description: 'Ihr Traumauto wird übergeben – Sie können losfahren!',
+      title: t('fin.steps.5.title'),
+      description: t('fin.steps.5.desc'),
     },
   ];
 
   const faqItems = [
     {
-      title: 'Welche Unterlagen benötige ich für eine Finanzierung?',
-      content: 'Für eine Finanzierungsanfrage benötigen Sie: Gültigen Personalausweis oder Reisepass mit Meldebescheinigung, Ihre letzten drei Gehaltsabrechnungen und einen Nachweis über ein unbefristetes Arbeitsverhältnis (außerhalb der Probezeit).',
+      title: t('fin.faq.1.t'),
+      content: t('fin.faq.1.a'),
     },
     {
-      title: 'Wie wirkt sich die Finanzierungsanfrage auf meinen SCHUFA-Score aus?',
-      content: 'Unsere vorläufige Kreditanfrage ist eine reine "Konditionenanfrage". Diese ist absolut bonitätsneutral und hat keinerlei negativen Einfluss auf Ihren SCHUFA-Score. Erst beim finalen Vertragsabschluss wird der Kredit verbindlich eingetragen.',
+      title: t('fin.faq.2.t'),
+      content: t('fin.faq.2.a'),
     },
     {
-      title: 'Was ist eine Ballonfinanzierung bzw. Zielfinanzierung?',
-      content: 'Bei der Ballonfinanzierung zahlen Sie während der Laufzeit sehr kleine monatliche Raten. Am Vertragsende bleibt eine größere "Schlussrate" (der Ballon) offen. Diese können Sie wahlweise auf einmal ablösen, das Fahrzeug an uns zurückgeben (verbrieftes Rückgaberecht) oder zu neuen Konditionen weiterfinanzieren.',
+      title: t('fin.faq.3.t'),
+      content: t('fin.faq.3.a'),
     },
     {
-      title: 'Sind jederzeit Sondertilgungen möglich?',
-      content: 'Ja! Bei einer Ratenfinanzierung können Sie gesetzlich jederzeit Sondertilgungen leisten oder den Kredit komplett ablösen, um Zinsen zu sparen.',
+      title: t('fin.faq.4.t'),
+      content: t('fin.faq.4.a'),
     },
     {
-      title: 'Wie hoch sollte meine Anzahlung sein?',
-      content: 'Sie können bei uns Ihr Wunschfahrzeug auch problemlos komplett finanzieren (0,- Euro Anzahlung). Eine Anzahlung über 10-20% wird jedoch oft empfohlen, da so die Restschuld und damit Ihre monatliche Rate merklich sinkt.',
+      title: t('fin.faq.5.t'),
+      content: t('fin.faq.5.a'),
     },
     {
-      title: 'Was passiert bei unerwarteter Krankheit oder Arbeitslosigkeit?',
-      content: 'Auf Wunsch sichern wir Sie mit einer Restschuldversicherung (RSV) ab. Diese Zusatzversicherung übernimmt im Falle von unverschuldeter Arbeitslosigkeit, Krankentagegeldbezug oder im schwersten Fall für Hinterbliebene Ihre komplette Finanzierungsrate.',
+      title: t('fin.faq.6.t'),
+      content: t('fin.faq.6.a'),
     },
   ];
 
   return (
     <>
       <Helmet>
-        <title>Finanzierung - Nordhessen Automobile</title>
-        <meta name="description" content="Flexible Fahrzeugfinanzierung mit fairen Konditionen. Schnelle Zusage und individuelle Lösungen für Ihr Traumauto." />
+        <title>{t('nav.financing')} - Nordhessen Automobile</title>
+        <meta name="description" content={t('fin.hero.subtitle')} />
       </Helmet>
 
       <div className="min-h-screen bg-[#1a1a1f] pt-20">
@@ -150,48 +152,49 @@ export default function Finanzierung() {
             <div className="max-w-4xl mx-auto text-center relative z-10">
               <Badge variant="premium" size="lg" className="mb-6">
                 <CreditCard className="w-4 h-4" />
-                Flexible Finanzierung
+                {t('fin.hero.badge')}
               </Badge>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-6">
-                Ihr Traumauto –{' '}
+                {t('fin.hero.title1')}{' '}
                 <span className="bg-gradient-to-r from-[#dc2626] to-[#ef4444] bg-clip-text text-transparent">
-                  einfach finanziert
+                  {t('fin.hero.title2')}
                 </span>
               </h1>
               
               <p className="text-xl text-gray-500 mb-8 leading-relaxed">
-                Faire Konditionen, schnelle Zusage und individuelle Lösungen. 
-                Wir machen Ihren Autokauf möglich – transparent und unkompliziert.
+                {t('fin.hero.subtitle')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="xl" rightIcon={<ArrowRight className="w-5 h-5" />}>
-                  Jetzt Finanzierung anfragen
-                </Button>
-                <Button variant="outline" size="xl">
+                <Link to="/kontakt">
+                  <Button size="xl" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                    {t('fin.hero.cta.inquiry')}
+                  </Button>
+                </Link>
+                <Button variant="outline" size="xl" onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}>
                   <Calculator className="w-5 h-5" />
-                  Rate berechnen
+                  {t('fin.hero.cta.calculate')}
                 </Button>
               </div>
 
               {/* Trust Indicators */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 pt-12 border-t border-white/[0.06]">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-100 mb-1">ab 3,99%</div>
-                  <div className="text-sm text-gray-500">effektiver Jahreszins</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">{t('fin.hero.stats.apr')}</div>
+                  <div className="text-sm text-gray-500">{t('fin.hero.stats.apr_label')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-100 mb-1">24h</div>
-                  <div className="text-sm text-gray-500">Zusage-Garantie</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">{t('fin.hero.stats.approval')}</div>
+                  <div className="text-sm text-gray-500">{t('fin.hero.stats.approval_label')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-100 mb-1">12-84</div>
-                  <div className="text-sm text-gray-500">Monate Laufzeit</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">{t('fin.hero.stats.term')}</div>
+                  <div className="text-sm text-gray-500">{t('fin.hero.stats.term_label')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-100 mb-1">0€</div>
-                  <div className="text-sm text-gray-500">Bearbeitungsgebühr</div>
+                  <div className="text-3xl font-bold text-gray-100 mb-1">{t('fin.hero.stats.fee')}</div>
+                  <div className="text-sm text-gray-500">{t('fin.hero.stats.fee_label')}</div>
                 </div>
               </div>
             </div>
@@ -202,9 +205,9 @@ export default function Finanzierung() {
         <Section variant="default">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>Ihre Vorteile bei uns</SectionTitle>
+              <SectionTitle>{t('fin.benefits.title')}</SectionTitle>
               <SectionSubtitle>
-                Wir bieten Ihnen mehr als nur eine Finanzierung
+                {t('fin.benefits.subtitle')}
               </SectionSubtitle>
             </div>
 
@@ -226,46 +229,46 @@ export default function Finanzierung() {
         <Section variant="dark">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>Unsere Finanzierungsmodelle</SectionTitle>
+              <SectionTitle>{t('fin.models.title')}</SectionTitle>
               <SectionSubtitle>
-                Maßgeschneidert auf Ihre Bedürfnisse und Lebenssituation im deutschen Markt
+                {t('fin.models.subtitle')}
               </SectionSubtitle>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-gray-100 mb-4">Klassische Ratenfinanzierung</h3>
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('fin.models.1.title')}</h3>
                 <p className="text-gray-500 mb-6 min-h-[80px]">
-                  Gleichbleibende monatliche Raten über die gesamte Vertragslaufzeit. Am Ende haben Sie das Fahrzeug komplett abbezahlt. Kein Restwertrisiko und 100% Planungssicherheit.
+                  {t('fin.models.1.desc')}
                 </p>
                 <ul className="space-y-3 text-gray-400">
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Konstante Raten</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Fahrzeug wird am Ende vollständig Ihr Eigentum</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Laufzeit bis zu 84 Monate</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.1.feat1')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.1.feat2')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.1.feat3')}</li>
                 </ul>
               </Card>
 
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-gray-100 mb-4">Ballonfinanzierung</h3>
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('fin.models.2.title')}</h3>
                 <p className="text-gray-500 mb-6 min-h-[80px]">
-                  Äußerst niedrige monatliche Raten kombiniert mit einer Schlussrate am Ende der Laufzeit. Perfekt, wenn Sie liquide bleiben oder später umschichten möchten.
+                  {t('fin.models.2.desc')}
                 </p>
                 <ul className="space-y-3 text-gray-400">
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Sehr geringe monatliche Belastung</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Individuell definierbare Schlussrate</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Anschlussfinanzierung (Schlussrate) möglich</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.2.feat1')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.2.feat2')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.2.feat3')}</li>
                 </ul>
               </Card>
 
               <Card variant="elevated" hover className="p-8 border-t-4 border-t-red-600">
-                <h3 className="text-2xl font-bold text-gray-100 mb-4">3-Wege-Finanzierung</h3>
+                <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('fin.models.3.title')}</h3>
                 <p className="text-gray-500 mb-6 min-h-[80px]">
-                  Die flexibelste Finanzierung am Markt. Am Laufzeitende wählen Sie: Auto kaufen, Ballon weiterfinanzieren oder einfach an uns zurückgeben!
+                  {t('fin.models.3.desc')}
                 </p>
                 <ul className="space-y-3 text-gray-400">
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Absolute Entscheidungsfreiheit am Ende</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Garantierter Rücknahmewert</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> Null Wertverlustrisiko</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.3.feat1')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.3.feat2')}</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-red-500" /> {t('fin.models.3.feat3')}</li>
                 </ul>
               </Card>
             </div>
@@ -276,9 +279,9 @@ export default function Finanzierung() {
         <Section variant="default">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>So einfach geht's</SectionTitle>
+              <SectionTitle>{t('fin.steps.title')}</SectionTitle>
               <SectionSubtitle>
-                In 5 Schritten zu Ihrem finanzierten Traumauto
+                {t('fin.steps.subtitle')}
               </SectionSubtitle>
             </div>
 
@@ -306,19 +309,19 @@ export default function Finanzierung() {
         </Section>
 
         {/* Calculator & Form Section */}
-        <Section variant="default">
+        <Section variant="default" id="calculator">
           <SectionContent>
             <div className="max-w-xl mx-auto">
               {/* Calculator */}
               <div>
                 <h2 className="text-3xl font-bold text-gray-100 mb-6">
                   <Calculator className="w-8 h-8 inline-block mr-3 text-red-500" />
-                  Ratenrechner
+                  {t('fin.calc.title')}
                 </h2>
                 <Card variant="elevated" className="p-6">
                   <div className="space-y-4">
                     <Input
-                      label="Fahrzeugpreis"
+                      label={t('fin.calc.price')}
                       type="number"
                       placeholder="25000"
                       value={formData.vehiclePrice}
@@ -326,7 +329,7 @@ export default function Finanzierung() {
                       rightIcon={<span className="text-gray-400">€</span>}
                     />
                     <Input
-                      label="Anzahlung (optional)"
+                      label={t('fin.calc.downpayment')}
                       type="number"
                       placeholder="5000"
                       value={formData.downPayment}
@@ -334,37 +337,37 @@ export default function Finanzierung() {
                       rightIcon={<span className="text-gray-400">€</span>}
                     />
                     <Select
-                      label="Laufzeit"
+                      label={t('fin.calc.term')}
                       value={formData.term}
                       onChange={(e) => setFormData({ ...formData, term: e.target.value })}
                       options={[
-                        { value: '12', label: '12 Monate' },
-                        { value: '24', label: '24 Monate' },
-                        { value: '36', label: '36 Monate' },
-                        { value: '48', label: '48 Monate' },
-                        { value: '60', label: '60 Monate' },
-                        { value: '72', label: '72 Monate' },
-                        { value: '84', label: '84 Monate' },
+                        { value: '12', label: '12 ' + t('car.data.months') },
+                        { value: '24', label: '24 ' + t('car.data.months') },
+                        { value: '36', label: '36 ' + t('car.data.months') },
+                        { value: '48', label: '48 ' + t('car.data.months') },
+                        { value: '60', label: '60 ' + t('car.data.months') },
+                        { value: '72', label: '72 ' + t('car.data.months') },
+                        { value: '84', label: '84 ' + t('car.data.months') },
                       ]}
                     />
                     <Button onClick={calculateMonthly} className="w-full" size="lg">
-                      Rate berechnen
+                      {t('fin.calc.button')}
                     </Button>
 
                     {monthlyPayment && (
                       <div className="mt-6 p-6 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-xl text-center">
-                        <div className="text-sm text-white/80 mb-2">Ihre monatliche Rate</div>
+                        <div className="text-sm text-white/80 mb-2">{t('fin.calc.result.label')}</div>
                         <div className="text-4xl font-bold text-white mb-2">
                           {monthlyPayment.toLocaleString('de-DE')} €
                         </div>
                         <div className="text-sm text-white/80">
-                          bei {formData.term} Monaten Laufzeit
+                          {t('fin.calc.result.desc').replace('{term}', formData.term)}
                         </div>
                       </div>
                     )}
 
                     <p className="text-xs text-gray-500 mt-4">
-                      * Beispielrechnung. Bonität vorausgesetzt. Effektiver Jahreszins ab 3,99%.
+                      {t('fin.calc.disclaimer')}
                     </p>
                   </div>
                 </Card>
@@ -380,55 +383,55 @@ export default function Finanzierung() {
           <SectionContent>
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <SectionTitle>Voraussetzungen</SectionTitle>
+                <SectionTitle>{t('fin.req.title')}</SectionTitle>
                 <SectionSubtitle>
-                  Was Sie für eine Finanzierung benötigen
+                  {t('fin.req.subtitle')}
                 </SectionSubtitle>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card variant="elevated" className="p-6">
                   <Users className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-xl font-bold text-gray-100 mb-3">Persönliche Voraussetzungen</h3>
+                  <h3 className="text-xl font-bold text-gray-100 mb-3">{t('fin.req.personal')}</h3>
                   <ul className="space-y-2 text-gray-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Mindestalter 18 Jahre</span>
+                      <span>{t('fin.requirements.1') || 'Mindestalter 18 Jahre'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Wohnsitz in Deutschland</span>
+                      <span>{t('fin.requirements.2') || 'Wohnsitz in Deutschland'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Regelmäßiges Einkommen</span>
+                      <span>{t('fin.requirements.3') || 'Regelmäßiges Einkommen'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Positive Bonität</span>
+                      <span>{t('fin.requirements.4') || 'Positive Bonität'}</span>
                     </li>
                   </ul>
                 </Card>
 
                 <Card variant="elevated" className="p-6">
                   <FileText className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-xl font-bold text-gray-100 mb-3">Benötigte Unterlagen</h3>
+                  <h3 className="text-xl font-bold text-gray-100 mb-3">{t('fin.req.documents')}</h3>
                   <ul className="space-y-2 text-gray-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Personalausweis oder Reisepass</span>
+                      <span>{t('fin.documents.1') || 'Personalausweis oder Reisepass'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Gehaltsabrechnungen (letzte 3 Monate)</span>
+                      <span>{t('fin.documents.2') || 'Gehaltsabrechnungen (letzte 3 Monate)'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Kontoauszüge</span>
+                      <span>{t('fin.documents.3') || 'Kontoauszüge'}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>Ggf. Nachweise über weitere Einkünfte</span>
+                      <span>{t('fin.documents.4') || 'Ggf. Nachweise über weitere Einkünfte'}</span>
                     </li>
                   </ul>
                 </Card>
@@ -442,9 +445,9 @@ export default function Finanzierung() {
           <SectionContent>
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <SectionTitle>Häufige Fragen</SectionTitle>
+                <SectionTitle>{t('fin.faq.title')}</SectionTitle>
                 <SectionSubtitle>
-                  Antworten auf die wichtigsten Fragen zur Finanzierung
+                  {t('fin.faq.subtitle')}
                 </SectionSubtitle>
               </div>
 
@@ -453,7 +456,7 @@ export default function Finanzierung() {
               <div className="text-center mt-8">
                 <Link to="/faq">
                   <Button variant="outline" size="lg">
-                    Alle FAQs ansehen
+                    {t('nav.faq')}
                   </Button>
                 </Link>
               </div>
@@ -467,20 +470,20 @@ export default function Finanzierung() {
             <div className="max-w-4xl mx-auto text-center">
               <TrendingUp className="w-16 h-16 text-red-500 mx-auto mb-6" />
               <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
-                Bereit für Ihr Traumauto?
+                {t('fin.cta.title')}
               </h2>
               <p className="text-xl text-gray-500 mb-8">
-                Entdecken Sie unsere Fahrzeuge und finden Sie Ihr perfektes Auto
+                {t('fin.cta.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/fahrzeuge">
                   <Button size="xl">
-                    Fahrzeuge ansehen
+                    {t('nav.inventory')}
                   </Button>
                 </Link>
                 <Link to="/kontakt">
                   <Button variant="outline" size="xl">
-                    Persönliche Beratung
+                    {t('nav.contact')}
                   </Button>
                 </Link>
               </div>

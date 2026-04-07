@@ -26,6 +26,7 @@ async function makeMobileDeRequest(endpoint: string, params: Record<string, any>
       headers: {
         'Authorization': getAuthHeader(),
         'Accept': 'application/xml',
+        'Accept-Language': 'de',
         'User-Agent': 'Nordhessen-Automobile/1.0'
       },
       params,
@@ -65,15 +66,34 @@ function transformVehicle(ad: any) {
   const price = ad['ad:price'] || {};
   const images = ad['ad:images'] || {};
   const specifics = vehicle['ad:specifics'] || {};
+  const seller = ad['ad:seller'] || {};
   
   // Extract make and model
   const make = vehicle['ad:make']?.['resource:local-description']?._ || 'Unknown';
   const model = vehicle['ad:model']?.['resource:local-description']?._ || 'Unknown';
   const modelDescription = vehicle['ad:model-description']?.$?.value || '';
   
-  // Extract price
+  // Extract price — gross (consumer) price
   const priceAmount = parseFloat(price['ad:consumer-price-amount']?.$?.value || '0');
   const currency = price.$?.currency || 'EUR';
+  
+  // Extract dealer/net price if available
+  const dealerPriceAmount = parseFloat(price['ad:dealer-price-amount']?.$?.value || '0');
+  
+  // VAT rate: mobile.de provides a 'vatable' flag or 'vat-rate'
+  const vatRate = parseFloat(price['ad:vat-rate']?.$?.value || '0');
+  const isVatable = price.$?.type === 'FIXED_WITH_VAT' || 
+                    price.$?.vattype === 'DISPLAY' ||
+                    price['ad:vatable']?.$?.value === 'true' ||
+                    vatRate > 0 ||
+                    dealerPriceAmount > 0;
+  
+  // Calculate net price: use dealer price if available, otherwise derive from gross
+  let netPrice = dealerPriceAmount;
+  if (!netPrice && isVatable && priceAmount > 0) {
+    const effectiveVatRate = vatRate > 0 ? vatRate : 19; // German standard VAT
+    netPrice = Math.round((priceAmount / (1 + effectiveVatRate / 100)) * 100) / 100;
+  }
   
   // Extract mileage from specifics
   const mileageValue = parseInt(specifics['ad:mileage']?.$?.value || '0');
@@ -106,6 +126,10 @@ function transformVehicle(ad: any) {
   const previousOwners = specifics['ad:number-of-previous-owners'] || 'Unknown';
   const driveType = specifics['ad:drive-type']?.$?.value || 'Unknown';
   
+  // Extract seller info
+  const sellerName = seller['ad:company-name']?.$?.value || seller['ad:company-name'] || '';
+  const sellerType = seller.$?.type || '';
+  
   // Extract features
   const features = vehicle['ad:features']?.['ad:feature'] || [];
   const featureList = Array.isArray(features) ? 
@@ -121,7 +145,11 @@ function transformVehicle(ad: any) {
     price: {
       amount: priceAmount,
       currency: currency,
-      formatted: `${priceAmount.toLocaleString('de-DE')} ${currency}`
+      formatted: `${priceAmount.toLocaleString('de-DE')} €`,
+      netAmount: netPrice || null,
+      netFormatted: netPrice ? `${netPrice.toLocaleString('de-DE')} €` : null,
+      isVatable: isVatable,
+      vatRate: vatRate || 19
     },
     image: getFirstImage(images),
     images: getAllImages(images),
@@ -149,6 +177,10 @@ function transformVehicle(ad: any) {
     previousOwners: previousOwners,
     driveType: driveType,
     features: featureList,
+    seller: {
+      name: sellerName || 'Nordhessen-Automobile',
+      type: sellerType
+    },
     publicUrl: ad.$?.url || '#'
   };
   
@@ -156,9 +188,13 @@ function transformVehicle(ad: any) {
     id: transformedVehicle.id,
     title: transformedVehicle.title,
     price: transformedVehicle.price.formatted,
+    netPrice: transformedVehicle.price.netFormatted,
+    isVatable: transformedVehicle.price.isVatable,
     mileage: transformedVehicle.mileage.formatted,
     year: transformedVehicle.year,
-    power: transformedVehicle.power.formatted
+    power: transformedVehicle.power.formatted,
+    fuelType: transformedVehicle.fuelType,
+    transmission: transformedVehicle.transmission
   });
   
   return transformedVehicle;
@@ -185,16 +221,20 @@ function getFirstImage(images: any): string | null {
     const representations = Array.isArray(firstImage['ad:representation']) ? 
                            firstImage['ad:representation'] : [firstImage['ad:representation']];
     
-    // Look for XL (Extra Large) size first, then L, then M, then S
-    const largeImage = representations.find((rep: any) => rep.$?.size === 'XL') ||
+    // Prefer largest image: XXXL > XXL > XL > L > M > S
+    const largeImage = representations.find((rep: any) => rep.$?.size === 'XXXL') ||
+                      representations.find((rep: any) => rep.$?.size === 'XXL') ||
+                      representations.find((rep: any) => rep.$?.size === 'XL') ||
                       representations.find((rep: any) => rep.$?.size === 'L') ||
                       representations.find((rep: any) => rep.$?.size === 'M') ||
                       representations[0];
     
-    return largeImage?.$?.url || largeImage?.url || null;
+    const url = largeImage?.$?.url || largeImage?.url || null;
+    return url ? url.replace(/^http:\/\//i, 'https://') : null;
   }
   
-  return firstImage.$?.url || firstImage.url || null;
+  const fallbackUrl = firstImage.$?.url || firstImage.url || null;
+  return fallbackUrl ? fallbackUrl.replace(/^http:\/\//i, 'https://') : null;
 }
 
 // Extract ALL images from mobile.de images structure
@@ -209,21 +249,25 @@ function getAllImages(images: any): string[] {
       const representations = Array.isArray(image['ad:representation']) ? 
                              image['ad:representation'] : [image['ad:representation']];
       
-      // Get the largest representation for each image (prefer XL, then L, then M, then S)
-      const largeImage = representations.find((rep: any) => rep.$?.size === 'XL') ||
+      // Get the largest representation for each image (prefer XXXL > XXL > XL > L > M > S)
+      const largeImage = representations.find((rep: any) => rep.$?.size === 'XXXL') ||
+                        representations.find((rep: any) => rep.$?.size === 'XXL') ||
+                        representations.find((rep: any) => rep.$?.size === 'XL') ||
                         representations.find((rep: any) => rep.$?.size === 'L') ||
                         representations.find((rep: any) => rep.$?.size === 'M') ||
                         representations[0];
       
-      if (largeImage?.$?.url) {
-        allImages.push(largeImage.$.url);
-      } else if (largeImage?.url) {
-        allImages.push(largeImage.url);
+      const url1 = largeImage?.$?.url;
+      const url2 = largeImage?.url;
+      if (url1) {
+        allImages.push(url1.replace(/^http:\/\//i, 'https://'));
+      } else if (url2) {
+        allImages.push(url2.replace(/^http:\/\//i, 'https://'));
       }
     } else if (image.$?.url) {
-      allImages.push(image.$.url);
+      allImages.push(image.$.url.replace(/^http:\/\//i, 'https://'));
     } else if (image.url) {
-      allImages.push(image.url);
+      allImages.push(image.url.replace(/^http:\/\//i, 'https://'));
     }
   });
   
@@ -354,6 +398,48 @@ export class InventoryController {
         success: false,
         data: [],
         total: 0,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get single vehicle by ID
+   * GET /api/inventory/:id
+   */
+  async getVehicleById(req: Request, res: Response) {
+    try {
+      console.log(`🚗 Fetching specific vehicle ad ${req.params.id} from mobile.de...`);
+      
+      const result = await makeMobileDeRequest(`/ad/${req.params.id}`);
+
+      if (result.success) {
+        const parsed = await parseXMLResponse(result.data);
+        const adData = parsed['ad:ad'];
+        if (!adData) {
+           return res.status(404).json({ success: false, data: null, message: 'Vehicle not found' });
+        }
+        
+        const vehicle = transformVehicle(adData);
+        res.json({
+          success: true,
+          data: vehicle,
+          message: `Successfully fetched vehicle details`
+        });
+      } else {
+        res.status(result.error?.status || 500).json({
+          success: false,
+          data: null,
+          error: result.error,
+          message: 'Failed to fetch inventory from mobile.de'
+        });
+      }
+    } catch (error: any) {
+      console.error('Controller error:', error);
+      res.status(500).json({
+        success: false,
+        data: null,
         message: 'Internal server error',
         error: error.message
       });

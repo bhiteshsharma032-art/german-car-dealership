@@ -13,13 +13,10 @@ import {
   Zap,
   Users,
   Palette,
-  Shield,
   Phone,
-  Mail,
 
   MapPin,
   CheckCircle,
-  Heart,
   Share2,
   AlertCircle,
 } from 'lucide-react';
@@ -29,17 +26,18 @@ import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import VehicleCard from '../../components/inventory/VehicleCard';
 import { cn } from '../../utils/cn';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function CarDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [vehicle, setVehicle] = useState<Car | null>(null);
   const [similarVehicles, setSimilarVehicles] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -57,7 +55,7 @@ export default function CarDetail() {
       setVehicle(car);
     } catch (err) {
       console.error('Error loading vehicle:', err);
-      setError('Fahrzeug nicht gefunden');
+      setError('not_found');
     } finally {
       setLoading(false);
     }
@@ -120,16 +118,16 @@ export default function CarDetail() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <Card variant="elevated" className="max-w-2xl mx-auto p-10 text-center border border-white/[0.08] bg-white/[0.02] backdrop-blur-xl">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-6" />
-            <h2 className="text-3xl font-display font-bold text-gray-100 mb-3">Fahrzeug nicht gefunden</h2>
+            <h2 className="text-3xl font-display font-bold text-gray-100 mb-3">{t('car.error.not_found')}</h2>
             <p className="text-gray-400 mb-8 font-light">
-              Das gesuchte Fahrzeug ist nicht verfügbar oder wurde bereits verkauft.
+              {t('car.error.not_found_desc')}
             </p>
             <div className="flex gap-4 justify-center">
               <Button onClick={() => navigate('/fahrzeuge')} className="bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
-                Zur Fahrzeugübersicht
+                {t('car.error.back_to_list')}
               </Button>
               <Button variant="secondary" onClick={() => navigate('/kontakt')} className="bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1] text-gray-200 rounded-xl">
-                Kontakt aufnehmen
+                {t('car.error.contact')}
               </Button>
             </div>
           </Card>
@@ -150,11 +148,11 @@ export default function CarDetail() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center gap-2 text-sm text-gray-500">
             <Link to="/" className="hover:text-red-400 transition-colors">
-              Startseite
+              {t('nav.home')}
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link to="/fahrzeuge" className="hover:text-red-400 transition-colors">
-              Fahrzeuge
+              {t('nav.inventory')}
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-100">{vehicle.brand} {vehicle.model}</span>
@@ -220,24 +218,44 @@ export default function CarDetail() {
                 {/* Thumbnail Grid */}
                 {vehicle.images && vehicle.images.length > 1 && (
                   <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-                    {vehicle.images.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={cn(
-                          'aspect-video rounded-xl overflow-hidden border-2 transition-all hover:scale-105',
-                          selectedImageIndex === index
-                            ? 'border-[#ef4444] shadow-glow-red'
-                            : 'border-transparent opacity-60 hover:opacity-100 hover:border-white/20'
-                        )}
-                      >
-                        <img
-                          src={image}
-                          alt={`${vehicle.brand} ${vehicle.model} - Bild ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                    {vehicle.images.map((image, index) => {
+                      const isHidden = index > 11;
+                      const isLastVisible = index === 11;
+                      const hasMoreImages = vehicle.images.length > 12;
+
+                      if (isHidden) return null;
+
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setSelectedImageIndex(index);
+                            // If they tap the "+X" button, pop open the lightbox immediately
+                            if (isLastVisible && hasMoreImages) {
+                              setShowLightbox(true);
+                            }
+                          }}
+                          className={cn(
+                            'relative aspect-video rounded-xl overflow-hidden border-2 transition-all hover:scale-105',
+                            selectedImageIndex === index
+                              ? 'border-[#ef4444] shadow-glow-red'
+                              : 'border-transparent opacity-60 hover:opacity-100 hover:border-white/20'
+                          )}
+                        >
+                          <img
+                            src={image}
+                            alt={`${vehicle.brand} ${vehicle.model} - Bild ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {/* "+X" overlay on the 12th image */}
+                          {isLastVisible && hasMoreImages && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                              <span className="text-white font-bold text-xl drop-shadow-md">+{vehicle.images.length - 11}</span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </motion.div>
@@ -247,22 +265,11 @@ export default function CarDetail() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h1 className="text-3xl md:text-5xl font-display font-bold text-gray-100 mb-2 tracking-tight">
-                      {vehicle.brand} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">{vehicle.model}</span>
+                      {vehicle.title || `${vehicle.brand} ${vehicle.model}`}
                     </h1>
                     <p className="text-lg text-gray-400 font-light">{vehicle.description}</p>
                   </div>
                   <div className="flex gap-3">
-                    <button
-                      onClick={() => setIsFavorite(!isFavorite)}
-                      className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass"
-                    >
-                      <Heart
-                        className={cn(
-                          'w-5 h-5 transition-colors',
-                          isFavorite ? 'text-red-500 fill-[#ef4444] drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'text-gray-400'
-                        )}
-                      />
-                    </button>
                     <button className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass">
                       <Share2 className="w-5 h-5 text-gray-400 hover:text-white" />
                     </button>
@@ -272,102 +279,115 @@ export default function CarDetail() {
                 <div className="flex flex-wrap gap-2">
                   {vehicle.isExclusive && (
                     <Badge variant="premium" size="md">
-                      Top Angebot
-                    </Badge>
-                  )}
-                  {vehicle.warranty && (
-                    <Badge variant="success" size="md">
-                      <Shield className="w-4 h-4" />
-                      Garantie inklusive
+                      {t('car.badge.top_offer')}
                     </Badge>
                   )}
                   <Badge variant="info" size="md">
-                    {vehicle.condition}
+                    {t(`attr.cond.${vehicle.condition}`)}
                   </Badge>
                 </div>
               </div>
 
               {/* Key Facts Grid */}
-              <Card variant="elevated">
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-100 mb-6">Fahrzeugdaten</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="relative bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
+                <div className="absolute top-0 right-1/2 w-64 h-64 bg-red-500/5 rounded-full blur-3xl group-hover:bg-red-500/10 transition-all duration-500" />
+                <div className="relative z-10">
+                  <h2 className="text-2xl font-display font-bold text-white mb-8 flex items-center gap-3">
+                    <div className="w-8 h-px bg-red-500" />
+                    {t('car.data.title')}
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <FactItem
                       icon={<Calendar className="w-5 h-5" />}
-                      label="Erstzulassung"
+                      label={t('car.data.year')}
                       value={vehicle.year.toString()}
                     />
                     <FactItem
                       icon={<Gauge className="w-5 h-5" />}
-                      label="Kilometerstand"
-                      value={`${vehicle.mileage.toLocaleString('de-DE')} km`}
+                      label={t('car.data.mileage')}
+                      value={vehicle.mileageFormatted || `${vehicle.mileage.toLocaleString('de-DE')} km`}
                     />
                     <FactItem
                       icon={<Fuel className="w-5 h-5" />}
-                      label="Kraftstoff"
-                      value={vehicle.fuelType}
+                      label={t('car.data.fuel')}
+                      value={t(`attr.fuel.${vehicle.fuelType}`)}
                     />
                     <FactItem
                       icon={<Settings className="w-5 h-5" />}
-                      label="Getriebe"
-                      value={vehicle.transmission}
+                      label={t('car.data.transmission')}
+                      value={t(`attr.trans.${vehicle.transmission}`)}
                     />
                     <FactItem
                       icon={<Zap className="w-5 h-5" />}
-                      label="Leistung"
-                      value={`${vehicle.horsePower} PS`}
+                      label={t('car.data.power')}
+                      value={vehicle.powerFormatted || `${vehicle.horsePower} PS`}
                     />
                     <FactItem
                       icon={<Users className="w-5 h-5" />}
-                      label="Vorbesitzer"
+                      label={t('car.data.owners')}
                       value={vehicle.previousOwners.toString()}
                     />
+                    {vehicle.exteriorColor && vehicle.exteriorColor !== 'Unknown' && (
                     <FactItem
                       icon={<Palette className="w-5 h-5" />}
-                      label="Außenfarbe"
-                      value={vehicle.exteriorColor}
+                      label={t('car.data.ext_color')}
+                      value={t(`attr.color.${vehicle.exteriorColor}`)}
                     />
+                    )}
+                    {vehicle.interiorColor && vehicle.interiorColor !== 'Unknown' && (
                     <FactItem
                       icon={<Palette className="w-5 h-5" />}
-                      label="Innenausstattung"
-                      value={vehicle.interiorColor}
+                      label={t('car.data.int_color')}
+                      value={t(`attr.color.${vehicle.interiorColor}`)}
                     />
-                    <FactItem
-                      icon={<Shield className="w-5 h-5" />}
-                      label="Garantie"
-                      value={vehicle.warranty ? `${vehicle.warrantyMonths || 12} Monate` : 'Keine'}
-                    />
+                    )}
                   </div>
                 </div>
-              </Card>
+              </div>
 
               {/* Description */}
               {vehicle.description && (
-                <Card variant="elevated">
-                  <div className="p-6">
-                    <h2 className="text-xl font-bold text-gray-100 mb-4">Beschreibung</h2>
-                    <p className="text-gray-400 leading-relaxed whitespace-pre-line">
-                      {vehicle.description}
-                    </p>
+                <div className="relative bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-red-500/80 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute top-0 -right-20 w-64 h-64 bg-red-500/5 rounded-full blur-3xl group-hover:bg-red-500/10 transition-all duration-500" />
+                  <div className="relative z-10">
+                    <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center gap-3">
+                      <div className="w-8 h-px bg-red-500" />
+                      {t('car.description.title')}
+                    </h2>
+                    <div className="prose prose-invert max-w-none">
+                      <p className="text-gray-300/90 leading-loose whitespace-pre-line font-light text-lg">
+                        {vehicle.description}
+                      </p>
+                    </div>
                   </div>
-                </Card>
+                </div>
               )}
 
               {/* Features */}
               {vehicle.features && vehicle.features.length > 0 && (
-                <Card variant="elevated">
-                  <div className="p-6">
-                    <h2 className="text-xl font-bold text-gray-100 mb-4">Ausstattung</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="relative bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
+                  <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-red-500/5 rounded-full blur-3xl group-hover:bg-red-500/10 transition-all duration-500" />
+                  <div className="relative z-10">
+                    <h2 className="text-2xl font-display font-bold text-white mb-8 flex items-center gap-3">
+                      <div className="w-8 h-px bg-red-500" />
+                      {t('car.features.title')}
+                    </h2>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                       {vehicle.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-2 text-gray-400">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                          <span>{feature}</span>
-                        </div>
+                        <li 
+                          key={index} 
+                          className="flex items-start gap-4 py-3 border-b border-white/[0.05] group"
+                        >
+                          <div className="mt-0.5 w-6 h-6 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-red-500/20 group-hover:scale-110 transition-all duration-300">
+                            <CheckCircle className="w-3.5 h-3.5 text-red-500 opacity-80 group-hover:opacity-100" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-300 leading-snug pt-0.5">{feature}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
-                </Card>
+                </div>
               )}
             </div>
 
@@ -377,16 +397,27 @@ export default function CarDetail() {
               <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 shadow-glass relative overflow-hidden group hover:border-white/[0.15] transition-all duration-500">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/10 rounded-full blur-3xl group-hover:bg-red-500/20 transition-all duration-500" />
                 <div className="relative z-10">
-                  <div className="text-sm text-gray-400 mb-2 font-medium tracking-wide uppercase">Preis</div>
-                  <div className="text-5xl font-display font-bold text-gray-100 mb-8 tracking-tight">
-                    {vehicle.price.toLocaleString('de-DE')} €
+                  <div className="text-sm text-gray-400 mb-2 font-medium tracking-wide uppercase">{t('car.price.label')}</div>
+                  <div className="text-5xl font-display font-bold text-gray-100 mb-2 tracking-tight">
+                    {vehicle.priceFormatted || `${vehicle.price.toLocaleString('de-DE')} €`}
                   </div>
+                  {vehicle.isVatable && vehicle.netPriceFormatted && (
+                    <div className="mb-6">
+                      <div className="text-sm text-gray-400">
+                        {vehicle.netPriceFormatted} {t('car.price.net')}
+                      </div>
+                      <span className="inline-flex items-center mt-1 px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-xs font-semibold border border-green-500/20">
+                        {t('car.price.vat_reclaimable')}
+                      </span>
+                    </div>
+                  )}
+                  {!vehicle.isVatable && <div className="mb-6" />}
 
                   <div className="space-y-4">
                     <a href="tel:+4956193004649" className="block w-full border-0 p-0 m-0">
                       <Button size="lg" className="w-full h-14 bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
                         <Phone className="w-5 h-5 pointer-events-none" />
-                        Jetzt anrufen
+                        {t('car.price.call_now')}
                       </Button>
                     </a>
                   </div>
@@ -400,19 +431,13 @@ export default function CarDetail() {
                     <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
                       <CheckCircle className="w-5 h-5 text-red-500" />
                     </div>
-                    <span className="text-sm text-gray-300 font-medium">Geprüfte Qualität</span>
-                  </div>
-                  <div className="flex items-center gap-4 group cursor-default">
-                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                      <Shield className="w-5 h-5 text-red-500" />
-                    </div>
-                    <span className="text-sm text-gray-300 font-medium">Garantie inklusive</span>
+                    <span className="text-sm text-gray-300 font-medium">{t('service.list.1.title')}</span>
                   </div>
                   <div className="flex items-center gap-4 group cursor-default">
                     <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
                       <CheckCircle className="w-5 h-5 text-red-500" />
                     </div>
-                    <span className="text-sm text-gray-300 font-medium">Faire Preise</span>
+                    <span className="text-sm text-gray-300 font-medium">{t('service.advantages.3.title')}</span>
                   </div>
                 </div>
               </div>
@@ -421,9 +446,10 @@ export default function CarDetail() {
               <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-6 shadow-glass">
                 <h3 className="font-display font-semibold text-gray-100 mb-4 flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-red-500" />
-                  Standort
+                  {t('car.location.title')}
                 </h3>
-                <p className="text-gray-300 text-sm mb-2 font-medium">Nordhessen-Automobile Seidler & Osmikhovsky GbR</p>
+                <p className="text-gray-300 text-sm mb-1 font-semibold">Nordhessen-Automobile</p>
+                <p className="text-gray-400 text-sm mb-2">Seidler und Osmikhovski GbR</p>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   Sandershäuser Straße 87a<br />
                   34123 Kassel
@@ -435,7 +461,7 @@ export default function CarDetail() {
           {/* Similar Vehicles */}
           {similarVehicles.length > 0 && (
             <div className="mt-16">
-              <h2 className="text-3xl font-bold text-gray-100 mb-8">Ähnliche Fahrzeuge</h2>
+              <h2 className="text-3xl font-bold text-gray-100 mb-8">{t('car.similar.title')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {similarVehicles.map((car) => (
                   <VehicleCard
@@ -443,17 +469,20 @@ export default function CarDetail() {
                     id={car.id}
                     make={car.brand}
                     model={car.model}
-                    title={`${car.brand} ${car.model}`}
+                    title={car.title || `${car.brand} ${car.model}`}
                     price={{
                       amount: car.price,
-                      formatted: `${car.price.toLocaleString('de-DE')} €`,
+                      formatted: car.priceFormatted || `${car.price.toLocaleString('de-DE')} €`,
                     }}
+                    netPrice={car.netPrice}
+                    netPriceFormatted={car.netPriceFormatted}
+                    isVatable={car.isVatable}
                     mileage={{
-                      formatted: `${car.mileage.toLocaleString('de-DE')} km`,
+                      formatted: car.mileageFormatted || `${car.mileage.toLocaleString('de-DE')} km`,
                     }}
                     firstRegistration={`${car.year}-01-01`}
                     power={{
-                      formatted: `${car.horsePower} PS`,
+                      formatted: car.powerFormatted || `${car.horsePower} PS`,
                     }}
                     fuelType={car.fuelType}
                     transmission={car.transmission}
@@ -470,10 +499,10 @@ export default function CarDetail() {
         {/* Lightbox */}
         <AnimatePresence>
           {showLightbox && vehicle.images && vehicle.images.length > 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-xl flex items-center justify-center">
               <button
                 onClick={() => setShowLightbox(false)}
-                className="absolute top-6 right-6 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
               >
                 <X className="w-6 h-6 text-white" />
               </button>
@@ -481,9 +510,9 @@ export default function CarDetail() {
               {vehicle.images.length > 1 && (
                 <button
                   onClick={prevImage}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                  className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
                 >
-                  <ChevronLeft className="w-8 h-8 text-white mr-1" />
+                  <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 text-white mr-1" />
                 </button>
               )}
 
@@ -495,19 +524,19 @@ export default function CarDetail() {
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 src={vehicle.images[selectedImageIndex]}
                 alt={`${vehicle.brand} ${vehicle.model}`}
-                className="max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl"
+                className="w-[100vw] md:w-[90vw] h-[100vh] md:h-[90vh] object-contain drop-shadow-2xl"
               />
 
               {vehicle.images.length > 1 && (
                 <button
                   onClick={nextImage}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
+                  className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-10 h-10 md:w-14 md:h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all border border-white/20 hover:scale-110"
                 >
-                  <ChevronRight className="w-8 h-8 text-white ml-1" />
+                  <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-white ml-1" />
                 </button>
               )}
 
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl text-white font-medium tracking-widest border border-white/20">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl text-white font-medium tracking-widest border border-white/20 text-sm md:text-base">
                 {selectedImageIndex + 1} / {vehicle.images.length}
               </div>
             </motion.div>
@@ -526,12 +555,14 @@ interface FactItemProps {
 
 function FactItem({ icon, label, value }: FactItemProps) {
   return (
-    <div>
-      <div className="flex items-center gap-2 text-gray-500 mb-1">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 group overflow-hidden">
+      <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center flex-shrink-0 text-red-500 group-hover:scale-110 group-hover:bg-red-500/20 transition-all duration-300">
         {icon}
-        <span className="text-sm">{label}</span>
       </div>
-      <div className="text-gray-100 font-semibold">{value}</div>
+      <div className="min-w-0 pr-1">
+        <div className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 truncate">{label}</div>
+        <div className="text-[13px] sm:text-sm font-bold text-gray-100 break-words leading-tight">{value}</div>
+      </div>
     </div>
   );
 }

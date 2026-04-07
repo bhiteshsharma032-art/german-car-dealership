@@ -18,6 +18,9 @@ import Datenschutz from './pages/legal/Datenschutz';
 // Company Pages
 import Geschichte from './pages/public/Geschichte';
 
+// Services
+import Inzahlungnahme from './pages/public/Inzahlungnahme';
+
 // Utility Pages
 import NotFound from './pages/utility/NotFound';
 
@@ -45,6 +48,7 @@ function App() {
           <Route path="/datenschutz" element={<Datenschutz />} />
           {/* Company Pages */}
           <Route path="/geschichte" element={<Geschichte />} />
+          <Route path="/inzahlungnahme" element={<Inzahlungnahme />} />
           
           {/* 404 - Must be last */}
           <Route path="*" element={<NotFound />} />

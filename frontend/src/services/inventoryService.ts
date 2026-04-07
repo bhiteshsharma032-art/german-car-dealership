@@ -9,6 +9,10 @@ export interface InventoryVehicle {
     amount: number;
     formatted: string;
     currency: string;
+    netAmount?: number | null;
+    netFormatted?: string | null;
+    isVatable?: boolean;
+    vatRate?: number;
   };
   mileage?: {
     value: number;
@@ -150,23 +154,19 @@ class InventoryService {
 
   async getVehicleById(id: string): Promise<InventoryVehicle | null> {
     try {
-      console.log(`📡 Fetching vehicle ${id} from mobile.de API...`);
+      console.log(`📡 Fetching vehicle ${id} from mobile.de Ad API...`);
       
-      // For now, fetch all and filter (can be optimized with specific endpoint)
-      const response = await this.getInventory(100);
+      const response = await api.get('/inventory/' + id);
       
-      if (response.success) {
-        const vehicle = response.data.find(v => v.id === id);
-        if (vehicle) {
-          console.log(`✅ Found vehicle: ${vehicle.make} ${vehicle.model}`);
-          return vehicle;
-        }
+      if (response.data.success && response.data.data) {
+        console.log(`✅ Found vehicle: ${response.data.data.make} ${response.data.data.model}`);
+        return response.data.data;
       }
 
-      console.warn(`⚠️ Vehicle ${id} not found`);
+      console.warn(`⚠️ Vehicle ${id} not found via API`);
       return null;
     } catch (error) {
-      console.error('❌ Error fetching vehicle:', error);
+      console.error('❌ Error fetching vehicle ad directly:', error);
       return null;
     }
   }

@@ -19,79 +19,82 @@ import Section, { SectionContent, SectionTitle, SectionSubtitle } from '../../co
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Service() {
+  const { t } = useLanguage();
+
   const services = [
     {
       icon: <CheckCircle className="w-8 h-8" />,
-      title: 'Qualitätsprüfung',
-      description: 'Jedes Fahrzeug durchläuft eine umfassende technische Prüfung',
+      title: t('service.list.1.title'),
+      description: t('service.list.1.desc'),
       features: [
-        'Motorprüfung und Diagnose',
-        'Fahrwerkskontrolle',
-        'Elektronik-Check',
-        'Karosserie-Inspektion',
-        'Probefahrt durch Experten',
+        t('service.list.1.f1'),
+        t('service.list.1.f2'),
+        t('service.list.1.f3'),
+        t('service.list.1.f4'),
+        t('service.list.1.f5'),
       ],
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: 'Garantie',
-      description: 'Umfassender Schutz für Ihr Fahrzeug',
+      title: t('service.list.2.title'),
+      description: t('service.list.2.desc'),
       features: [
-        'Bis zu 24 Monate Garantie',
-        'Motor & Getriebe abgedeckt',
-        'Garantieerweiterung möglich',
-        'Partnerwerkstätten deutschlandweit',
-        'Schnelle Schadensabwicklung',
+        t('service.list.2.f1'),
+        t('service.list.2.f2'),
+        t('service.list.2.f3'),
+        t('service.list.2.f4'),
+        t('service.list.2.f5'),
       ],
     },
     {
       icon: <CreditCard className="w-8 h-8" />,
-      title: 'Finanzierung',
-      description: 'Flexible Finanzierungslösungen für jeden Bedarf',
+      title: t('service.list.3.title'),
+      description: t('service.list.3.desc'),
       features: [
-        'Zinssätze ab 3,99% effektiv',
-        'Laufzeiten von 12-84 Monaten',
-        'Anzahlung optional',
-        'Schnelle Zusage in 24h',
-        'Individuelle Beratung',
+        t('service.list.3.f1'),
+        t('service.list.3.f2'),
+        t('service.list.3.f3'),
+        t('service.list.3.f4'),
+        t('service.list.3.f5'),
       ],
     },
     {
       icon: <RefreshCw className="w-8 h-8" />,
-      title: 'Inzahlungnahme',
-      description: 'Faire Bewertung Ihres Gebrauchtwagens',
+      title: t('service.list.4.title'),
+      description: t('service.list.4.desc'),
       features: [
-        'Kostenlose Fahrzeugbewertung',
-        'Marktgerechte Preise',
-        'Schnelle Abwicklung',
-        'Verrechnung mit Neukauf',
-        'Auch Ankauf ohne Neukauf',
+        t('service.list.4.f1'),
+        t('service.list.4.f2'),
+        t('service.list.4.f3'),
+        t('service.list.4.f4'),
+        t('service.list.4.f5'),
       ],
     },
     {
       icon: <FileCheck className="w-8 h-8" />,
-      title: 'Zulassungsservice',
-      description: 'Wir übernehmen alle Formalitäten für Sie',
+      title: t('service.list.5.title'),
+      description: t('service.list.5.desc'),
       features: [
-        'Komplette Zulassung',
-        'Kennzeichen-Reservierung',
-        'Versicherungsabwicklung',
-        'Überführung möglich',
-        'Kurzzeitkennzeichen',
+        t('service.list.5.f1'),
+        t('service.list.5.f2'),
+        t('service.list.5.f3'),
+        t('service.list.5.f4'),
+        t('service.list.5.f5'),
       ],
     },
     {
       icon: <Users className="w-8 h-8" />,
-      title: 'Persönlicher Service',
-      description: 'Individuelle Betreuung von Anfang bis Ende',
+      title: t('service.list.6.title'),
+      description: t('service.list.6.desc'),
       features: [
-        'Persönlicher Ansprechpartner',
-        'Ausführliche Beratung',
-        'Probefahrt nach Wunsch',
-        'Fahrzeugübergabe mit Einweisung',
-        'After-Sales-Support',
+        t('service.list.6.f1'),
+        t('service.list.6.f2'),
+        t('service.list.6.f3'),
+        t('service.list.6.f4'),
+        t('service.list.6.f5'),
       ],
     },
   ];
@@ -99,66 +102,66 @@ export default function Service() {
   const advantages = [
     {
       icon: <Star className="w-6 h-6" />,
-      title: 'Premium-Auswahl',
-      description: 'Handverlesene Fahrzeuge von Top-Marken',
+      title: t('service.advantages.1.title'),
+      description: t('service.advantages.1.desc'),
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: 'Geprüfte Qualität',
-      description: 'Jedes Fahrzeug wird gründlich inspiziert',
+      title: t('service.advantages.2.title'),
+      description: t('service.advantages.2.desc'),
     },
     {
       icon: <Euro className="w-6 h-6" />,
-      title: 'Faire Preise',
-      description: 'Transparente Preisgestaltung ohne versteckte Kosten',
+      title: t('service.advantages.3.title'),
+      description: t('service.advantages.3.desc'),
     },
     {
       icon: <Clock className="w-6 h-6" />,
-      title: 'Schnelle Abwicklung',
-      description: 'Von der Anfrage bis zur Übergabe in kürzester Zeit',
+      title: t('service.advantages.4.title'),
+      description: t('service.advantages.4.desc'),
     },
     {
       icon: <Award className="w-6 h-6" />,
-      title: '15+ Jahre Erfahrung',
-      description: 'Kompetenz und Vertrauen seit 2009',
+      title: t('service.advantages.5.title'),
+      description: t('service.advantages.5.desc'),
     },
     {
       icon: <Users className="w-6 h-6" />,
-      title: 'Persönliche Beratung',
-      description: 'Individuelle Betreuung durch Experten',
+      title: t('service.advantages.6.title'),
+      description: t('service.advantages.6.desc'),
     },
   ];
 
   const stats = [
-    { value: '5.000+', label: 'Zufriedene Kunden' },
-    { value: '500+', label: 'Fahrzeuge pro Jahr' },
-    { value: '15+', label: 'Jahre Erfahrung' },
-    { value: '98%', label: 'Weiterempfehlungsrate' },
+    { value: '5.000+', label: t('service.stats.customers') },
+    { value: '500+', label: t('service.stats.cars') },
+    { value: '15+', label: t('service.stats.experience') },
+    { value: '98%', label: t('service.stats.referral') },
   ];
 
   const testimonials = [
     {
-      name: 'Michael S.',
+      name: t('service.testimonials.1.name'),
       rating: 5,
-      text: 'Hervorragender Service von Anfang bis Ende. Die Beratung war kompetent und die Abwicklung reibungslos. Sehr empfehlenswert!',
+      text: t('service.testimonials.1.text'),
     },
     {
-      name: 'Sarah W.',
+      name: t('service.testimonials.2.name'),
       rating: 5,
-      text: 'Mein Traumauto gefunden und dank der flexiblen Finanzierung auch leisten können. Das Team war super freundlich und hilfsbereit.',
+      text: t('service.testimonials.2.text'),
     },
     {
-      name: 'Thomas M.',
+      name: t('service.testimonials.3.name'),
       rating: 5,
-      text: 'Faire Inzahlungnahme meines alten Fahrzeugs und ein tolles neues Auto. Alles perfekt organisiert. Danke!',
+      text: t('service.testimonials.3.text'),
     },
   ];
 
   return (
     <>
       <Helmet>
-        <title>Service & Vorteile - Nordhessen Automobile</title>
-        <meta name="description" content="Entdecken Sie unsere umfassenden Services: Qualitätsprüfung, Garantie, Finanzierung, Inzahlungnahme und persönlicher Service." />
+        <title>{t('nav.services')} - Nordhessen Automobile</title>
+        <meta name="description" content={t('service.hero.subtitle')} />
       </Helmet>
 
       <div className="min-h-screen bg-[#1a1a1f] pt-20">
@@ -168,31 +171,30 @@ export default function Service() {
             <div className="max-w-4xl mx-auto text-center relative z-10">
               <Badge variant="premium" size="lg" className="mb-6">
                 <Award className="w-4 h-4" />
-                Premium Service
+                {t('service.hero.badge')}
               </Badge>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-100 mb-6">
-                Mehr als nur{' '}
+                {t('service.hero.title1')}{' '}
                 <span className="bg-gradient-to-r from-[#dc2626] to-[#ef4444] bg-clip-text text-transparent">
-                  ein Autokauf
+                  {t('service.hero.title2')}
                 </span>
               </h1>
               
               <p className="text-xl text-gray-500 mb-8 leading-relaxed">
-                Entdecken Sie unsere umfassenden Services und Vorteile, die Ihren 
-                Fahrzeugkauf zu einem rundum sorglosen Erlebnis machen.
+                {t('service.hero.subtitle')}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/fahrzeuge">
                   <Button size="xl">
-                    Fahrzeuge ansehen
+                    {t('service.hero.cta.browse')}
                   </Button>
                 </Link>
                 <Link to="/kontakt">
                   <Button variant="outline" size="xl">
                     <Phone className="w-5 h-5" />
-                    Beratung anfragen
+                    {t('service.hero.cta.consult')}
                   </Button>
                 </Link>
               </div>
@@ -218,9 +220,9 @@ export default function Service() {
         <Section variant="dark">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>Unsere Services</SectionTitle>
+              <SectionTitle>{t('service.list.title')}</SectionTitle>
               <SectionSubtitle>
-                Umfassende Betreuung für Ihren Fahrzeugkauf
+                {t('service.list.subtitle')}
               </SectionSubtitle>
             </div>
 
@@ -250,9 +252,9 @@ export default function Service() {
         <Section variant="default">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>Ihre Vorteile</SectionTitle>
+              <SectionTitle>{t('service.advantages.title')}</SectionTitle>
               <SectionSubtitle>
-                Warum Kunden uns vertrauen
+                {t('service.advantages.subtitle')}
               </SectionSubtitle>
             </div>
 
@@ -275,48 +277,42 @@ export default function Service() {
           <SectionContent>
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <SectionTitle>Unser Qualitätsversprechen</SectionTitle>
+                <SectionTitle>{t('service.promise.title')}</SectionTitle>
                 <SectionSubtitle>
-                  Darauf können Sie sich verlassen
+                  {t('service.promise.subtitle')}
                 </SectionSubtitle>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card variant="elevated" className="p-8">
                   <Zap className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Schnell & Unkompliziert</h3>
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('service.promise.1.title')}</h3>
                   <p className="text-gray-500 leading-relaxed">
-                    Von der ersten Anfrage bis zur Fahrzeugübergabe – wir machen den Prozess 
-                    so einfach und schnell wie möglich. Keine unnötige Bürokratie, keine 
-                    versteckten Kosten.
+                    {t('service.promise.1.desc')}
                   </p>
                 </Card>
 
                 <Card variant="elevated" className="p-8">
                   <Shield className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Sicher & Transparent</h3>
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('service.promise.2.title')}</h3>
                   <p className="text-gray-500 leading-relaxed">
-                    Alle Fahrzeuge sind geprüft und dokumentiert. Sie erhalten vollständige 
-                    Transparenz über Zustand, Historie und Ausstattung. Keine bösen 
-                    Überraschungen.
+                    {t('service.promise.2.desc')}
                   </p>
                 </Card>
 
                 <Card variant="elevated" className="p-8">
                   <Users className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Persönlich & Kompetent</h3>
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('service.promise.3.title')}</h3>
                   <p className="text-gray-500 leading-relaxed">
-                    Unser erfahrenes Team steht Ihnen mit Rat und Tat zur Seite. Individuelle 
-                    Beratung, die auf Ihre Bedürfnisse zugeschnitten ist.
+                    {t('service.promise.3.desc')}
                   </p>
                 </Card>
 
                 <Card variant="elevated" className="p-8">
                   <Award className="w-12 h-12 text-red-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-100 mb-4">Erfahren & Vertrauenswürdig</h3>
+                  <h3 className="text-2xl font-bold text-gray-100 mb-4">{t('service.promise.4.title')}</h3>
                   <p className="text-gray-500 leading-relaxed">
-                    Seit über 15 Jahren sind wir Ihr Partner für Premium-Fahrzeuge. Tausende 
-                    zufriedene Kunden sprechen für unsere Qualität und Zuverlässigkeit.
+                    {t('service.promise.4.desc')}
                   </p>
                 </Card>
               </div>
@@ -328,9 +324,9 @@ export default function Service() {
         <Section variant="default">
           <SectionContent>
             <div className="text-center mb-12">
-              <SectionTitle>Das sagen unsere Kunden</SectionTitle>
+              <SectionTitle>{t('service.testimonials.title')}</SectionTitle>
               <SectionSubtitle>
-                Echte Bewertungen von echten Kunden
+                {t('service.testimonials.subtitle')}
               </SectionSubtitle>
             </div>
 
@@ -349,7 +345,7 @@ export default function Service() {
                     </div>
                     <div>
                       <div className="font-semibold text-gray-100">{testimonial.name}</div>
-                      <div className="text-sm text-gray-500">Verifizierter Kunde</div>
+                      <div className="text-sm text-gray-500">{t('service.testimonials.verified')}</div>
                     </div>
                   </div>
                 </Card>
@@ -364,25 +360,25 @@ export default function Service() {
             <div className="max-w-4xl mx-auto text-center">
               <TrendingUp className="w-16 h-16 text-red-500 mx-auto mb-6" />
               <h2 className="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
-                Überzeugt? Dann starten Sie jetzt!
+                {t('service.cta.title')}
               </h2>
               <p className="text-xl text-gray-500 mb-8">
-                Entdecken Sie unsere Premium-Fahrzeuge oder lassen Sie sich persönlich beraten
+                {t('service.cta.subtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/fahrzeuge">
                   <Button size="xl">
-                    Fahrzeuge ansehen
+                    {t('service.cta.browse')}
                   </Button>
                 </Link>
                 <Link to="/finanzierung">
                   <Button variant="outline" size="xl">
-                    Finanzierung prüfen
+                    {t('service.cta.finance')}
                   </Button>
                 </Link>
                 <Link to="/kontakt">
                   <Button variant="outline" size="xl">
-                    Kontakt aufnehmen
+                    {t('service.cta.contact')}
                   </Button>
                 </Link>
               </div>

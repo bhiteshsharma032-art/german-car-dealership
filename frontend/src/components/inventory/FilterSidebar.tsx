@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { SearchParams } from '../../services/inventoryService';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface FilterSidebarProps {
   filters: SearchParams;
@@ -22,6 +23,7 @@ export default function FilterSidebar({
   onClearFilters,
   filterOptions,
 }: FilterSidebarProps) {
+  const { t } = useLanguage();
   const [expandedSections, setExpandedSections] = useState({
     price: true,
     brand: true,
@@ -41,11 +43,11 @@ export default function FilterSidebar({
   };
 
   const priceRanges = [
-    { label: 'Bis 20.000 €', min: 0, max: 20000 },
-    { label: '20.000 - 40.000 €', min: 20000, max: 40000 },
-    { label: '40.000 - 60.000 €', min: 40000, max: 60000 },
-    { label: '60.000 - 100.000 €', min: 60000, max: 100000 },
-    { label: 'Über 100.000 €', min: 100000, max: 999999 },
+    { label: t('filter.price_up_to', { price: '20.000' }), min: 0, max: 20000 },
+    { label: t('filter.price_range', { min: '20.000', max: '40.000' }), min: 20000, max: 40000 },
+    { label: t('filter.price_range', { min: '40.000', max: '60.000' }), min: 40000, max: 60000 },
+    { label: t('filter.price_range', { min: '60.000', max: '100.000' }), min: 60000, max: 100000 },
+    { label: t('filter.price_over', { price: '100.000' }), min: 100000, max: 999999 },
   ];
 
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined && v !== '');
@@ -61,14 +63,14 @@ export default function FilterSidebar({
       <div className="flex items-center justify-between mb-8 relative z-10">
         <h2 className="text-lg font-semibold text-gray-100 flex items-center gap-2">
           <SlidersHorizontal className="w-5 h-5 text-red-500" />
-          Filter
+          {t('filter.title')}
         </h2>
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
             className="text-sm text-[#f87171] hover:text-red-300 font-medium transition-colors"
           >
-            Zurücksetzen
+            {t('filter.reset')}
           </button>
         )}
       </div>
@@ -76,14 +78,14 @@ export default function FilterSidebar({
       <div className="space-y-4">
         {/* Price Filter */}
         <FilterSection
-          title="Preis"
+          title={t('filter.price')}
           isExpanded={expandedSections.price}
           onToggle={() => toggleSection('price')}
         >
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Von</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('filter.from')}</label>
                 <input
                   type="number"
                   placeholder="0"
@@ -93,7 +95,7 @@ export default function FilterSidebar({
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Bis</label>
+                <label className="block text-xs text-gray-500 mb-1">{t('filter.to')}</label>
                 <input
                   type="number"
                   placeholder="200000"
@@ -122,7 +124,7 @@ export default function FilterSidebar({
 
         {/* Brand Filter */}
         <FilterSection
-          title="Marke"
+          title={t('filter.brand')}
           isExpanded={expandedSections.brand}
           onToggle={() => toggleSection('brand')}
           count={filterOptions.brands.length}
@@ -132,7 +134,7 @@ export default function FilterSidebar({
             onChange={(e) => onFilterChange('make', e.target.value || undefined)}
             className={inputClasses}
           >
-            <option value="">Alle Marken</option>
+            <option value="">{t('filter.all_brands')}</option>
             {filterOptions.brands.map(brand => (
               <option key={brand} value={brand}>{brand}</option>
             ))}
@@ -141,13 +143,13 @@ export default function FilterSidebar({
 
         {/* Year Filter */}
         <FilterSection
-          title="Erstzulassung"
+          title={t('filter.year')}
           isExpanded={expandedSections.year}
           onToggle={() => toggleSection('year')}
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.from')}</label>
               <input
                 type="number"
                 placeholder="2015"
@@ -157,7 +159,7 @@ export default function FilterSidebar({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.to')}</label>
               <input
                 type="number"
                 placeholder="2024"
@@ -171,13 +173,13 @@ export default function FilterSidebar({
 
         {/* Mileage Filter */}
         <FilterSection
-          title="Kilometerstand"
+          title={t('filter.mileage')}
           isExpanded={expandedSections.mileage}
           onToggle={() => toggleSection('mileage')}
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.from')}</label>
               <input
                 type="number"
                 placeholder="0"
@@ -187,7 +189,7 @@ export default function FilterSidebar({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.to')}</label>
               <input
                 type="number"
                 placeholder="200000"
@@ -201,7 +203,7 @@ export default function FilterSidebar({
 
         {/* Fuel Type Filter */}
         <FilterSection
-          title="Kraftstoffart"
+          title={t('filter.fuel')}
           isExpanded={expandedSections.fuel}
           onToggle={() => toggleSection('fuel')}
         >
@@ -210,16 +212,16 @@ export default function FilterSidebar({
             onChange={(e) => onFilterChange('fuelType', e.target.value || undefined)}
             className={inputClasses}
           >
-            <option value="">Alle Kraftstoffarten</option>
+            <option value="">{t('filter.all_fuel')}</option>
             {filterOptions.fuelTypes.map(fuel => (
-              <option key={fuel} value={fuel}>{fuel}</option>
+              <option key={fuel} value={fuel}>{t(`attr.fuel.${fuel}`)}</option>
             ))}
           </select>
         </FilterSection>
 
         {/* Transmission Filter */}
         <FilterSection
-          title="Getriebe"
+          title={t('filter.transmission')}
           isExpanded={expandedSections.transmission}
           onToggle={() => toggleSection('transmission')}
         >
@@ -228,16 +230,16 @@ export default function FilterSidebar({
             onChange={(e) => onFilterChange('transmission', e.target.value || undefined)}
             className={inputClasses}
           >
-            <option value="">Alle Getriebe</option>
+            <option value="">{t('filter.all_transmissions')}</option>
             {filterOptions.transmissions.map(trans => (
-              <option key={trans} value={trans}>{trans}</option>
+              <option key={trans} value={trans}>{t(`attr.trans.${trans}`)}</option>
             ))}
           </select>
         </FilterSection>
 
         {/* Body Type Filter */}
         <FilterSection
-          title="Fahrzeugtyp"
+          title={t('filter.body')}
           isExpanded={expandedSections.body}
           onToggle={() => toggleSection('body')}
         >
@@ -246,22 +248,22 @@ export default function FilterSidebar({
             onChange={(e) => onFilterChange('bodyType', e.target.value || undefined)}
             className={inputClasses}
           >
-            <option value="">Alle Fahrzeugtypen</option>
+            <option value="">{t('filter.all_bodies')}</option>
             {filterOptions.bodyTypes.map(body => (
-              <option key={body} value={body}>{body}</option>
+              <option key={body} value={body}>{t(`attr.body.${body}`)}</option>
             ))}
           </select>
         </FilterSection>
 
         {/* Power Filter */}
         <FilterSection
-          title="Leistung (PS)"
+          title={t('filter.power')}
           isExpanded={expandedSections.power}
           onToggle={() => toggleSection('power')}
         >
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Von</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.from')}</label>
               <input
                 type="number"
                 placeholder="0"
@@ -271,7 +273,7 @@ export default function FilterSidebar({
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Bis</label>
+              <label className="block text-xs text-gray-500 mb-1">{t('filter.to')}</label>
               <input
                 type="number"
                 placeholder="500"

@@ -175,13 +175,17 @@ function getFirstImage(images: any): string | null {
   if (firstImage['ad:representation']) {
     const representations = Array.isArray(firstImage['ad:representation']) ?
       firstImage['ad:representation'] : [firstImage['ad:representation']];
-    const largeImage = representations.find((rep: any) => rep.$?.size === 'L') ||
+    const largeImage = representations.find((rep: any) => rep.$?.size === 'XXXL') ||
+      representations.find((rep: any) => rep.$?.size === 'XXL') ||
       representations.find((rep: any) => rep.$?.size === 'XL') ||
+      representations.find((rep: any) => rep.$?.size === 'L') ||
       representations.find((rep: any) => rep.$?.size === 'M') ||
       representations[0];
-    return largeImage?.$?.url || largeImage?.url || null;
+    const url = largeImage?.$?.url || largeImage?.url || null;
+    return url ? url.replace(/^http:\/\//i, 'https://') : null;
   }
-  return firstImage.$?.url || firstImage.url || null;
+  const fallbackUrl = firstImage.$?.url || firstImage.url || null;
+  return fallbackUrl ? fallbackUrl.replace(/^http:\/\//i, 'https://') : null;
 }
 
 function getAllImages(images: any): string[] {
@@ -192,16 +196,20 @@ function getAllImages(images: any): string[] {
     if (image['ad:representation']) {
       const representations = Array.isArray(image['ad:representation']) ?
         image['ad:representation'] : [image['ad:representation']];
-      const largeImage = representations.find((rep: any) => rep.$?.size === 'L') ||
+      const largeImage = representations.find((rep: any) => rep.$?.size === 'XXXL') ||
+        representations.find((rep: any) => rep.$?.size === 'XXL') ||
         representations.find((rep: any) => rep.$?.size === 'XL') ||
+        representations.find((rep: any) => rep.$?.size === 'L') ||
         representations.find((rep: any) => rep.$?.size === 'M') ||
         representations[0];
-      if (largeImage?.$?.url) allImages.push(largeImage.$.url);
-      else if (largeImage?.url) allImages.push(largeImage.url);
+      const url1 = largeImage?.$?.url;
+      const url2 = largeImage?.url;
+      if (url1) allImages.push(url1.replace(/^http:\/\//i, 'https://'));
+      else if (url2) allImages.push(url2.replace(/^http:\/\//i, 'https://'));
     } else if (image.$?.url) {
-      allImages.push(image.$.url);
+      allImages.push(image.$.url.replace(/^http:\/\//i, 'https://'));
     } else if (image.url) {
-      allImages.push(image.url);
+      allImages.push(image.url.replace(/^http:\/\//i, 'https://'));
     }
   });
   return allImages;
@@ -444,6 +452,26 @@ app.get('/api/inventory', async (req, res) => {
     }
   } catch (error: any) {
     res.status(500).json({ success: false, data: [], total: 0, error: error.message });
+  }
+});
+
+app.get('/api/inventory/:id', async (req, res) => {
+  try {
+    // We hit the specific AD endpoint instead of search to get ALL details including ALL images
+    const result = await makeMobileDeRequest(`/ad/${req.params.id}`);
+    if (result.success) {
+      const parsed = await parseXMLResponse(result.data);
+      const adData = parsed['ad:ad'];
+      if (!adData) {
+         return res.status(404).json({ success: false, data: null, message: 'Vehicle not found' });
+      }
+      const vehicle = transformVehicle(adData);
+      res.json({ success: true, data: vehicle, message: 'Successfully fetched vehicle details' });
+    } else {
+      res.status(result.error?.status || 500).json({ success: false, data: null, error: result.error, message: 'Failed to fetch vehicle from mobile.de' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, data: null, error: error.message });
   }
 });
 

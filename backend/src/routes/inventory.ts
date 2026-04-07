@@ -7,6 +7,7 @@ const router = Router();
 router.get('/test', inventoryController.testConnection);        // GET /api/inventory/test
 router.get('/filters', inventoryController.getFilterOptions);   // GET /api/inventory/filters
 router.get('/search', inventoryController.searchVehicles);      // GET /api/inventory/search
+router.get('/:id', inventoryController.getVehicleById);         // GET /api/inventory/:id
 router.get('/', inventoryController.getInventory);             // GET /api/inventory
 
 export default router;

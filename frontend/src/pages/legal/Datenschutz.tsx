@@ -43,7 +43,7 @@ function DatenschutzDE() {
         <h2 className="text-2xl font-bold text-gray-100 mb-6">3. Allgemeine Hinweise und Pflichtinformationen</h2>
         <h3 className="text-lg font-bold text-gray-100 mt-6 mb-2">Datenschutz</h3>
         <p className="mb-4">Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung. Wenn Sie diese Website benutzen, werden verschiedene personenbezogene Daten erhoben. Personenbezogene Daten sind Daten, mit denen Sie persönlich identifiziert werden können. Die vorliegende Datenschutzerklärung erläutert, welche Daten wir erheben und wofür wir sie nutzen. Sie erläutert auch, wie und zu welchem Zweck das geschieht.</p>
-        <p className="mb-4">Wir weisen darauf hin, dass die Datenübertragung im Internet (z. B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
+        <p className="mb-4">Wir weise darauf hin, dass die Datenübertragung im Internet (z. B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
 
         <h3 className="text-lg font-bold text-gray-100 mt-6 mb-2">Hinweis zur verantwortlichen Stelle</h3>
         <p className="mb-2">Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:</p>
@@ -290,13 +290,13 @@ function DatenschutzEN() {
 }
 
 export default function Datenschutz() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   return (
     <>
       <Helmet>
-        <title>{language === 'en' ? 'Privacy Policy' : 'Datenschutzerklärung'} - Nordhessen Automobile</title>
-        <meta name="description" content={language === 'en' ? 'Privacy Policy of Nordhessen Automobile' : 'Datenschutzerklärung von Nordhessen Automobile'} />
+        <title>{t('legal.privacy.title')} - Nordhessen Automobile</title>
+        <meta name="description" content="Datenschutz Nordhessen Automobile" />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 

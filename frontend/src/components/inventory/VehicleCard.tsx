@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, Calendar, Gauge, Fuel, Settings, MapPin } from 'lucide-react';
+import { Calendar, Gauge, Fuel, Settings, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -14,6 +14,9 @@ interface VehicleCardProps {
     amount: number;
     formatted: string;
   };
+  netPrice?: number | null;
+  netPriceFormatted?: string | null;
+  isVatable?: boolean;
   mileage?: {
     formatted: string;
   };
@@ -38,6 +41,8 @@ export default function VehicleCard({
   id,
   title,
   price,
+  netPriceFormatted,
+  isVatable,
   mileage,
   firstRegistration,
   fuelType,
@@ -48,7 +53,6 @@ export default function VehicleCard({
   viewMode = 'grid',
 }: VehicleCardProps) {
   const { t } = useLanguage();
-  const [isFavorite, setIsFavorite] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   const displayImage = image || (images && images[0]);
@@ -69,18 +73,13 @@ export default function VehicleCard({
       }}
     >
       {/* Glossy Sheen overlay */}
-      <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/[0.1] via-transparent to-transparent" />
+      <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
       
-      {/* Animated glowing top border */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-20 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform" style={{ transitionDuration: '1.5s' }} />
+      {/* Animated glowing border effect */}
+      <div className="absolute inset-0 border border-transparent group-hover:border-red-500/30 rounded-[2rem] transition-colors duration-500 z-20 pointer-events-none" />
 
       {/* Hover background glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0 rounded-[2rem]"
-        style={{
-          background: 'radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 0%), rgba(239,68,68,0.08), transparent 60%)',
-        }}
-      />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0 rounded-[2rem] bg-gradient-to-tr from-red-500/5 to-transparent" />
 
       {/* Image */}
       <Link to={`/fahrzeug/${id}`} className={cn(
@@ -98,31 +97,11 @@ export default function VehicleCard({
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#12121c] to-[#22222a]">
-            <svg className="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M5 17H4C3.44772 17 3 16.5523 3 16V12L5.4 6.8C5.55 6.3 6 6 6.5 6H17.5C18 6 18.45 6.3 18.6 6.8L21 12V16C21 16.5523 20.5523 17 20 17H19M5 17C5 18.1046 5.89543 19 7 19C8.10457 19 9 18.1046 9 17M5 17C5 15.8954 5.89543 15 7 15C8.10457 15 9 15.8954 9 17M19 17C19 18.1046 18.1046 19 17 19C15.8954 19 15 18.1046 15 17M19 17C19 15.8954 18.1046 15 17 15C15.8954 15 15 15.8954 15 17M9 17H15" />
-            </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#12121c] to-[#1a1a1f] border border-white/[0.05] rounded-[2rem]">
+            <img src="/logo.png" alt="Nordhessen Automobile" className="h-16 mb-4 opacity-50 grayscale" />
+            <span className="text-gray-500 font-medium text-sm tracking-widest uppercase">{t('Bilder folgen')}</span>
           </div>
         )}
-
-        {/* No badges */}
-
-        {/* Favorite Button */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsFavorite(!isFavorite);
-          }}
-          className="absolute top-3 right-3 w-9 h-9 bg-black/40 backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-black/60 transition-all z-10 border border-white/[0.06]"
-          aria-label="Zu Favoriten hinzufügen"
-        >
-          <Heart
-            className={cn(
-              'h-4 w-4 transition-all duration-300',
-              isFavorite ? 'text-red-500 fill-red-500 scale-110' : 'text-white/70'
-            )}
-          />
-        </button>
 
         {/* Bottom Gradient */}
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#22222a] to-transparent z-[1]" />
@@ -135,7 +114,7 @@ export default function VehicleCard({
       )}>
         {/* Title */}
         <Link to={`/fahrzeug/${id}`}>
-          <h3 className="text-base font-display font-bold text-white mb-1 line-clamp-2 leading-snug min-h-[2.75rem] group-hover:text-red-400 transition-colors duration-300">
+          <h3 className="text-base font-display font-bold text-white mb-1 leading-snug min-h-[2.75rem] group-hover:text-red-400 transition-colors duration-300">
             {title}
           </h3>
         </Link>
@@ -153,6 +132,14 @@ export default function VehicleCard({
           <div className="text-2xl font-display font-bold text-white">
             {price.formatted}
           </div>
+          {isVatable && netPriceFormatted && (
+            <div className="text-xs text-gray-400 mt-1">
+              <span className="text-gray-500">{netPriceFormatted} {t('car.price.net')}</span>
+              <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] font-semibold border border-green-500/20">
+                MwSt. ausweisbar
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Key Specs */}
@@ -188,7 +175,7 @@ export default function VehicleCard({
               </div>
               <div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-wider">{t('card.fuel')}</div>
-                <div className="text-xs font-semibold text-gray-200 truncate">{fuelType}</div>
+                <div className="text-xs font-semibold text-gray-200 truncate">{t(`attr.fuel.${fuelType}`)}</div>
               </div>
             </div>
           )}
@@ -200,7 +187,7 @@ export default function VehicleCard({
               </div>
               <div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-wider">{t('card.gearbox')}</div>
-                <div className="text-xs font-semibold text-gray-200 truncate">{transmission}</div>
+                <div className="text-xs font-semibold text-gray-200 truncate">{t(`attr.trans.${transmission}`)}</div>
               </div>
             </div>
           )}
@@ -209,11 +196,7 @@ export default function VehicleCard({
         {/* CTA */}
         <Link
           to={`/fahrzeug/${id}`}
-          className="flex items-center justify-center w-full py-3 text-white rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg group/btn"
-          style={{
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-            boxShadow: '0 0 20px rgba(239,68,68,0.15)',
-          }}
+          className="flex items-center justify-center w-full py-3 text-gray-300 bg-white/[0.03] border border-white/[0.08] rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] group/btn"
         >
           <span className="group-hover/btn:tracking-wider transition-all duration-300">{t('card.details')}</span>
         </Link>

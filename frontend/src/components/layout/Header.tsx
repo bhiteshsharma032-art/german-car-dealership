@@ -15,6 +15,7 @@ export default function Header() {
   const navigation = [
     { label: t('nav.home'), href: '/' },
     { label: t('nav.vehicles'), href: '/fahrzeuge' },
+    { label: t('nav.tradein'), href: '/inzahlungnahme' },
     { label: t('nav.history'), href: '/geschichte' },
     { label: t('nav.about'), href: '/#philosophie' },
   ];
@@ -81,7 +82,7 @@ export default function Header() {
                 <img
                   src="/logo.png"
                   alt="Nordhessen Automobile"
-                  className="h-10 md:h-12 w-auto scale-150 origin-left ml-4 transition-transform duration-300 group-hover:scale-[1.6]"
+                  className="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                   onError={() => setLogoError(true)}
                 />
               ) : (
@@ -159,24 +160,24 @@ export default function Header() {
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-3 md:hidden">
-              <div className="relative flex items-center">
+              <div className="relative flex items-center bg-white/[0.05] border border-white/[0.1] rounded-full px-3 py-1.5 backdrop-blur-md">
+                <Globe className="w-3 h-3 text-red-500 mr-1.5" />
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value as any)}
-                  className="pl-6 pr-2 py-1 text-xs font-bold uppercase bg-transparent appearance-none cursor-pointer focus:outline-none text-gray-400 hover:text-white tracking-wider"
+                  className="bg-transparent text-[10px] font-black uppercase appearance-none cursor-pointer focus:outline-none text-white tracking-widest"
                 >
-                  <option value="de" className="bg-[#12121c] text-gray-100">DE</option>
-                  <option value="en" className="bg-[#12121c] text-gray-100">EN</option>
-                  <option value="pt" className="bg-[#12121c] text-gray-100">PT</option>
-                  <option value="fr" className="bg-[#12121c] text-gray-100">FR</option>
-                  <option value="es" className="bg-[#12121c] text-gray-100">ES</option>
-                  <option value="it" className="bg-[#12121c] text-gray-100">IT</option>
+                  <option value="de" className="bg-[#1a1a1f] text-gray-100">DE</option>
+                  <option value="en" className="bg-[#1a1a1f] text-gray-100">EN</option>
+                  <option value="pt" className="bg-[#1a1a1f] text-gray-100">PT</option>
+                  <option value="fr" className="bg-[#1a1a1f] text-gray-100">FR</option>
+                  <option value="es" className="bg-[#1a1a1f] text-gray-100">ES</option>
+                  <option value="it" className="bg-[#1a1a1f] text-gray-100">IT</option>
                 </select>
-                <Globe className="w-3.5 h-3.5 absolute left-1 pointer-events-none text-gray-500" />
               </div>
               <button
                 type="button"
-                className="p-2 rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center text-white hover:bg-white/[0.06] transition-all duration-300 border border-white/[0.06]"
+                className="p-2.5 rounded-2xl min-w-[44px] min-h-[44px] flex items-center justify-center text-white bg-white/[0.05] border border-white/[0.1] backdrop-blur-md transition-all duration-300 hover:bg-white/[0.1]"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
               >

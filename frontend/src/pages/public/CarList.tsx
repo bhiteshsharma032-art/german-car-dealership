@@ -136,9 +136,9 @@ export default function CarList() {
     if (filters.make) chips.push({ key: 'make', label: `${t('inv.chip.make')}: ${filters.make}` });
     if (filters.priceFrom || filters.priceTo) chips.push({ key: 'priceFrom', label: `${t('inv.chip.price')}: ${filters.priceFrom || 0} - ${filters.priceTo || '∞'} €` });
     if (filters.yearFrom || filters.yearTo) chips.push({ key: 'yearFrom', label: `${t('inv.chip.year')}: ${filters.yearFrom || '0'} - ${filters.yearTo || t('inv.chip.today')}` });
-    if (filters.fuelType) chips.push({ key: 'fuelType', label: `${t('inv.chip.fuel')}: ${filters.fuelType}` });
-    if (filters.transmission) chips.push({ key: 'transmission', label: `${t('inv.chip.gear')}: ${filters.transmission}` });
-    if (filters.bodyType) chips.push({ key: 'bodyType', label: `${t('inv.chip.type')}: ${filters.bodyType}` });
+    if (filters.fuelType) chips.push({ key: 'fuelType', label: `${t('inv.chip.fuel')}: ${t(`attr.fuel.${filters.fuelType}`)}` });
+    if (filters.transmission) chips.push({ key: 'transmission', label: `${t('inv.chip.gear')}: ${t(`attr.trans.${filters.transmission}`)}` });
+    if (filters.bodyType) chips.push({ key: 'bodyType', label: `${t('inv.chip.type')}: ${t(`attr.body.${filters.bodyType}`)}` });
     return chips;
   };
 
@@ -195,10 +195,10 @@ export default function CarList() {
           <div className="max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 relative z-10 flex flex-col items-center text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl w-full">
               <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-100 mb-4 tracking-tight">
-                {t('inv.title').replace('Fahrzeuge', '')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">{t('inv.cars')}</span>
+                {t('inv.hero.title_part1')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ef4444] to-[#f87171]">{t('inv.hero.title_part2')}</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 font-light max-w-xl mx-auto">
-                {t('inv.subtitle')}
+                {t('inv.hero.subtitle')}
               </p>
               <div className="relative group text-left">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 group-focus-within:text-red-500 transition-colors" />
@@ -330,11 +330,14 @@ export default function CarList() {
                           id={vehicle.id}
                           make={vehicle.brand}
                           model={vehicle.model}
-                          title={`${vehicle.brand} ${vehicle.model}`}
-                          price={{ amount: vehicle.price, formatted: `${vehicle.price.toLocaleString('de-DE')} €` }}
-                          mileage={{ formatted: `${vehicle.mileage.toLocaleString('de-DE')} km` }}
+                          title={vehicle.title || `${vehicle.brand} ${vehicle.model}`}
+                          price={{ amount: vehicle.price, formatted: vehicle.priceFormatted || `${vehicle.price.toLocaleString('de-DE')} €` }}
+                          netPrice={vehicle.netPrice}
+                          netPriceFormatted={vehicle.netPriceFormatted}
+                          isVatable={vehicle.isVatable}
+                          mileage={{ formatted: vehicle.mileageFormatted || `${vehicle.mileage.toLocaleString('de-DE')} km` }}
                           firstRegistration={`${vehicle.year}-01-01`}
-                          power={{ formatted: `${vehicle.horsePower} PS` }}
+                          power={{ formatted: vehicle.powerFormatted || `${vehicle.horsePower} PS` }}
                           fuelType={vehicle.fuelType}
                           transmission={vehicle.transmission}
                           image={vehicle.images[0]}
