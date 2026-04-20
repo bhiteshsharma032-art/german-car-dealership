@@ -31,6 +31,8 @@ import AdminCarList from './pages/admin/AdminCarList';
 import AdminCarAdd from './pages/admin/AdminCarAdd';
 import AdminCarEdit from './pages/admin/AdminCarEdit';
 import AdminTradeIns from './pages/admin/AdminTradeIns';
+import AdminContacts from './pages/admin/AdminContacts';
+import AdminFinancing from './pages/admin/AdminFinancing';
 
 import SmoothScroll from './components/SmoothScroll';
 
@@ -63,6 +65,8 @@ function App() {
           <Route path="fahrzeuge/neu" element={<AdminCarAdd />} />
           <Route path="fahrzeuge/:id/bearbeiten" element={<AdminCarEdit />} />
           <Route path="inzahlungnahmen" element={<AdminTradeIns />} />
+          <Route path="kontakte" element={<AdminContacts />} />
+          <Route path="finanzierungen" element={<AdminFinancing />} />
         </Route>
       </Routes>
       

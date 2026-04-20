@@ -19,7 +19,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-4 flex flex-col items-start pr-0 lg:pr-8">
             <Link to="/" className="inline-block mb-8">
-              <img src="/logo.png" alt="Nordhessen Automobile" className="h-28 sm:h-36 w-auto object-contain transition-transform duration-500 hover:scale-105" />
+              <img src="/logo.png?v=3" alt="Nordhessen Automobile" className="h-28 sm:h-36 w-auto object-contain transition-transform duration-500 hover:scale-105" />
             </Link>
             <p className="text-sm leading-relaxed text-gray-400 max-w-sm font-light">
               {t('footer.tagline')}
@@ -79,17 +79,23 @@ export default function Footer() {
               {t('footer.contact')}
             </h3>
             <div className="space-y-4 text-sm text-gray-400">
-              <a href="tel:+4956193004649" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
+              <a href="tel:+4956198866911" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
                 <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">
                   <Phone className="h-4 w-4 text-gray-300 group-hover:text-red-400" />
                 </div>
-                <span className="tracking-wide">0561 930 04 649</span>
+                <span className="tracking-wide">0561/98866911 (Verkauf)</span>
               </a>
-              <a href="mailto:info@nordhessen-automobile.de" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
+              <a href="tel:+4956198866918" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
+                <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">
+                  <Phone className="h-4 w-4 text-gray-300 group-hover:text-red-400" />
+                </div>
+                <span className="tracking-wide">0561/98866918 (Werkstatt)</span>
+              </a>
+              <a href="mailto:verkauf@nordhessen-automobile.de" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
                 <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">
                   <Mail className="h-4 w-4 text-gray-300 group-hover:text-red-400" />
                 </div>
-                <span className="tracking-wide">info@nordhessen-automobile.de</span>
+                <span className="tracking-wide">verkauf@nordhessen-automobile.de</span>
               </a>
             </div>
 

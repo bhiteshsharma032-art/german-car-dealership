@@ -98,8 +98,8 @@ export default function VehicleCard({
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#12121c] to-[#1a1a1f] border border-white/[0.05] rounded-[2rem]">
-            <img src="/logo.png" alt="Nordhessen Automobile" className="h-16 mb-4 opacity-50 grayscale" />
-            <span className="text-gray-500 font-medium text-sm tracking-widest uppercase">{t('Bilder folgen')}</span>
+            <img src="/logo.png?v=3" alt="Nordhessen Automobile" className="h-16 mb-4 opacity-50 grayscale" />
+            <span className="text-gray-500 font-medium text-sm tracking-widest uppercase">{t('card.images_soon')}</span>
           </div>
         )}
 
@@ -136,7 +136,7 @@ export default function VehicleCard({
             <div className="text-xs text-gray-400 mt-1">
               <span className="text-gray-500">{netPriceFormatted} {t('car.price.net')}</span>
               <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] font-semibold border border-green-500/20">
-                MwSt. ausweisbar
+                {t('car.price.vat_reclaimable')}
               </span>
             </div>
           )}

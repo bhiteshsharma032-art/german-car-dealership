@@ -1,0 +1,141 @@
+﻿node.exe : Retrieving projectΓÇª
+At C:\Users\cocwi\AppData\Roaming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Retrieving projectΓÇª:String) [], RemoteExceptio 
+   n
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Deploying bhiteshsharma032-1898s-projects/german-car-dealership
+Uploading [--------------------] (0.0B/1.1MB)
+Uploading [=====---------------] (289.5KB/1.1MB)
+Uploading [==========----------] (577.5KB/1.1MB)
+Uploading [===============-----] (865.5KB/1.1MB)
+Uploading [====================] (1.1MB/1.1MB)
+Inspect: https://vercel.com/bhiteshsharma032-1898s-projects/german-car-dealership/3BZowd3V2hPo
+uHCAhgk86gwVvNZg [7s]
+Production: 
+https://german-car-dealership-nuqtxes2t-bhiteshsharma032-1898s-projects.vercel.app [7s]
+Building...
+Building...
+Building: Running build in Washington, D.C., USA (East) ΓÇô iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 1017 deployment files...
+Building: Restored build cache from previous deployment (ZhQGTJqWoX5517SxrgzbhG9zcx6o)
+Building: Warning: Detected "engines": { "node": ">=18.0.0" } in your `package.json` that 
+will automatically upgrade when a new major Node.js Version is released. Learn More: 
+https://vercel.link/node-version
+Building: Running "vercel build"
+Building: Vercel CLI 50.42.0
+Building: Warning: Detected "engines": { "node": ">=18.0.0" } in your `package.json` that 
+will automatically upgrade when a new major Node.js Version is released. Learn More: 
+https://vercel.link/node-version
+Building: Running "install" command: `npm install`...
+Building: up to date, audited 338 packages in 2s
+Building: 55 packages are looking for funding
+Building: run `npm fund` for details
+Building: 11 vulnerabilities (1 low, 4 moderate, 5 high, 1 critical)
+Building: To address issues that do not require attention, run:
+Building: npm audit fix
+Building: To address all issues (including breaking changes), run:
+Building: npm audit fix --force
+Building: Run `npm audit` for details.
+Building: up to date, audited 338 packages in 876ms
+Building: 55 packages are looking for funding
+Building: run `npm fund` for details
+Building: 5 vulnerabilities (2 moderate, 2 high, 1 critical)
+Building: To address issues that do not require attention, run:
+Building: npm audit fix
+Building: To address all issues (including breaking changes), run:
+Building: npm audit fix --force
+Building: Run `npm audit` for details.
+Building: > @car-dealership/frontend@1.0.0 build
+Building: > vite build
+Building: vite v5.4.21 building for production...
+Building: transforming...
+Building: [vite:css] @import must precede all other statements (besides @charset or empty 
+@layer)
+Building: 7  |     ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
+Building: 8  |
+Building: 9  |  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;6
+00;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+Building: |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 10 |
+Building: 11 |  @layer base {
+Building: Γ£ô 1916 modules transformed.
+Building: rendering chunks...
+Building: computing gzip size...
+Building: dist/index.html                   0.65 kB Γöé gzip:   0.39 kB
+Building: dist/assets/index-Dzxqgc9V.css  107.16 kB Γöé gzip:  16.48 kB
+Building: dist/assets/index-cScMyWYM.js   971.25 kB Γöé gzip: 284.89 kB
+Building: Γ£ô built in 5.21s
+Building: (!) Some chunks are larger than 500 kB after minification. Consider:
+Building: - Using dynamic import() to code-split the application
+Building: - Use build.rollupOptions.output.manualChunks to improve chunking: 
+https://rollupjs.org/configuration-options/#output-manualchunks
+Building: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Building: Warning: Detected "engines": { "node": ">=18.0.0" } in your `package.json` that 
+will automatically upgrade when a new major Node.js Version is released. Learn More: 
+https://vercel.link/node-version
+Building: Installing dependencies...
+Building: up to date in 1s
+Building: 55 packages are looking for funding
+Building: run `npm fund` for details
+Building: Running "npm run vercel-build"
+Building: > car-dealership-monorepo@1.0.0 vercel-build
+Building: > cd frontend && npm install && npm run build
+Building: up to date, audited 338 packages in 860ms
+Building: 55 packages are looking for funding
+Building: run `npm fund` for details
+Building: 5 vulnerabilities (2 moderate, 2 high, 1 critical)
+Building: To address issues that do not require attention, run:
+Building: npm audit fix
+Building: To address all issues (including breaking changes), run:
+Building: npm audit fix --force
+Building: Run `npm audit` for details.
+Building: > @car-dealership/frontend@1.0.0 build
+Building: > vite build
+Building: vite v5.4.21 building for production...
+Building: transforming...
+Building: [vite:css] @import must precede all other statements (besides @charset or empty 
+@layer)
+Building: 7  |     ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
+Building: 8  |
+Building: 9  |  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;6
+00;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+Building: |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building: 10 |
+Building: 11 |  @layer base {
+Building: Γ£ô 1916 modules transformed.
+Building: rendering chunks...
+Building: computing gzip size...
+Building: dist/index.html                   0.65 kB Γöé gzip:   0.39 kB
+Building: dist/assets/index-Dzxqgc9V.css  107.16 kB Γöé gzip:  16.48 kB
+Building: dist/assets/index-cScMyWYM.js   971.25 kB Γöé gzip: 284.89 kB
+Building: (!) Some chunks are larger than 500 kB after minification. Consider:
+Building: - Using dynamic import() to code-split the application
+Building: - Use build.rollupOptions.output.manualChunks to improve chunking: 
+https://rollupjs.org/configuration-options/#output-manualchunks
+Building: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Building: Γ£ô built in 5.15s
+Building: Using TypeScript 5.9.3 (local user-provided)
+Building: Build Completed in /vercel/output [23s]
+Building: Deploying outputs...
+Building: Warning: Provided `memory` setting in `vercel.json` is ignored on Active CPU 
+billing. You can safely remove this setting from your configuration. Learn more: 
+https://vercel.com/docs/fluid-compute/pricing
+[2K[1A[2K[GProduction: 
+https://german-car-dealership-nuqtxes2t-bhiteshsharma032-1898s-projects.vercel.app [45s]
+Completing...
+Aliased: https://german-car-dealership.vercel.app [45s]
+
+Common next commands:
+- `vercel inspect german-car-dealership-nuqtxes2t-bhiteshsharma032-1898s-projects.vercel.app 
+--logs`
+- `vercel redeploy german-car-dealership-nuqtxes2t-bhiteshsharma032-1898s-projects.vercel.app`
+https://german-car-dealership-nuqtxes2t-bhiteshsharma032-1898s-projects.vercel.app

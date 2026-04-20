@@ -16,8 +16,7 @@ export default function Header() {
     { label: t('nav.home'), href: '/' },
     { label: t('nav.vehicles'), href: '/fahrzeuge' },
     { label: t('nav.tradein'), href: '/inzahlungnahme' },
-    { label: t('nav.history'), href: '/geschichte' },
-    { label: t('nav.about'), href: '/#philosophie' },
+    { label: t('nav.about'), href: '/geschichte' },
   ];
 
   useEffect(() => {
@@ -58,16 +57,17 @@ export default function Header() {
           backdropFilter: scrolled ? 'blur(30px) saturate(200%)' : 'blur(0px)',
         }}
         className={cn(
-          'w-full sticky top-0 z-50 transition-all duration-500',
+          'w-full top-0 z-50 transition-all duration-500',
+          isHome ? 'fixed' : 'sticky',
           scrolled
             ? 'bg-black/80 backdrop-blur-md shadow-glass border-b border-white/[0.06]'
             : isHome
-              ? 'bg-black/80 backdrop-blur-md'
+              ? ''
               : 'bg-[#1a1a1f] border-b border-white/[0.04]'
         )}
         style={{
           background: isHome && !scrolled
-            ? 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)'
+            ? 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 70%, transparent 100%)'
             : undefined,
         }}
       >
@@ -80,7 +80,7 @@ export default function Header() {
             >
               {!logoError ? (
                 <img
-                  src="/logo.png"
+                  src="/logo.png?v=3"
                   alt="Nordhessen Automobile"
                   className="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                   onError={() => setLogoError(true)}
@@ -97,9 +97,9 @@ export default function Header() {
               {navigation.map((item) => {
                 const active = isActive(item.href);
                 return (
-                  <a
+                  <Link
                     key={item.label}
-                    href={item.href}
+                    to={item.href}
                     className="relative px-4 py-2.5 text-sm font-medium transition-all duration-300 rounded-xl group"
                   >
                     <span className={cn(
@@ -126,7 +126,7 @@ export default function Header() {
                     {!active && (
                       <div className="absolute inset-0 rounded-xl bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     )}
-                  </a>
+                  </Link>
                 );
               })}
 
@@ -150,11 +150,11 @@ export default function Header() {
 
             {/* Call to Action Button */}
               <a 
-                href="tel:+4956193004649" 
+                href="tel:+4956198866911" 
                 className="ml-5 h-[36px] px-5 rounded-lg flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-red-500 border border-red-500/30 bg-red-500/10 hover:bg-red-500 hover:text-white transition-all duration-300"
               >
                 <Phone className="w-3 h-3 mr-2" />
-                {t('header.consultation')}
+                0561/98866911
               </a>
             </div>
 
@@ -242,8 +242,8 @@ export default function Header() {
                   animate={mobileMenuOpen ? { opacity: 1, x: 0 } : {}}
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                 >
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
                     className={cn(
                       'px-4 py-4 text-base font-medium transition-all duration-300 min-h-[44px] flex items-center rounded-xl',
                       isActive(item.href)
@@ -256,7 +256,7 @@ export default function Header() {
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-3 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
                     )}
                     {item.label}
-                  </a>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -268,8 +268,11 @@ export default function Header() {
               <p className="text-sm font-display font-semibold text-white mb-1">
                 Nordhessen Automobile
               </p>
-              <a href="tel:+4956193004649" className="text-xs text-red-400 hover:text-red-300 transition-colors">
-                0561 930 04 649
+              <a href="tel:+4956198866911" className="text-xs text-red-400 hover:text-red-300 transition-colors block mb-1">
+                Verkauf: 0561/98866911
+              </a>
+              <a href="tel:+4956198866918" className="text-xs text-red-400 hover:text-red-300 transition-colors block">
+                Werkstatt: 0561/98866918
               </a>
             </div>
           </div>

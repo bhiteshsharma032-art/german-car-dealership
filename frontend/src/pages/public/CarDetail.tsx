@@ -38,6 +38,7 @@ export default function CarDetail() {
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -342,6 +343,63 @@ export default function CarDetail() {
                     />
                     )}
                   </div>
+                  
+                  {/* Energy Efficiency & CO2 Data */}
+                  {(vehicle.fuelConsumption?.combined || vehicle.co2Emission || vehicle.emissionClass) && (
+                    <div className="mt-8 pt-6 border-t border-white/[0.05]">
+                      <h3 className="text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">Verbrauchs- & Emissionswerte</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {vehicle.fuelConsumption?.combined && (
+                          <div className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.05]">
+                            <div className="text-[10px] text-gray-500 uppercase">Verbrauch komb.</div>
+                            <div className="text-sm font-bold text-gray-100">{vehicle.fuelConsumption.combined} l/100km</div>
+                          </div>
+                        )}
+                        {vehicle.co2Emission && (
+                          <div className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.05]">
+                            <div className="text-[10px] text-gray-500 uppercase">CO2-Emissionen</div>
+                            <div className="text-sm font-bold text-gray-100">{vehicle.co2Emission} g/km</div>
+                          </div>
+                        )}
+                        {vehicle.emissionClass && (
+                          <div className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.05]">
+                            <div className="text-[10px] text-gray-500 uppercase">Schadstoffklasse</div>
+                            <div className="text-sm font-bold text-gray-100">{vehicle.emissionClass}</div>
+                          </div>
+                        )}
+                        {vehicle.electricityConsumption && (
+                          <div className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.05]">
+                            <div className="text-[10px] text-gray-500 uppercase">Stromverbrauch</div>
+                            <div className="text-sm font-bold text-gray-100">{vehicle.electricityConsumption} kWh/100km</div>
+                          </div>
+                        )}
+                        {vehicle.electricRange && (
+                          <div className="bg-white/[0.02] rounded-xl p-3 border border-white/[0.05]">
+                            <div className="text-[10px] text-gray-500 uppercase">Elektr. Reichweite</div>
+                            <div className="text-sm font-bold text-gray-100">{vehicle.electricRange} km</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mandatory Vehicle Disclaimers */}
+                  <div className="mt-6 pt-6 border-t border-white/[0.05] space-y-2 text-xs text-gray-500 leading-relaxed font-light">
+                    <p>
+                      * <strong>Endpreis ohne versteckte Zusatzkosten:</strong> Liefergebühren oder ähnliche zwingende Kosten sind (sofern anwendbar) bereits im angegebenen Endpreis enthalten.
+                    </p>
+                    <p>
+                      * <strong>Laufleistung:</strong> Sofern die hier angegebene Laufleistung nicht der tatsächlichen Gesamtlaufleistung entsprechen sollte, ist dieser Wert ausdrücklich als abgelesener Kilometerstand zu verstehen.
+                    </p>
+                    {vehicle.isImport && (
+                      <p>
+                        * <strong>Herstellerstatus:</strong> Es handelt sich bei diesem Fahrzeug um ein Importfahrzeug / nicht ursprünglich für den deutschen Markt gebautes Fahrzeug.
+                      </p>
+                    )}
+                    <p>
+                      * Im Falle von konkreten <strong>Finanzierungs- oder Leasingraten</strong> beachten Sie bitte die gesonderten Pflichtinformationen gemäß PAngV direkt beim jeweiligen Angebot.
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -374,7 +432,7 @@ export default function CarDetail() {
                       {t('car.features.title')}
                     </h2>
                     <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-                      {vehicle.features.map((feature, index) => (
+                      {(showAllFeatures ? vehicle.features : vehicle.features.slice(0, 6)).map((feature, index) => (
                         <li 
                           key={index} 
                           className="flex items-start gap-4 py-3 border-b border-white/[0.05] group"
@@ -386,6 +444,19 @@ export default function CarDetail() {
                         </li>
                       ))}
                     </ul>
+                    {vehicle.features.length > 6 && (
+                      <div className="mt-8 flex justify-center">
+                        <Button 
+                          onClick={() => setShowAllFeatures(!showAllFeatures)}
+                          variant="secondary"
+                          className="bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1] text-gray-200 rounded-xl px-8"
+                        >
+                          {showAllFeatures 
+                            ? (t('car.features.show_less') === 'car.features.show_less' ? 'Weniger anzeigen' : t('car.features.show_less') || 'Weniger anzeigen') 
+                            : (t('car.features.show_more') === 'car.features.show_more' ? 'Mehr anzeigen' : t('car.features.show_more') || 'Mehr anzeigen')}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -424,24 +495,6 @@ export default function CarDetail() {
                 </div>
               </div>
 
-              {/* Trust Badges */}
-              <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-6 shadow-glass hover:border-white/[0.15] transition-all duration-500">
-                <div className="space-y-5">
-                  <div className="flex items-center gap-4 group cursor-default">
-                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                      <CheckCircle className="w-5 h-5 text-red-500" />
-                    </div>
-                    <span className="text-sm text-gray-300 font-medium">{t('service.list.1.title')}</span>
-                  </div>
-                  <div className="flex items-center gap-4 group cursor-default">
-                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                      <CheckCircle className="w-5 h-5 text-red-500" />
-                    </div>
-                    <span className="text-sm text-gray-300 font-medium">{t('service.advantages.3.title')}</span>
-                  </div>
-                </div>
-              </div>
-
               {/* Location */}
               <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-6 shadow-glass">
                 <h3 className="font-display font-semibold text-gray-100 mb-4 flex items-center gap-2">
@@ -460,9 +513,9 @@ export default function CarDetail() {
 
           {/* Similar Vehicles */}
           {similarVehicles.length > 0 && (
-            <div className="mt-16">
-              <h2 className="text-3xl font-bold text-gray-100 mb-8">{t('car.similar.title')}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="mt-16 mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-100 mb-8">{t('car.similar.title')}</h2>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {similarVehicles.map((car) => (
                   <VehicleCard
                     key={car.id}

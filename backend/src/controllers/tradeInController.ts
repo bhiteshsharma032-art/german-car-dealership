@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
-import { sendTradeInEmail } from '../services/emailService';
+import { sendTradeInEmail, sendTradeInConfirmationEmail } from '../services/emailService';
+import { 
+  saveTradeInSubmission, 
+  getTradeInSubmissions, 
+  updateTradeInStatusInDB,
+  deleteTradeInFromDB
+} from '../services/supabaseService';
 
 // Define the interface for a trade-in request
 export interface TradeInRequest {
@@ -59,10 +65,6 @@ export interface TradeInRequest {
   message?: string;
 }
 
-// In-memory storage for serverless environments (Vercel)
-// In production, replace this with a real database (Supabase, PostgreSQL, etc.)
-let tradeInsStore: TradeInRequest[] = [];
-
 // Controller methods
 export const createTradeIn = async (req: Request, res: Response) => {
   try {
@@ -73,21 +75,26 @@ export const createTradeIn = async (req: Request, res: Response) => {
       status: 'new'
     };
     
-    tradeInsStore.unshift(newTradeIn); // add to top
+    // Perform parallel execution: Emails + DB
+    const emailPromise = sendTradeInEmail(newTradeIn).catch(err => {
+      console.error('Trade-in email error:', err);
+    });
     
-    // Send email notification
-    try {
-      await sendTradeInEmail(newTradeIn);
-      console.log('Trade-in email sent successfully');
-    } catch (emailError) {
-      console.error('Failed to send trade-in email:', emailError);
-      // Don't fail the request if email fails
-    }
+    const clientEmailPromise = sendTradeInConfirmationEmail(newTradeIn).catch(err => {
+      console.error('Trade-in client confirmation email error:', err);
+    });
+
+    const dbPromise = saveTradeInSubmission(newTradeIn).catch(err => {
+      console.error('Trade-in database error:', err);
+    });
+    
+    // Wait for all to be initiated 
+    await Promise.allSettled([emailPromise, clientEmailPromise, dbPromise]);
     
     res.status(201).json({
       success: true,
       data: newTradeIn,
-      message: 'Trade-in request successfully created'
+      message: 'Trade-in request successfully created and saved'
     });
   } catch (error: any) {
     console.error('Create trade-in error:', error);
@@ -101,16 +108,22 @@ export const createTradeIn = async (req: Request, res: Response) => {
 
 export const getTradeIns = async (req: Request, res: Response) => {
   try {
+    const result = await getTradeInSubmissions();
+    
+    if (!result.success) {
+      throw result.error;
+    }
+
     res.json({
       success: true,
-      data: tradeInsStore,
-      total: tradeInsStore.length
+      data: result.data,
+      total: result.data?.length || 0
     });
   } catch (error: any) {
     console.error('Get trade-ins error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to get trade-ins',
+      message: 'Failed to get trade-ins from Supabase',
       error: error.message
     });
   }
@@ -121,23 +134,21 @@ export const updateTradeInStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
     
-    const index = tradeInsStore.findIndex(t => t.id === id);
-    if (index === -1) {
-      return res.status(404).json({ success: false, message: 'Trade-in not found' });
-    }
+    const result = await updateTradeInStatusInDB(id, status);
     
-    tradeInsStore[index].status = status;
+    if (!result.success) {
+      throw result.error;
+    }
     
     res.json({
       success: true,
-      data: tradeInsStore[index],
-      message: 'Status updated successfully'
+      message: 'Status updated successfully in Supabase'
     });
   } catch (error: any) {
     console.error('Update trade-in error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update trade-in',
+      message: 'Failed to update trade-in status',
       error: error.message
     });
   }
@@ -147,16 +158,15 @@ export const deleteTradeIn = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
-    const initialLength = tradeInsStore.length;
-    tradeInsStore = tradeInsStore.filter(t => t.id !== id);
+    const result = await deleteTradeInFromDB(id);
     
-    if (tradeInsStore.length === initialLength) {
-      return res.status(404).json({ success: false, message: 'Trade-in not found' });
+    if (!result.success) {
+      throw result.error;
     }
     
     res.json({
       success: true,
-      message: 'Trade-in deleted successfully'
+      message: 'Trade-in deleted successfully from Supabase'
     });
   } catch (error: any) {
     console.error('Delete trade-in error:', error);

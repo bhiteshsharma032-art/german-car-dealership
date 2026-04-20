@@ -15,11 +15,13 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { cn } from '../../utils/cn';
 
 export default function AdminDashboard() {
   const { user } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentCars, setRecentCars] = useState<any[]>([]);
+  const [recentInquiries, setRecentInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,16 +30,29 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const [statsData, carsData] = await Promise.all([
+      const [statsData, carsData, tradeIns, contacts, financing] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getAllCars(),
+        adminService.getTradeInSubmissions(),
+        adminService.getContactSubmissions(),
+        adminService.getFinancingSubmissions(),
       ]);
       setStats(statsData);
-      // Get 5 most recent cars
-      const sorted = [...carsData].sort(
+      
+      // Recent cars
+      const sortedCars = [...carsData].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
-      setRecentCars(sorted.slice(0, 5));
+      setRecentCars(sortedCars.slice(0, 5));
+
+      // Combine and sort inquiries
+      const allInquiries = [
+        ...tradeIns.map(i => ({ ...i, type: 'Inzahlungnahme', date: i.createdAt })),
+        ...contacts.map(i => ({ ...i, type: 'Kontakt', date: i.created_at, name: `${i.first_name} ${i.last_name}` })),
+        ...financing.map(i => ({ ...i, type: 'Finanzierung', date: i.created_at })),
+      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      setRecentInquiries(allInquiries.slice(0, 5));
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -278,6 +293,72 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Recent Inquiries */}
+        <div className="bg-[#2b2b36] rounded-lg shadow-sm overflow-hidden mt-6">
+          <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-white">Letzte Anfragen</h2>
+            <Link to="/admin/kontakte" className="text-sm text-red-500 hover:text-red-400 font-medium transition-colors">
+              Alle ansehen →
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-zinc-900 border border-zinc-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Typ
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kunde
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Anmerkung
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Datum
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-[#2b2b36] divide-y divide-gray-200">
+                {recentInquiries.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                      Keine aktuellen Anfragen vorhanden.
+                    </td>
+                  </tr>
+                ) : (
+                  recentInquiries.map((inquiry) => (
+                    <tr key={inquiry.id} className="hover:bg-zinc-900 border border-zinc-800">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={cn(
+                          "px-2 py-1 text-xs rounded-full font-medium",
+                          inquiry.type === 'Inzahlungnahme' ? "bg-blue-900/40 text-blue-300 border border-blue-800/50" :
+                          inquiry.type === 'Finanzierung' ? "bg-amber-900/40 text-amber-300 border border-amber-800/50" :
+                          "bg-purple-900/40 text-purple-300 border border-purple-800/50"
+                        )}>
+                          {inquiry.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-white">{inquiry.name}</div>
+                        <div className="text-xs text-gray-500">{inquiry.email}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-400 max-w-xs truncate">
+                          {inquiry.message || inquiry.subject || 'Keine Nachricht'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-white">{formatDate(inquiry.date)}</div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

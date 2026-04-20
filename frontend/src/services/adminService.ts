@@ -144,5 +144,23 @@ export const adminService = {
       throw new Error('Car not found in mobile.de inventory');
     }
     return car;
+  },
+
+  // Get all contact submissions
+  getContactSubmissions: async (): Promise<any[]> => {
+    const response = await api.get<ApiResponse<any[]>>('/contact');
+    return response.data.data || [];
+  },
+
+  // Get all trade-in submissions
+  getTradeInSubmissions: async (): Promise<any[]> => {
+    const response = await api.get<ApiResponse<any[]>>('/trade-ins');
+    return response.data.data || [];
+  },
+
+  // Get all financing submissions
+  getFinancingSubmissions: async (): Promise<any[]> => {
+    const response = await api.get<ApiResponse<any[]>>('/contact/financing');
+    return response.data.data || [];
   }
 };

@@ -94,6 +94,7 @@ class InventoryService {
   private cache: InventoryResponse | null = null;
   private lastFetch: number = 0;
   private CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private inflightRequest: Promise<InventoryResponse> | null = null;
 
   async getInventory(limit: number = 1000, params?: SearchParams): Promise<InventoryResponse> {
     try {
@@ -109,40 +110,72 @@ class InventoryService {
         };
       }
 
+      // Deduplicate: if a simple query is already in-flight, reuse it
+      if (isSimpleQuery && this.inflightRequest) {
+        console.log('⏳ Reusing in-flight inventory request...');
+        const result = await this.inflightRequest;
+        return {
+          ...result,
+          data: result.data.slice(0, limit),
+          limit
+        };
+      }
+
       console.log('📡 Fetching inventory from mobile.de API...');
       
-      const response = await api.get('/inventory', {
-        params: {
-          limit,
-          ...params,
-        },
-      });
+      const fetchPromise = (async (): Promise<InventoryResponse> => {
+        const response = await api.get('/inventory', {
+          params: {
+            limit: 1000, // Always fetch all for caching
+            ...params,
+          },
+        });
 
-      if (response.data.success) {
-        console.log(`✅ Loaded ${response.data.data?.length || 0} vehicles from mobile.de`);
-        const result = {
-          success: true,
-          data: response.data.data || [],
-          total: response.data.total,
-          page: response.data.page,
-          limit: response.data.limit,
-        };
+        if (response.data.success) {
+          console.log(`✅ Loaded ${response.data.data?.length || 0} vehicles from mobile.de`);
+          const result: InventoryResponse = {
+            success: true,
+            data: response.data.data || [],
+            total: response.data.total,
+            page: response.data.page,
+            limit: response.data.limit,
+          };
 
-        // Cache the successful base response
-        if (isSimpleQuery && result.data.length > 0) {
-          this.cache = result;
-          this.lastFetch = Date.now();
+          // Cache the successful base response
+          if (isSimpleQuery && result.data.length > 0) {
+            this.cache = result;
+            this.lastFetch = Date.now();
+          }
+
+          return result;
         }
 
-        return result;
+        return {
+          success: false,
+          data: [],
+          error: response.data.error || 'Failed to fetch inventory',
+        };
+      })();
+
+      // Store inflight promise for deduplication
+      if (isSimpleQuery) {
+        this.inflightRequest = fetchPromise;
+      }
+
+      const result = await fetchPromise;
+
+      // Clear inflight
+      if (isSimpleQuery) {
+        this.inflightRequest = null;
       }
 
       return {
-        success: false,
-        data: [],
-        error: response.data.error || 'Failed to fetch inventory',
+        ...result,
+        data: result.data.slice(0, limit),
+        limit
       };
     } catch (error: any) {
+      this.inflightRequest = null;
       console.error('❌ Error fetching inventory:', error);
       return {
         success: false,

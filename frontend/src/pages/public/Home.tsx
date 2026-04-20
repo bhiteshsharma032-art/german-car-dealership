@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { motion, useInView, useMotionValue, useTransform, animate, useSpring } from 'framer-motion';
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
 import {
   ArrowRight,
   ShieldCheck,
@@ -17,30 +17,9 @@ import { carService, Car as CarType } from '../../services/carService';
 import VehicleCard from '../../components/inventory/VehicleCard';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-/* ──────────── Animated Counter ──────────── */
-function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => Math.round(v));
 
-  useEffect(() => {
-    if (isInView) {
-      animate(count, target, { duration: 2, ease: [0.32, 0.72, 0, 1] });
-    }
-  }, [isInView, target, count]);
 
-  useEffect(() => {
-    const unsub = rounded.on('change', (v) => {
-      if (ref.current) ref.current.textContent = `${v.toLocaleString('de-DE')}${suffix}`;
-    });
-    return unsub;
-  }, [rounded, suffix]);
-
-  return <span ref={ref}>0{suffix}</span>;
-}
-
-/* ──────────── Fade-Up Animation Wrapper ──────────── */
+/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Fade-Up Animation Wrapper ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
@@ -58,7 +37,7 @@ function FadeUp({ children, delay = 0, className = '' }: { children: React.React
   );
 }
 
-/* ──────────── Magnetic Wrapper ──────────── */
+/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Magnetic Wrapper ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 function Magnetic({ children }: { children: React.ReactElement }) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -92,7 +71,7 @@ function Magnetic({ children }: { children: React.ReactElement }) {
   );
 }
 
-/* ──────────── Main Component ──────────── */
+/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ Main Component ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
 export default function Home() {
   const { t } = useLanguage();
   const [featuredCars, setFeaturedCars] = useState<CarType[]>([]);
@@ -182,38 +161,30 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: 500, suffix: '+', label: t('home.stats.customers') },
-    { value: 15, suffix: '+', label: t('home.stats.experience') },
-    { value: 100, suffix: '%', label: t('home.stats.quality') },
+    { value: 'Premium', label: t('home.stats.customers') },
+    { value: 'Top Choice', label: t('home.stats.experience') },
+    { value: '100%', label: t('home.stats.quality') },
   ];
 
   return (
     <>
       <Helmet>
-        <title>Nordhessen Automobile — Ihr Partner für Premium-Fahrzeuge</title>
+        <title>Nordhessen Automobile ΓÇö Ihr Partner f├╝r Premium-Fahrzeuge</title>
         <meta
           name="description"
           content={t('home.hero.subtitle')}
         />
       </Helmet>
 
-      {/* ═══════════════ SCROLL IMAGE HERO ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ SCROLL IMAGE HERO ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <div className="relative z-0 bg-[#1a1a1f]">
-        <ScrollImageSequence frameCount={121} folderPath="/frames" filePrefix="ezgif-frame-" fileExtension=".jpg" padLength={3} />
+        <ScrollImageSequence frameCount={120} folderPath="/4k_frames" filePrefix="" fileExtension=".webp" padLength={4} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1f] via-transparent to-transparent pointer-events-none" />
         
-        {/* AI Disclosure Badge - Left Side */}
-        <div className="absolute bottom-8 left-4 sm:left-8 z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span className="text-[10px] text-gray-400 font-medium tracking-wide">KI-generiert</span>
-          </div>
-        </div>
+
       </div>
 
-      {/* ═══════════════ BRAND SHOWCASE ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ BRAND SHOWCASE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-24 relative overflow-hidden bg-[#0e0e0e]">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, rgba(239,68,68,0.15) 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
@@ -266,7 +237,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ PREMIUM SERVICES ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PREMIUM SERVICES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-32 relative bg-[#111111] overflow-hidden">
         <div className="absolute inset-0 border-t border-white/[0.04]" />
         
@@ -317,7 +288,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ STATS BAR ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ STATS BAR ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-24 relative bg-[#0a0a0a] overflow-hidden">
         <div className="absolute inset-0 border-y border-white/[0.06]" />
         
@@ -329,10 +300,10 @@ export default function Home() {
             {stats.map((stat, i) => (
               <FadeUp key={stat.label} delay={i * 0.15} className="text-center md:px-8 pt-8 md:pt-0 first:pt-0">
                 <div 
-                  className="text-5xl md:text-6xl lg:text-7xl font-display font-black mb-4 tracking-tighter"
+                  className="text-4xl md:text-5xl lg:text-6xl font-display font-black mb-4 tracking-tighter"
                   style={{ background: 'linear-gradient(135deg, #ffffff 0%, #ef4444 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
                 >
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  {stat.value}
                 </div>
                 <p className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.3em] font-semibold">{stat.label}</p>
               </FadeUp>
@@ -341,7 +312,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ FEATURED VEHICLES ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ FEATURED VEHICLES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-24 relative overflow-hidden bg-[#111111]">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
           <FadeUp>
@@ -381,7 +352,7 @@ export default function Home() {
                     title={vehicle.title || `${vehicle.brand} ${vehicle.model}`}
                     price={{
                       amount: vehicle.price,
-                      formatted: vehicle.priceFormatted || `${vehicle.price.toLocaleString('de-DE')} €`,
+                      formatted: vehicle.priceFormatted || `${vehicle.price.toLocaleString('de-DE')} Γé¼`,
                     }}
                     netPrice={vehicle.netPrice}
                     netPriceFormatted={vehicle.netPriceFormatted}
@@ -425,7 +396,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ ABOUT US / PHILOSOPHIE ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ABOUT US / PHILOSOPHIE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section id="philosophie" className="py-32 relative overflow-hidden bg-[#0c0c0c]">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-red-500/5 to-transparent pointer-events-none blur-3xl" />
@@ -518,7 +489,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ WHY CHOOSE US ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-24 relative overflow-hidden bg-[#161616]">
         <div className="absolute inset-0 opacity-[0.015]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -565,7 +536,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ FINAL CTA BANNER ═══════════════ */}
+      {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ FINAL CTA BANNER ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <section className="py-40 relative overflow-hidden bg-[#050505] border-t border-white/[0.05]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#000000] z-10 opacity-90" />

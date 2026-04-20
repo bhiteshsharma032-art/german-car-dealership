@@ -36,6 +36,12 @@ export interface Car {
   };
   createdAt: string | Date;
   updatedAt: string | Date;
+  co2Emission?: number;
+  fuelConsumption?: { combined?: number; city?: number; highway?: number };
+  emissionClass?: string;
+  electricityConsumption?: number;
+  electricRange?: number;
+  isImport?: boolean;
 }
 
 export interface CarFilters {
@@ -151,6 +157,10 @@ const transformMobileDeVehicle = (vehicle: InventoryVehicle): Car => {
     seller: vehicle.seller,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    co2Emission: vehicle.co2Emission,
+    fuelConsumption: vehicle.fuelConsumption,
+    emissionClass: vehicle.emissionClass,
+    // Note: Assuming these fields might exist in mobile de api under specific features or extended info
   };
 };
 
@@ -262,27 +272,47 @@ export const carService = {
     try {
       console.log('🔗 CarService: Getting similar cars from mobile.de (NO MOCK DATA)');
       
-      const response = await inventoryService.getInventory(50);
+      const response = await inventoryService.getInventory(100);
       
-      if (!response.success) {
+      if (!response.success || response.data.length === 0) {
         return [];
       }
 
-      // Get the current car to find similar ones
+      // Filter out the current vehicle
+      const otherVehicles = response.data.filter(v => v.id !== id);
+      
+      if (otherVehicles.length === 0) {
+        return [];
+      }
+
+      // Try to find the current car to get better matches
       const currentVehicle = response.data.find(v => v.id === id);
       
-      if (!currentVehicle) {
-        return [];
+      let similarVehicles: typeof otherVehicles;
+      
+      if (currentVehicle) {
+        // Prefer same make, then similar price range
+        const sameMake = otherVehicles.filter(v => v.make === currentVehicle.make);
+        const similarPrice = otherVehicles.filter(v => 
+          v.make !== currentVehicle.make && 
+          Math.abs(v.price.amount - currentVehicle.price.amount) < 15000
+        );
+        similarVehicles = [...sameMake, ...similarPrice].slice(0, 4);
+      } else {
+        // Fallback: just pick 4 random vehicles
+        similarVehicles = otherVehicles
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 4);
       }
 
-      // Find similar cars (same make or similar price range)
-      const similarVehicles = response.data
-        .filter(v => v.id !== id)
-        .filter(v => 
-          v.make === currentVehicle.make || 
-          Math.abs(v.price.amount - currentVehicle.price.amount) < 10000
-        )
-        .slice(0, 3);
+      // If still not enough, pad with random vehicles
+      if (similarVehicles.length < 4) {
+        const remaining = otherVehicles
+          .filter(v => !similarVehicles.includes(v))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 4 - similarVehicles.length);
+        similarVehicles = [...similarVehicles, ...remaining];
+      }
 
       return similarVehicles.map(transformMobileDeVehicle);
     } catch (error) {

@@ -3,10 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Phone, MapPin, Clock, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { saveContactToSupabase } from '../../services/supabaseService';
 
 interface ContactForm {
   salutation: string;
@@ -18,6 +19,7 @@ interface ContactForm {
   carReference?: string;
   message: string;
   privacy: boolean;
+  website: string;
 }
 
 export default function Contact() {
@@ -34,9 +36,52 @@ export default function Contact() {
   });
 
   const onSubmit = async (data: ContactForm) => {
+    if (data.website) return; // Honeypot trap
+
     try {
       setSubmitting(true);
-      await api.post('/contact', data);
+
+      // Run email API + Supabase save + Anfragen API in parallel
+      const emailPromise = api.post('/contact', data);
+
+      // Save to Supabase (fire and forget)
+      saveContactToSupabase({
+        salutation: data.salutation,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        subject: data.subject,
+        carReference: data.carReference,
+        message: data.message,
+      });
+
+      // Send data to Anfragen system (fire and forget)
+      try {
+        const anfrageTyp = 
+          data.subject === 'Inzahlungnahme' ? 'inzahlungnahme' :
+          data.subject === 'Finanzierung' ? 'finanzierung' :
+          data.subject === 'Service' ? 'werkstatt' : 'allgemein';
+
+        fetch(import.meta.env.VITE_ANFRAGEN_API_URL || 'https://<backend-url>/api/anfragen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `${data.firstName} ${data.lastName}`.trim(),
+            email: data.email,
+            telefon: data.phone,
+            anfrageTyp,
+            nachricht: data.message,
+            website: data.website
+          })
+        }).catch(err => console.error('Anfragen API error:', err));
+      } catch (err) {
+        // Ignore errors to not affect existing flow
+      }
+
+      // Wait only for the email API (primary action)
+      await emailPromise;
+
       toast.success(t('contact.form.success'));
       reset();
     } catch (error) {
@@ -265,6 +310,9 @@ export default function Contact() {
                   )}
                 </div>
 
+                {/* Honeypot */}
+                <input type="text" {...register('website')} className="hidden" tabIndex={-1} autoComplete="off" />
+
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
@@ -321,7 +369,7 @@ export default function Contact() {
               </div>
             </motion.div>
 
-            {/* Phone Card */}
+            {/* Departments Card */}
             <motion.div 
               whileHover={{ scale: 1.02, translateY: -5 }}
               className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
@@ -331,33 +379,27 @@ export default function Contact() {
                 <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
                   <Phone className="h-7 w-7" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-100 text-lg mb-2">{t('contact.info.phone')}</h3>
-                  <a href="tel:+4956193004649" className="text-gray-500 hover:text-red-500 font-light text-lg transition-colors">
-                    0561 930 04 649
-                  </a>
+                <div className="w-full space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-100 text-lg mb-1">Verkauf</h3>
+                    <div className="flex flex-col gap-1">
+                      <a href="tel:+4956198866911" className="text-gray-500 hover:text-red-500 font-light text-sm transition-colors">Tel: 0561/98866911</a>
+                      <p className="text-gray-500 font-light text-sm">Fax: 0561/98866916</p>
+                      <a href="mailto:verkauf@nordhessen-automobile.de" className="text-gray-500 hover:text-red-500 font-light text-sm transition-colors break-all">verkauf@nordhessen-automobile.de</a>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-100 text-lg mb-1">Werkstatt</h3>
+                    <div className="flex flex-col gap-1">
+                      <a href="tel:+4956198866918" className="text-gray-500 hover:text-red-500 font-light text-sm transition-colors">Tel: 0561/98866918</a>
+                      <a href="mailto:werkstatt@nordhessen-automobile.de" className="text-gray-500 hover:text-red-500 font-light text-sm transition-colors break-all">werkstatt@nordhessen-automobile.de</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Email Card */}
-            <motion.div 
-              whileHover={{ scale: 1.02, translateY: -5 }}
-              className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-6 shadow-md hover:border-red-200 hover:shadow-lg transition-all duration-300 group relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex items-start gap-5">
-                <div className="p-4 bg-white/[0.03] text-gray-500 rounded-2xl group-hover:text-red-500 group-hover:bg-red-500/10 transition-colors">
-                  <Mail className="h-7 w-7" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-100 text-lg mb-2">{t('contact.info.email')}</h3>
-                  <a href="mailto:info@nordhessen-automobile.de" className="text-gray-500 hover:text-red-500 font-light transition-colors break-all">
-                    info@nordhessen-automobile.de
-                  </a>
-                </div>
-              </div>
-            </motion.div>
+
 
             {/* Opening Hours Card */}
             <motion.div 

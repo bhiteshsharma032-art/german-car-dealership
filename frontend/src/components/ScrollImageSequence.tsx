@@ -7,6 +7,8 @@ interface ScrollImageSequenceProps {
   filePrefix?: string;
   fileExtension?: string;
   padLength?: number;
+  onLoadProgress?: (progress: number) => void;
+  onAllLoaded?: () => void;
 }
 
 
@@ -20,7 +22,9 @@ export default function ScrollImageSequence({
   folderPath = '/frames',
   filePrefix = 'frame-',
   fileExtension = '.jpg',
-  padLength = 4
+  padLength = 4,
+  onLoadProgress,
+  onAllLoaded,
 }: ScrollImageSequenceProps) {
   const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -48,16 +52,27 @@ export default function ScrollImageSequence({
         img.onload = () => {
           loadedImages[index] = img;
           loadedCount++;
-          setLoadProgress(Math.round((loadedCount / totalFrames) * 100));
+          const progress = Math.round((loadedCount / totalFrames) * 100);
+          setLoadProgress(progress);
+          onLoadProgress?.(progress);
           // Show content as soon as first frame is ready
           if (loadedCount === 1) {
             setImages([...loadedImages]);
             setImagesLoaded(true);
           }
+          if (loadedCount === Math.ceil(totalFrames * 0.5)) {
+            onAllLoaded?.();
+          }
           resolve();
         };
         img.onerror = () => {
           loadedCount++;
+          const progress = Math.round((loadedCount / totalFrames) * 100);
+          setLoadProgress(progress);
+          onLoadProgress?.(progress);
+          if (loadedCount === totalFrames) {
+            onAllLoaded?.();
+          }
           resolve();
         };
       });
@@ -101,12 +116,13 @@ export default function ScrollImageSequence({
     if (!canvas || !container || !context) return;
 
     const setCanvasSize = () => {
-      if (!canvas || images.length === 0) return;
+      if (!canvas) return;
       const dpr = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     setCanvasSize();
@@ -123,7 +139,8 @@ export default function ScrollImageSequence({
         setScrollProgress(smoothScrollRef.current);
       }
       currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, 0.12);
-      let fi = Math.min(Math.floor(currentFrameRef.current), images.length - 1);
+      const fi = Math.max(0, Math.min(Math.floor(currentFrameRef.current), images.length - 1));
+
       let img = images[fi];
       // If target frame not loaded yet, find closest loaded frame
       if (!img || !img.complete) {
@@ -135,41 +152,47 @@ export default function ScrollImageSequence({
         }
       }
       if (img && img.complete) {
-        const cw = canvas.width;
-        const ch = canvas.height;
-        context.clearRect(0, 0, cw, ch);
+        const cw = window.innerWidth;
+        const ch = window.innerHeight;
+        context.fillStyle = '#1a1a1f';
+        context.fillRect(0, 0, cw, ch);
         
-        // object-contain logic (shows full car without cropping)
+        // Smart rendering: contain on mobile (show full car), cover on desktop
         const imgRatio = img.width / img.height;
         const canvasRatio = cw / ch;
-        let drawWidth = cw;
-        let drawHeight = ch;
-        let offsetX = 0;
-        let offsetY = 0;
+        let drawWidth: number;
+        let drawHeight: number;
+        let offsetX: number;
+        let offsetY: number;
 
-        if (canvasRatio > imgRatio) {
-           // height is the limiting factor
-           drawHeight = ch;
-           drawWidth = ch * imgRatio;
-           offsetX = (cw - drawWidth) / 2;
+        const isMobile = cw < 768;
+
+        if (isMobile) {
+          // Mobile: specific zoom so the car stretches perfectly to the borders without empty padding
+          // A factor of 1.45 scales the 16:9 frame to perfectly fit the car width to edge
+          const scaleFactor = 1.45;
+          drawWidth = cw * scaleFactor;
+          drawHeight = drawWidth / imgRatio;
+          
+          // Center horizontally and vertically
+          offsetX = (cw - drawWidth) / 2;
+          offsetY = (ch - drawHeight) / 2;
         } else {
-           // width is the limiting factor
-           drawWidth = cw;
-           drawHeight = cw / imgRatio;
-           offsetY = (ch - drawHeight) / 2;
+          // Desktop: object-cover (fills screen, may crop edges)
+          if (canvasRatio > imgRatio) {
+             drawWidth = cw;
+             drawHeight = cw / imgRatio;
+          } else {
+             drawHeight = ch;
+             drawWidth = ch * imgRatio;
+          }
+          offsetX = (cw - drawWidth) / 2;
+          offsetY = (ch - drawHeight) / 2;
         }
 
-        // Apply a gentle 1.18x scale to make the car wider/more prominent without overpowering the layout
-        const zoom = 1.18;
-        const finalWidth = drawWidth * zoom;
-        const finalHeight = drawHeight * zoom;
-        offsetX = (cw - finalWidth) / 2;
-        offsetY = (ch - finalHeight) / 2;
-
-        // Use smoothing for better quality
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = 'high';
-        context.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
+        context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
       }
       rafRef.current = requestAnimationFrame(renderFrame);
     };
@@ -199,7 +222,7 @@ export default function ScrollImageSequence({
       description: t('scroll.elegance_desc'),
       price: '',
       start: 0, fadeInEnd: 0.03, fadeOutStart: 0.22, end: 0.25,
-      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-8 p-5 sm:p-0 sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -209,7 +232,7 @@ export default function ScrollImageSequence({
       description: t('scroll.design_desc'),
       price: '',
       start: 0.25, fadeInEnd: 0.28, fadeOutStart: 0.47, end: 0.50,
-      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -219,7 +242,7 @@ export default function ScrollImageSequence({
       description: t('scroll.engine_desc'),
       price: '',
       start: 0.50, fadeInEnd: 0.53, fadeOutStart: 0.72, end: 0.75,
-      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -229,7 +252,7 @@ export default function ScrollImageSequence({
       description: t('scroll.performance_desc'),
       price: '',
       start: 0.75, fadeInEnd: 0.78, fadeOutStart: 0.87, end: 0.90,
-      posClass: 'left-4 right-4 bottom-24 sm:left-auto sm:right-10 md:right-16 lg:right-20 sm:bottom-16 md:bottom-24 sm:max-w-lg md:max-w-2xl lg:max-w-4xl',
+      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
       align: 'left' as const,
       alignSm: 'right' as const,
     },
@@ -259,21 +282,9 @@ export default function ScrollImageSequence({
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
       <div
-        className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden -mt-20 md:mt-0"
+        className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden"
         style={{ background: NAVY }}
       >
-        {/* Top HUD Indicators (Mobile only) */}
-        <div className="absolute top-[12vh] right-6 z-10 flex flex-col items-end gap-1.5 md:hidden pointer-events-none opacity-40">
-           <div className="flex gap-1">
-             {[...Array(8)].map((_, i) => (
-                <div key={i} className={`w-[2px] h-4 ${i < 5 ? 'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]' : 'bg-white/20'}`} />
-             ))}
-           </div>
-           <span className="text-[6px] tracking-[0.4em] font-mono text-white/50 uppercase">System Integrity: 98%</span>
-           <div className="w-16 h-[1px] bg-white/10" />
-           <span className="text-[6px] tracking-[0.3em] font-mono text-white/30 uppercase">Node Kass-021</span>
-        </div>
-
         {!imagesLoaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-4">
             <div className="w-8 h-8 border-2 border-white/20 rounded-full animate-spin" style={{ borderTopColor: GOLD }} />
@@ -290,56 +301,59 @@ export default function ScrollImageSequence({
           style={{ willChange: 'transform', transform: 'translateZ(0)' }}
         />
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-50 md:opacity-30 pointer-events-none">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent animate-pulse" />
-          <span className="text-[7px] tracking-[0.5em] uppercase text-white/50 font-bold">{t('scroll.down')}</span>
-        </div>
-
-        {/* Futuristic Animated Background Elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-5">
-          {/* Floating Particles */}
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-red-500/30 rounded-full animate-pulse"
-            style={{ animation: 'float 6s ease-in-out infinite' }}></div>
-          <div className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-white/10 rounded-full animate-pulse"
-            style={{ animation: 'float 9s ease-in-out infinite 0.5s' }}></div>
-          <div className="absolute bottom-1/3 left-1/2 w-1.5 h-1.5 bg-red-500/20 rounded-full animate-pulse"
-            style={{ animation: 'float 7s ease-in-out infinite 2s' }}></div>
-          <div className="absolute top-1/3 left-1/3 w-1 h-1 bg-white/20 rounded-full animate-pulse"
-            style={{ animation: 'float 10s ease-in-out infinite 1.5s' }}></div>
-
-          {/* Geometric Lines */}
-          <div className="absolute top-1/4 right-0 w-32 h-px bg-gradient-to-l from-yellow-500/30 to-transparent"
-            style={{ animation: 'slideLeft 3s ease-in-out infinite' }}></div>
-          <div className="absolute bottom-1/3 left-0 w-40 h-px bg-gradient-to-r from-white/20 to-transparent"
-            style={{ animation: 'slideRight 4s ease-in-out infinite 1s' }}></div>
-
-          {/* Corner Accents */}
-          <div className="absolute top-20 right-20 w-16 h-16 border-t border-r border-yellow-500/20"
-            style={{ animation: 'fadeInOut 4s ease-in-out infinite' }}></div>
-          <div className="absolute bottom-20 left-20 w-20 h-20 border-b border-l border-white/10"
-            style={{ animation: 'fadeInOut 5s ease-in-out infinite 2s' }}></div>
-
-          {/* Scanning Lines */}
-          <div className="absolute top-[10vh] left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/10 to-transparent"
-            style={{ animation: 'scanDown 8s linear infinite' }}></div>
-          <div className="absolute top-[15vh] left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent"
-            style={{ animation: 'scanDown 12s linear infinite 4s' }}></div>
-          <div className="absolute top-0 left-[20%] w-[1px] h-full bg-gradient-to-b from-transparent via-red-500/5 to-transparent" 
-            style={{ animation: 'slideRight 15s linear infinite' }}></div>
-          <div className="absolute top-0 right-[20%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/5 to-transparent" 
-            style={{ animation: 'slideRight 20s linear infinite reverse' }}></div>
-        </div>
-
         {imagesLoaded && (
           <>
+            {/* ── Floating Red Dot Particles ── */}
+            <div className="absolute top-[28%] left-[25%] w-2 h-2 bg-red-500/40 rounded-full pointer-events-none z-[5] animate-pulse" />
+            <div className="absolute bottom-[35%] right-[8%] w-1.5 h-1.5 bg-red-500/30 rounded-full pointer-events-none z-[5] animate-pulse" style={{ animationDelay: '1s' }} />
+            
+            {/* ── Geometric Lines ── */}
+            <div className="absolute top-[22%] right-0 w-24 md:w-32 h-px bg-gradient-to-l from-red-500/20 to-transparent pointer-events-none z-[5]" />
+            <div className="absolute bottom-[38%] left-0 w-28 md:w-40 h-px bg-gradient-to-r from-white/10 to-transparent pointer-events-none z-[5]" />
+
+            {/* ── Left Empty Space Fillers (Tech Elements - Mobile) ── */}
+            <div className="absolute left-4 top-[35%] z-[6] flex flex-col gap-5 md:hidden pointer-events-none opacity-70">
+              
+              {/* Technical Target Graphic */}
+              <div className="relative w-10 h-10 opacity-50">
+                <div className="absolute inset-0 border border-white/[0.08] rounded-full" />
+                <div className="absolute inset-1 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
+                <div className="absolute inset-3 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-1 h-1 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,1)]" />
+                </div>
+                {/* Crosshairs */}
+                <div className="absolute top-[-5px] bottom-[-5px] left-1/2 w-[1px] bg-white/[0.06]" />
+                <div className="absolute left-[-5px] right-[-5px] top-1/2 h-[1px] bg-white/[0.06]" />
+              </div>
+
+              {/* Technical Scan Marker */}
+              <div className="flex flex-col gap-0.5 border-l border-red-500/30 pl-2.5 py-0.5">
+                 <span className="text-[7px] tracking-[0.3em] font-mono text-white/30 uppercase">Scan Active</span>
+                 <div className="flex gap-1 mb-1.5">
+                   {[...Array(3)].map((_, i) => (
+                     <div key={i} className="w-1 h-1 bg-red-500/40 rounded-full animate-pulse" style={{ animationDelay: i * 200 + 'ms' }} />
+                   ))}
+                 </div>
+                 <span className="text-[7px] tracking-[0.3em] font-mono text-red-500/60 uppercase">
+                    Location // Kassel
+                 </span>
+                 <span className="text-[8px] tracking-[0.15em] font-mono text-white/50 uppercase">
+                    51.3127° N
+                 </span>
+                 <span className="text-[8px] tracking-[0.15em] font-mono text-white/50 uppercase">
+                    9.4797° E
+                 </span>
+              </div>
+            </div>
+
             {/* ── Side Navigation ── */}
-            <div className="absolute top-[22vh] md:top-1/3 w-[94%] left-[3%] md:left-12 md:w-auto -translate-y-0 md:-translate-y-1/4 flex flex-row md:flex-col justify-between md:justify-center z-20 p-1.5 md:p-6 rounded-2xl md:rounded-3xl backdrop-blur-xl bg-white/[0.03] md:bg-black/10 border border-white/[0.08] md:border-white/[0.03] shadow-2xl">
-              {/* Vertical Track Line (desktop only) */}
-              <div className="absolute left-[27px] md:left-[35px] top-10 bottom-10 w-[2px] bg-white/[0.08] hidden md:block" />
+            <div className="absolute top-[110px] w-[92%] left-[4%] md:top-[35vh] md:-translate-y-1/4 md:left-10 md:w-auto flex flex-row md:flex-col justify-between md:justify-start z-20 p-4 md:p-5 rounded-[1.5rem] backdrop-blur-md bg-gradient-to-b from-[#2a2a35]/80 to-[#0a0a0a]/90 border border-white/[0.06] shadow-2xl">
+              {/* Vertical Track Line */}
+              <div className="hidden md:block absolute left-[36px] top-8 bottom-8 w-[2px] bg-white/[0.08]" />
               <div 
-                className="absolute left-[27px] md:left-[35px] top-10 w-[2px] transition-all duration-700 ease-out hidden md:block shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
-                style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 5rem)`, background: GOLD }} 
+                className="hidden md:block absolute left-[36px] top-8 w-[2px] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
+                style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 4rem)`, background: GOLD }} 
               />
               
               {[t('scroll.nav.start'), t('scroll.nav.design'), t('scroll.nav.engine'), t('scroll.nav.performance')].map((label, i) => {
@@ -348,11 +362,10 @@ export default function ScrollImageSequence({
                   const container = containerRef.current;
                   if (!container) return;
                   
-                  const sectionProgress = i * 0.25; // 0%, 25%, 50%, 75%
+                  const sectionProgress = i * 0.25;
                   const scrollHeight = container.offsetHeight - window.innerHeight;
                   const targetScroll = sectionProgress * scrollHeight;
                   
-                  // Smooth scroll to target
                   window.scrollTo({
                     top: container.offsetTop + targetScroll,
                     behavior: 'smooth'
@@ -363,22 +376,19 @@ export default function ScrollImageSequence({
                   <button
                     key={label}
                     onClick={handleClick}
-                    className="group relative py-2.5 md:py-6 px-3 md:pl-16 md:pr-8 text-[9px] sm:text-xs md:text-base tracking-[0.15em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center overflow-hidden rounded-xl md:rounded-2xl flex-1"
+                    className="group relative py-1 md:py-4 px-1 md:pl-14 md:pr-10 text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center justify-center overflow-hidden rounded-xl flex-1 md:flex-none"
                     style={{ 
-                      color: active ? 'white' : 'rgba(255,255,255,0.5)',
-                      fontWeight: active ? '900' : '600',
+                      color: active ? 'white' : 'rgba(255,255,255,0.4)',
+                      fontWeight: active ? '700' : '500',
                     }}
                   >
-                    {/* Hover background */}
-                    <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Active dot indicator on the track (desktop) */}
+                    {/* Active dot indicator on the track (Desktop) */}
                     <span 
-                      className={`hidden md:block absolute left-2 md:left-4 w-3 h-3 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 scale-100 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-transparent border-white/20 scale-75 group-hover:scale-100 group-hover:border-white/40'}`}
+                      className={`hidden md:block absolute left-[21px] w-2.5 h-2.5 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-[#1a1a1f] border-white/20 group-hover:border-white/40'}`}
                     />
                     
-                    <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-3 flex flex-col md:flex-row items-center gap-1 md:gap-4">
-                      <span className={`font-black text-[10px] md:text-base transition-colors duration-500 ${active ? 'text-red-500 opacity-100' : 'text-gray-600 opacity-60'}`}>
+                    <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-2 flex flex-col md:flex-row items-center gap-1.5 md:gap-4 w-full">
+                      <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-500'}`}>
                         {`0${i+1}`}
                       </span>
                       <span>{label}</span>
@@ -397,51 +407,42 @@ export default function ScrollImageSequence({
               return (
                 <div
                   key={index}
-                  className={'absolute z-10 px-4 py-6 md:p-0 ' + section.posClass}
-                  style={{ 
-                    opacity, 
-                    transform: 'translateY(' + ty + 'px)',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
-                    borderRadius: '2rem',
-                  }}
+                  className={'absolute z-10 ' + section.posClass}
+                  style={{ opacity, transform: 'translateY(' + ty + 'px)' }}
                 >
-                  {/* Gold rule + subtitle */}
-                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                    <div className="h-[2px] w-8 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
-                    <span
-                      className="text-[10px] sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] uppercase font-black"
-                      style={{ color: GOLD, textShadow: '0 0 10px rgba(239,68,68,0.3)' }}
+                  {/* The Dark Gradient Card exactly like the reference */}
+                  <div className="relative z-10 p-6 md:p-0 bg-gradient-to-b from-[#111116]/95 to-[#050505]/95 md:bg-transparent rounded-3xl md:rounded-none shadow-[0_15px_40px_rgba(0,0,0,0.6)] md:shadow-none border border-white/[0.04] md:border-none">
+                    {/* Gold rule + subtitle */}
+                    <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                      <div className="h-[2px] w-6 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
+                      <span
+                        className="text-[9px] sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] uppercase font-bold"
+                        style={{ color: GOLD }}
+                      >
+                        {section.subtitle}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h1
+                      className="font-black leading-[0.88] mb-1 sm:mb-4 md:mb-5 tracking-tighter text-white"
+                      style={{
+                        fontSize: 'clamp(2.7rem, 11vw, 7.5rem)',
+                        textAlign: 'left',
+                        textShadow: '0 2px 40px rgba(0,0,0,0.8)',
+                      }}
                     >
-                      {section.subtitle}
-                    </span>
+                      {(section.title || '').split('\n').map((line, li) => (
+                        <span key={li} style={{ display: 'block' }}>{line}</span>
+                      ))}
+                    </h1>
                   </div>
-
-                  {/* Title */}
-                  <h1
-                    className="font-black leading-[0.88] mb-3 sm:mb-4 md:mb-5 tracking-tighter text-white drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]"
-                    style={{
-                      fontSize: 'clamp(2.5rem, 12vw, 7.5rem)',
-                      textAlign: 'left',
-                      textShadow: '0 2px 40px rgba(0,0,0,0.9)',
-                    }}
-                  >
-                    {(section.title || '').split('\n').map((line, li) => (
-                      <span key={li} style={{ display: 'block' }}>{line}</span>
-                    ))}
-                  </h1>
-
-                  {/* Description - visible on mobile to fill blank space */}
-                  <p
-                    className="text-xs sm:text-sm md:text-lg leading-relaxed block font-medium"
-                    style={{
-                      color: 'rgba(255,255,255,0.9)',
-                      textAlign: 'left',
-                      maxWidth: '380px',
-                      textShadow: '0 1px 1px rgba(0,0,0,0.5)',
-                    }}
-                  >
-                    {section.description}
-                  </p>
+                  
+                  {/* SCROLL DOWN indicator positioned OUTSIDE, below the card */}
+                  <div className="md:hidden absolute left-0 right-0 -bottom-[5.5rem] flex flex-col items-center justify-center gap-3 w-full opacity-60">
+                    <div className="w-[1px] h-[30px] bg-gradient-to-b from-white/40 to-transparent" />
+                    <span className="text-[9px] tracking-[0.4em] text-white uppercase font-bold">Scroll Down</span>
+                  </div>
                 </div>
               );
             })}
@@ -516,6 +517,12 @@ export default function ScrollImageSequence({
 
 
 
+            {/* ── SCROLL DOWN indicator ── */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 pointer-events-none">
+              <div className="w-[1px] h-8 bg-gradient-to-b from-transparent to-white/30" />
+              <span className="text-[8px] tracking-[0.4em] uppercase text-white/30 font-light">Scroll Down</span>
+            </div>
+
             {/* ── Bottom branding ── */}
             <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10 hidden md:block">
               <span className="text-[9px] tracking-[0.5em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.25)' }}>
@@ -523,61 +530,9 @@ export default function ScrollImageSequence({
               </span>
             </div>
 
-            {/* ── Left Empty Space Fillers (Tech Elements) ── */}
-            <div className="absolute left-6 md:left-12 top-[35vh] md:bottom-28 z-0 flex flex-col gap-8 md:gap-10 pointer-events-none opacity-60 md:opacity-80">
-              
-              {/* Technical Target Graphic */}
-              <div className="relative w-12 h-12 md:w-16 md:h-16 opacity-40 md:opacity-60">
-                <div className="absolute inset-0 border border-white/[0.08] rounded-full" />
-                <div className="absolute inset-1.5 md:inset-2 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
-                <div className="absolute inset-3.5 md:inset-4 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,1)]" />
-                </div>
-                {/* Crosshairs */}
-                <div className="absolute top-[-10px] bottom-[-10px] left-1/2 w-[1px] bg-white/[0.08]" />
-                <div className="absolute left-[-10px] right-[-10px] top-1/2 h-[1px] bg-white/[0.08]" />
-              </div>
-              
-              {/* Technical Scan Marker (Mobile Only) */}
-              <div className="flex md:hidden flex-col gap-1.5 border-l border-white/20 pl-4 py-1">
-                 <span className="text-[7px] tracking-[0.4em] font-mono text-white/30 uppercase">Scan Active</span>
-                 <div className="flex gap-1">
-                   {[...Array(3)].map((_, i) => (
-                     <div key={i} className="w-1 h-1 bg-red-500/50 rounded-full animate-pulse" style={{ animationDelay: i * 200 + 'ms' }} />
-                   ))}
-                 </div>
-              </div>
-
-              <div className="flex gap-8 items-end">
-                {/* Coordinates */}
-                <div className="flex flex-col gap-2 border-l-2 border-red-500/40 pl-5 py-1">
-                  <span className="text-[8px] md:text-[9px] tracking-[0.4em] font-mono text-red-500/60 uppercase">
-                    {t('scroll.location')}
-                  </span>
-                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/50 uppercase">
-                    51.3127° N
-                  </span>
-                  <span className="text-[10px] md:text-xs tracking-[0.2em] font-mono text-white/50 uppercase">
-                    9.4797° E
-                  </span>
-                </div>
-
-                {/* Data streams indicator */}
-                <div className="hidden sm:flex gap-2.5 pb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="flex flex-col gap-1.5 opacity-60">
-                      <div className="w-1 h-3 bg-white/10 rounded-sm" />
-                      <div className={`w-1 rounded-sm ${i === 1 ? 'bg-red-500 h-8 shadow-[0_0_8px_rgba(239,68,68,0.6)]' : i === 3 ? 'bg-white/50 h-5' : 'bg-white/20 h-2'}`} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             {/* ── Ambient Background Typography ── */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] md:-translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.04] md:opacity-[0.03] z-0 mix-blend-overlay">
-              <span className="text-[6rem] sm:text-[10rem] md:text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.03] z-0 mix-blend-overlay hidden xl:block">
+              <span className="text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
                 NORDHESSEN
               </span>
             </div>

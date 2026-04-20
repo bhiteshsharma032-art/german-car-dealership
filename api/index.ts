@@ -4,9 +4,27 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import * as xml2js from 'xml2js';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 // Load environment variables
 dotenv.config();
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Email configuration
+const hasEmailConfig = process.env.SMTP_USER && process.env.SMTP_PASS;
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: hasEmailConfig ? {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  } : undefined,
+});
 
 const app = express();
 
@@ -294,10 +312,78 @@ const carFeatures = [
 ];
 
 // ============================================================================
-// TRADE-IN IN-MEMORY STORAGE
+// HELPERS & DB MAPPING
 // ============================================================================
 
-let tradeInsStore: any[] = [];
+const mapTradeInToDB = (data: any) => ({
+  id: data.id,
+  name: data.name,
+  email: data.email,
+  phone: data.phone,
+  address: data.address,
+  vin: data.vin,
+  license_plate: data.licensePlate,
+  first_registration: data.firstRegistration,
+  mileage: data.mileage,
+  expected_price: data.expectedPrice,
+  accident_free: data.accidentFree,
+  accident_damage: data.accidentDamage,
+  previous_owners: data.previousOwners,
+  repainted: data.repainted,
+  repainted_details: data.repaintedDetails,
+  replaced_engine_or_gearbox: data.replacedEngineOrGearbox,
+  replaced_engine_or_gearbox_details: data.replacedEngineOrGearboxDetails,
+  exterior_color: data.exteriorColor,
+  is_metallic: data.isMetallic,
+  interior_color: data.interiorColor,
+  service_history: data.serviceHistory,
+  last_inspection_km: data.lastInspectionKm,
+  last_inspection_date: data.lastInspectionDate,
+  tuv_valid_until: data.tuvValidUntil,
+  upholstery: data.upholstery,
+  financing: data.financing,
+  financing_details: data.financingDetails,
+  smokers_car: data.smokersCar,
+  re_import: data.reImport,
+  message: data.message,
+  status: data.status || 'new',
+  created_at: data.createdAt || new Date().toISOString()
+});
+
+const mapTradeInFromDB = (item: any) => ({
+  id: item.id,
+  createdAt: item.created_at,
+  status: item.status || 'new',
+  name: item.name,
+  email: item.email,
+  phone: item.phone,
+  address: item.address,
+  vin: item.vin,
+  licensePlate: item.license_plate,
+  firstRegistration: item.first_registration,
+  mileage: item.mileage,
+  expectedPrice: item.expected_price,
+  accidentFree: item.accident_free,
+  accidentDamage: item.accident_damage,
+  previousOwners: item.previous_owners,
+  repainted: item.repainted,
+  repaintedDetails: item.repainted_details,
+  replacedEngineOrGearbox: item.replaced_engine_or_gearbox,
+  replacedEngineOrGearboxDetails: item.replaced_engine_or_gearbox_details,
+  exteriorColor: item.exterior_color,
+  isMetallic: item.is_metallic,
+  interiorColor: item.interior_color,
+  serviceHistory: item.service_history,
+  lastInspectionKm: item.last_inspection_km,
+  lastInspectionDate: item.last_inspection_date,
+  tuv_valid_until: item.tuv_valid_until,
+  upholstery: item.upholstery,
+  financing: item.financing,
+  financing_details: item.financing_details,
+  smokersCar: item.smokers_car,
+  reImport: item.re_import,
+  message: item.message,
+});
 
 // ============================================================================
 // ROUTES
@@ -584,8 +670,89 @@ app.get('/api/mobilede/test-connection', async (req, res) => {
   }
 });
 
+// --- Contact Form ---
+app.post('/api/contact', async (req, res) => {
+  try {
+    const formData = req.body;
+    
+    // DB Save
+    const { error: dbError } = await supabase.from('contact_submissions').insert([formData]);
+    if (dbError) console.error('DB Error:', dbError);
+
+    // Email Logic
+    if (hasEmailConfig) {
+      const mailOptions = {
+        from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
+        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        replyTo: formData.email,
+        subject: `Neue Kontaktanfrage: ${formData.subject}`,
+        text: `Name: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message}`
+      };
+      await transporter.sendMail(mailOptions);
+    }
+
+    res.status(200).json({ success: true, message: 'Contact form submitted and saved successfully' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Failed to submit contact form', error: error.message });
+  }
+});
+
+app.post('/api/contact/financing', async (req, res) => {
+  try {
+    const formData = req.body;
+    const dbData = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      vehicle_price: formData.vehiclePrice,
+      down_payment: formData.downPayment,
+      term: formData.term,
+      message: formData.message
+    };
+    
+    const { error: dbError } = await supabase.from('financing_submissions').insert([dbData]);
+    if (dbError) console.error('DB Error:', dbError);
+
+    if (hasEmailConfig) {
+      const mailOptions = {
+        from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
+        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        replyTo: formData.email,
+        subject: `Neue Finanzierungsanfrage: ${formData.name}`,
+        text: `Name: ${formData.name}\nEmail: ${formData.email}\nPrice: ${formData.vehiclePrice}\nTerm: ${formData.term}`
+      };
+      await transporter.sendMail(mailOptions);
+    }
+
+    res.status(200).json({ success: true, message: 'Financing request submitted and saved successfully' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Failed to submit financing request', error: error.message });
+  }
+});
+
+// Admin variants to fetch
+app.get('/api/contact', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('contact_submissions').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json({ success: true, data, total: data?.length || 0 });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/contact/financing', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('financing_submissions').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json({ success: true, data, total: data?.length || 0 });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // --- Trade-Ins ---
-app.post('/api/trade-ins', (req, res) => {
+app.post('/api/trade-ins', async (req, res) => {
   try {
     const newTradeIn = {
       ...req.body,
@@ -593,32 +760,60 @@ app.post('/api/trade-ins', (req, res) => {
       createdAt: new Date().toISOString(),
       status: 'new'
     };
-    tradeInsStore.unshift(newTradeIn);
-    res.status(201).json({ success: true, data: newTradeIn, message: 'Trade-in request successfully created' });
+    
+    const dbData = mapTradeInToDB(newTradeIn);
+    const { error: dbError } = await supabase.from('tradein_submissions').insert([dbData]);
+    if (dbError) console.error('DB Error:', dbError);
+
+    if (hasEmailConfig) {
+      const mailOptions = {
+        from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
+        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        replyTo: newTradeIn.email,
+        subject: `Neue Inzahlungnahme-Anfrage: ${newTradeIn.name}`,
+        text: `Name: ${newTradeIn.name}\nVIN: ${newTradeIn.vin}\nPrice: ${newTradeIn.expectedPrice}`
+      };
+      await transporter.sendMail(mailOptions);
+    }
+
+    res.status(201).json({ success: true, data: newTradeIn, message: 'Trade-in request successfully created and saved' });
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Failed to create trade-in request', error: error.message });
   }
 });
 
-app.get('/api/trade-ins', authMiddleware, (req, res) => {
-  res.json({ success: true, data: tradeInsStore, total: tradeInsStore.length });
+app.get('/api/trade-ins', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('tradein_submissions').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    const mappedData = data.map(mapTradeInFromDB);
+    res.json({ success: true, data: mappedData, total: mappedData.length });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
-app.patch('/api/trade-ins/:id/status', authMiddleware, (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const index = tradeInsStore.findIndex((t: any) => t.id === id);
-  if (index === -1) return res.status(404).json({ success: false, message: 'Trade-in not found' });
-  tradeInsStore[index].status = status;
-  res.json({ success: true, data: tradeInsStore[index], message: 'Status updated successfully' });
+app.patch('/api/trade-ins/:id/status', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const { error } = await supabase.from('tradein_submissions').update({ status }).eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Status updated successfully in Supabase' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Failed to update status', error: error.message });
+  }
 });
 
-app.delete('/api/trade-ins/:id', authMiddleware, (req, res) => {
-  const { id } = req.params;
-  const initialLength = tradeInsStore.length;
-  tradeInsStore = tradeInsStore.filter((t: any) => t.id !== id);
-  if (tradeInsStore.length === initialLength) return res.status(404).json({ success: false, message: 'Trade-in not found' });
-  res.json({ success: true, message: 'Trade-in deleted successfully' });
+app.delete('/api/trade-ins/:id', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from('tradein_submissions').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Trade-in deleted successfully from Supabase' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: 'Failed to delete trade-in', error: error.message });
+  }
 });
 
 // --- Error handler ---

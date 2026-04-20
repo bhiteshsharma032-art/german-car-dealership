@@ -123,14 +123,14 @@ export default function ChatBot() {
         <button
           onClick={() => setIsOpen(true)}
           className={cn(
-            'fixed z-[110] w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center',
+            'fixed z-[110] w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center',
             'bg-gradient-to-r from-red-600 to-red-500 hover:shadow-xl hover:shadow-red-500/50 transform hover:scale-110',
             'text-white font-semibold',
-            'bottom-20 right-4 md:bottom-6 md:right-24'
+            'bottom-16 right-4 md:bottom-6 md:right-20'
           )}
           aria-label={t('chat.aria_open')}
         >
-          <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />
+          <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
         </button>
       )}
 
@@ -139,14 +139,14 @@ export default function ChatBot() {
         <button
           onClick={() => setIsOpen(false)}
           className={cn(
-            'fixed z-[110] w-14 h-14 rounded-full shadow-lg transition-all duration-300 items-center justify-center',
+            'fixed z-[110] w-12 h-12 rounded-full shadow-lg transition-all duration-300 items-center justify-center',
             'bg-gradient-to-r from-red-600 to-red-500 hover:shadow-xl hover:shadow-red-500/50 transform hover:scale-110',
             'text-white font-semibold',
-            'hidden md:flex md:bottom-6 md:right-24'
+            'hidden md:flex md:bottom-6 md:right-20'
           )}
           aria-label={t('chat.aria_open')}
         >
-          <X className="h-6 w-6" />
+          <X className="h-5 w-5" />
         </button>
       )}
 

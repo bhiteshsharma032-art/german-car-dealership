@@ -1,7 +1,7 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
-import { LayoutDashboard, Car, LogOut, Menu, X, User } from 'lucide-react';
+import { LayoutDashboard, Car, LogOut, Menu, X, User, Mail, Euro } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export default function AdminLayout() {
@@ -65,6 +65,8 @@ export default function AdminLayout() {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Fahrzeuge', href: '/admin/fahrzeuge', icon: Car },
     { name: 'Inzahlungnahmen', href: '/admin/inzahlungnahmen', icon: Car },
+    { name: 'Kontaktanfragen', href: '/admin/kontakte', icon: Mail },
+    { name: 'Finanzierung', href: '/admin/finanzierungen', icon: Euro },
   ];
 
   const isActive = (path: string) => location.pathname === path;

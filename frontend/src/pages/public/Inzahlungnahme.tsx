@@ -18,6 +18,7 @@ import Badge from '../../components/ui/Badge';
 import api from '../../services/api';
 import { useLenis } from '../../components/SmoothScroll';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { saveTradeInToSupabase } from '../../services/supabaseService';
 
 // ---------- Types ----------
 interface TradeInFormData {
@@ -60,6 +61,7 @@ interface TradeInFormData {
   // Extra
   message: string;
   privacy: boolean;
+  website: string;
 }
 
 // ---------- Helpers ----------
@@ -94,9 +96,43 @@ export default function Inzahlungnahme() {
 
 
   const onSubmit = async (data: TradeInFormData) => {
+    if (data.website) return; // Honeypot trap
+
     try {
       setSubmitting(true);
-      await api.post('/trade-ins', data);
+
+      // Run email API + Supabase save + Anfragen API in parallel
+      const emailPromise = api.post('/trade-ins', data);
+
+      // Save to Supabase (fire and forget)
+      saveTradeInToSupabase(data);
+
+      // Send to Anfragen API (fire and forget)
+      try {
+        fetch(import.meta.env.VITE_ANFRAGEN_API_URL || 'https://<backend-url>/api/anfragen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            telefon: data.phone,
+            anfrageTyp: 'inzahlungnahme',
+            fahrzeugReferenz: {
+              marke: "Unknown", 
+              modell: data.vin || "Unknown", 
+              baujahr: parseInt(data.firstRegistration?.split('.')[1] || data.firstRegistration?.split('.')[0] || '2000') || 2000,
+              kilometerstand: parseInt(data.mileage) || 0,
+              zustand: data.accidentFree === 'Nein' ? 'unfallwagen' : data.accidentDamage ? 'maengel' : 'normal'
+            },
+            nachricht: data.message,
+            website: data.website
+          })
+        }).catch(err => console.error('Anfragen API error:', err));
+      } catch (err) {}
+
+      // Wait only for the email API (primary action)
+      await emailPromise;
+
       toast.success('Vielen Dank! Ihre Anfrage wurde erfolgreich gesendet. Wir melden uns innerhalb von 24 Stunden bei Ihnen.');
       setSubmitted(true);
       reset();
@@ -341,219 +377,326 @@ export default function Inzahlungnahme() {
                   </div>
                 </motion.div>
               ) : (
-                                <motion.div
+                <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7 }}
+                  className="max-w-4xl mx-auto"
                 >
-                  <div className="max-w-4xl mx-auto shadow-lg relative overflow-hidden group p-4 lg:p-0">
+                  <div className="bg-[#2a2a34] border border-white/[0.08] rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-red-400" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent pointer-events-none" />
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="w-full bg-white text-gray-900 font-sans border-2 border-[#dc2626]">
-                      {/* Red Header */}
-                      <div className="bg-[#dc2626] text-white font-bold p-3 text-lg md:text-xl md:px-4 text-center">
-                        {t('tradein.form.title')}
+                    <form onSubmit={handleSubmit(onSubmit)} className="relative z-10 space-y-12">
+                      
+                      {/* Section 1: Personal Data */}
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-sm">01</span>
+                          {t('tradein.form.section.personal')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.name')} *</label>
+                            <input type="text" {...register('name', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">E-Mail *</label>
+                            <input type="email" {...register('email', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.phone')} *</label>
+                            <input type="text" {...register('phone', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.address')} * <span className="text-[10px] opacity-60">({t('tradein.form.table.address_hint')})</span></label>
+                            <input type="text" {...register('address', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="p-1 md:p-2 bg-white flex flex-col space-y-[2px]">
-                        
-                        {/* Name/Address section */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[30%] bg-[#d1d5db] text-gray-800 p-2 text-sm md:text-base font-semibold flex flex-col justify-between">
-                            <div>{t('tradein.form.table.name')}</div>
-                            <div className="my-2">{t('tradein.form.table.address')}<br/><span className="text-xs font-normal">{t('tradein.form.table.address_hint')}</span></div>
-                            <div>{t('tradein.form.table.phone')}</div>
+                      {/* Section 2: Vehicle Basics */}
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-sm">02</span>
+                          {t('tradein.form.section.vehicle')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.vin')} *</label>
+                            <input type="text" {...register('vin', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors uppercase" placeholder="WBA..." />
                           </div>
-                          <div className="w-[70%] flex flex-col justify-between gap-[2px]">
-                            <input type="text" {...register('name', { required: true })} className="h-[33%] w-full border border-gray-300 px-2 outline-none" />
-                            <input type="text" {...register('address', { required: true })} className="h-[33%] w-full border border-gray-300 px-2 outline-none" />
-                            <input type="text" {...register('phone', { required: true })} className="h-[33%] w-full border border-gray-300 px-2 outline-none" />
-                          </div>
-                        </div>
-
-                        {/* 1 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[30%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.vin')}</div>
-                          <div className="w-[70%]"><input type="text" {...register('vin', { required: true })} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 2 & 3 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[20%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.licenseplate')}</div>
-                          <div className="w-[30%]"><input type="text" {...register('licensePlate')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                          <div className="w-[20%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center pr-0">{t('tradein.form.table.firstregistration')}</div>
-                          <div className="w-[30%]"><input type="text" {...register('firstRegistration', { required: true })} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 4 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] p-2 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.accidentfree')}</div>
-                          <div className="w-[45%] bg-[#d1d5db] p-2 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-                            <div className="flex gap-4 items-center">
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('accidentFree')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('accidentFree')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.licenseplate')}</label>
+                              <input type="text" {...register('licensePlate')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
                             </div>
-                            <span className="text-xs leading-none max-w-[120px]">{t('tradein.form.table.accident_hint')}</span>
-                          </div>
-                          <div className="w-[30%]"><input type="text" {...register('accidentDamage')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 5 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.prevowners')}</div>
-                          <div className="w-[75%] border border-gray-300 px-2 py-2 flex items-center gap-2">
-                            <span className="text-sm">{t('tradein.form.table.prevowners_hint')}</span>
-                            <input type="text" {...register('previousOwners')} className="flex-1 outline-none text-sm px-2" />
-                          </div>
-                        </div>
-
-                        {/* 6 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] p-2 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.repainted')}</div>
-                          <div className="w-[45%] bg-[#d1d5db] p-2 text-sm flex items-center justify-between">
-                            <div className="flex gap-4 items-center">
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('repainted')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('repainted')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.firstregistration')} *</label>
+                              <input type="text" {...register('firstRegistration', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" placeholder="MM/JJJJ" />
                             </div>
-                            <span className="text-sm">{t('tradein.form.table.repainted_hint')}</span>
                           </div>
-                          <div className="w-[30%]"><input type="text" {...register('repaintedDetails')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 7 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] p-2 text-sm md:text-base font-medium flex items-center" dangerouslySetInnerHTML={{ __html: t('tradein.form.table.engine').replace('\\n', '<br/>') }}></div>
-                          <div className="w-[45%] bg-[#d1d5db] p-2 text-sm flex items-center justify-between">
-                            <div className="flex gap-4 items-center">
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('replacedEngineOrGearbox')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                              <label className="flex items-center gap-1 cursor-pointer">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('replacedEngineOrGearbox')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.mileage')} *</label>
+                            <input type="text" {...register('mileage', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" placeholder="e.g. 50.000" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.price')}</label>
+                            <div className="relative">
+                              <input type="text" {...register('expectedPrice')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors pr-10" placeholder="0" />
+                              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">€</span>
                             </div>
-                            <span className="text-xs leading-none max-w-[150px]" dangerouslySetInnerHTML={{ __html: t('tradein.form.table.engine_hint').replace('\\n', '<br/>') }}></span>
-                          </div>
-                          <div className="w-[30%]"><input type="text" {...register('replacedEngineOrGearboxDetails')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 8 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.extcolor')}</div>
-                          <div className="w-[60%]"><input type="text" {...register('exteriorColor')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                          <div className="w-[15%] bg-[#d1d5db] p-2 flex items-center justify-center gap-2 text-sm font-medium">
-                            {t('tradein.form.table.metallic')} <input type="checkbox" {...register('isMetallic')} className="w-4 h-4 accent-white rounded-full bg-white" />
                           </div>
                         </div>
+                      </div>
 
-                        {/* 9 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.intcolor')}</div>
-                          <div className="w-[75%]"><input type="text" {...register('interiorColor')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 10 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[35%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center" dangerouslySetInnerHTML={{ __html: t('tradein.form.table.servicehistory').replace('\\n', '<br/>') }}></div>
-                          <div className="flex-1 bg-[#d1d5db] px-2 py-3 flex items-center gap-6">
-                            <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('serviceHistory')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                            <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('serviceHistory')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                          </div>
-                        </div>
-
-                        {/* 11 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.lastinspection')}</div>
-                          <div className="flex-1 border border-gray-300 flex items-center px-2">
-                             <span className="text-sm mr-2 w-8">{t('tradein.form.table.km')}</span>
-                             <input type="text" {...register('lastInspectionKm')} className="flex-1 border-b border-gray-300 outline-none h-6 px-1 mr-4" />
-                             <span className="text-sm mr-2">{t('tradein.form.table.date')}</span>
-                             <input type="text" {...register('lastInspectionDate')} className="flex-1 border-b border-gray-300 outline-none h-6 px-1" />
-                          </div>
-                        </div>
-
-                        {/* 12 & 13 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[30%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center pr-0">{t('tradein.form.table.tuv')}</div>
-                          <div className="w-[35%]"><input type="text" {...register('tuvValidUntil')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                          <div className="w-[20%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center pr-0">{t('tradein.form.table.mileage')}</div>
-                          <div className="w-[15%]"><input type="text" {...register('mileage', { required: true })} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 14 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.upholstery')}</div>
-                          <div className="flex-1 bg-[#d1d5db] px-4 py-3 flex items-center gap-8">
-                            <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.fabric')} <input type="radio" value="Stoff" {...register('upholstery')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                            <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.leather')} <input type="radio" value="Leder" {...register('upholstery')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                            <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.part_leather')} <input type="radio" value="Teilleder" {...register('upholstery')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                          </div>
-                        </div>
-
-                        {/* 15 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[25%] bg-[#d1d5db] px-2 py-3 text-sm md:text-base font-medium flex items-center">{t('tradein.form.table.price')}</div>
-                          <div className="flex-1"><input type="text" {...register('expectedPrice')} className="w-full h-full min-h-[44px] border border-gray-300 px-2 outline-none" /></div>
-                        </div>
-
-                        {/* 16 */}
-                        <div className="flex flex-col gap-[2px] bg-[#d1d5db] p-2 mt-2">
-                          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                            <div className="w-[25%] font-medium text-sm md:text-base pr-2">{t('tradein.form.table.financing')}</div>
-                            <div className="flex items-center gap-6">
-                              <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('financing')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                              <label className="flex items-center gap-1 cursor-pointer text-sm">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('financing')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+                      {/* Section 3: Condition & History */}
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-sm">03</span>
+                          {t('tradein.form.section.condition')}
+                        </h3>
+                        <div className="space-y-8">
+                          
+                          {/* Accident Free */}
+                          <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="space-y-1">
+                                <p className="text-white font-semibold">{t('tradein.form.table.accidentfree')}</p>
+                                <p className="text-xs text-gray-500">{t('tradein.form.table.accident_hint')}</p>
+                              </div>
+                              <div className="flex gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Ja" {...register('accidentFree')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.yes')}</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Nein" {...register('accidentFree')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.no')}</span>
+                                </label>
+                              </div>
                             </div>
-                            <div className="text-sm ml-4">{t('tradein.form.table.financing_hint')}</div>
+                            <input type="text" {...register('accidentDamage')} placeholder={t('tradein.form.table.accident_details')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors mt-2" />
                           </div>
-                          <input type="text" {...register('financingDetails')} className="w-full h-10 border border-gray-300 bg-white px-2 outline-none mt-2" />
-                        </div>
 
-                        {/* 17 & 18 */}
-                        <div className="flex gap-[2px]">
-                          <div className="w-[50%] bg-[#d1d5db] p-2 flex items-center gap-4 text-sm md:text-base font-medium">
-                             <div className="w-[60%]">{t('tradein.form.table.smokers')}</div>
-                             <div className="flex gap-4">
-                               <label className="flex items-center gap-1 cursor-pointer font-normal">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('smokersCar')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                               <label className="flex items-center gap-1 cursor-pointer font-normal">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('smokersCar')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+                          {/* Repainted */}
+                          <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="space-y-1">
+                                <p className="text-white font-semibold">{t('tradein.form.table.repainted')}</p>
+                              </div>
+                              <div className="flex gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Ja" {...register('repainted')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.yes')}</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Nein" {...register('repainted')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.no')}</span>
+                                </label>
+                              </div>
+                            </div>
+                            <input type="text" {...register('repaintedDetails')} placeholder={t('tradein.form.table.repainted_hint')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors mt-2" />
+                          </div>
+
+                          {/* Engine/Gearbox Replacement */}
+                          <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="space-y-1">
+                                <p className="text-white font-semibold">{t('tradein.form.table.engine')}</p>
+                              </div>
+                              <div className="flex gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Ja" {...register('replacedEngineOrGearbox')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.yes')}</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer bg-white/5 px-4 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Nein" {...register('replacedEngineOrGearbox')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.no')}</span>
+                                </label>
+                              </div>
+                            </div>
+                            <input type="text" {...register('replacedEngineOrGearboxDetails')} placeholder={t('tradein.form.table.engine_hint')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors mt-2" />
+                          </div>
+
+                          {/* Detail Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.prevowners')}</label>
+                              <div className="relative">
+                                <input type="text" {...register('previousOwners')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" placeholder={t('tradein.form.table.prevowners_hint')} />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.servicehistory')}</label>
+                              <div className="flex gap-4">
+                                <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 py-3 rounded-xl border border-white/10 hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Ja" {...register('serviceHistory')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.yes')}</span>
+                                </label>
+                                <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 py-3 rounded-xl border border-white/10 hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                  <input type="radio" value="Nein" {...register('serviceHistory')} className="hidden" />
+                                  <span className="text-sm text-white">{t('tradein.form.table.no')}</span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Inspection row */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                                <p className="text-white font-semibold text-sm">{t('tradein.form.table.lastinspection')}</p>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <input type="text" {...register('lastInspectionKm')} placeholder={t('tradein.form.table.km')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-red-500" />
+                                  <input type="text" {...register('lastInspectionDate')} placeholder={t('tradein.form.table.date')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-red-500" />
+                                </div>
+                             </div>
+                             <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                                <p className="text-white font-semibold text-sm">{t('tradein.form.table.tuv')}</p>
+                                <input type="text" {...register('tuvValidUntil', { required: true })} placeholder="MM/JJJJ" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-red-500" />
                              </div>
                           </div>
-                          <div className="w-[50%] bg-[#d1d5db] p-2 flex items-center gap-4 text-sm md:text-base font-medium">
-                             <div className="w-[50%]">{t('tradein.form.table.reimport')}</div>
-                             <div className="flex gap-4">
-                               <label className="flex items-center gap-1 cursor-pointer font-normal">{t('tradein.form.table.yes')} <input type="radio" value="Ja" {...register('reImport')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
-                               <label className="flex items-center gap-1 cursor-pointer font-normal">{t('tradein.form.table.no')} <input type="radio" value="Nein" {...register('reImport')} className="w-4 h-4 ml-1 accent-gray-800" /></label>
+
+                        </div>
+                      </div>
+
+                      {/* Section 4: Configuration & Additional Info */}
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 text-sm">04</span>
+                          {t('tradein.form.section.config')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                          {/* Exterior */}
+                          <div className="space-y-6">
+                             <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.extcolor')}</label>
+                                <input type="text" {...register('exteriorColor')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
                              </div>
+                             <label className="flex items-center gap-3 cursor-pointer group">
+                                <div className="w-6 h-6 rounded-md bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-red-500 transition-colors">
+                                  <input type="checkbox" {...register('isMetallic')} className="w-4 h-4 accent-red-500" />
+                                </div>
+                                <span className="text-sm text-gray-300">{t('tradein.form.table.metallic')}</span>
+                             </label>
+
+                             <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.price')}</label>
+                                <div className="relative">
+                                  <input type="text" {...register('expectedPrice')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors pr-10" placeholder="0" />
+                                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">€</span>
+                                </div>
+                             </div>
+                          </div>
+                          
+                          {/* Interior */}
+                          <div className="space-y-6">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.upholstery')}</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                  {['fabric', 'leather', 'part_leather'].map(type => (
+                                    <label key={type} className="flex flex-col items-center justify-center gap-1 cursor-pointer bg-white/5 p-2 rounded-xl border border-white/10 hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                      <input type="radio" value={type} {...register('upholstery')} className="hidden" />
+                                      <span className="text-[10px] text-white text-center font-bold tracking-tighter uppercase">{t(`tradein.form.table.${type}`)}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.intcolor')}</label>
+                                <input type="text" {...register('interiorColor')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" />
+                              </div>
                           </div>
                         </div>
 
+                        {/* Extra Options Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                           <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                              <p className="text-white font-semibold text-sm">{t('tradein.form.table.smokers')}</p>
+                              <div className="flex gap-4">
+                                {['Ja', 'Nein'].map(val => (
+                                  <label key={val} className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 py-2.5 rounded-xl border border-white/10 hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                    <input type="radio" value={val} {...register('smokersCar')} className="hidden" />
+                                    <span className="text-sm text-white">{val === 'Ja' ? t('tradein.form.table.yes') : t('tradein.form.table.no')}</span>
+                                  </label>
+                                ))}
+                              </div>
+                           </div>
+                           <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                              <p className="text-white font-semibold text-sm">{t('tradein.form.table.reimport')}</p>
+                              <div className="flex gap-4">
+                                {['Ja', 'Nein'].map(val => (
+                                  <label key={val} className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 py-2.5 rounded-xl border border-white/10 hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                    <input type="radio" value={val} {...register('reImport')} className="hidden" />
+                                    <span className="text-sm text-white">{val === 'Ja' ? t('tradein.form.table.yes') : t('tradein.form.table.no')}</span>
+                                  </label>
+                                ))}
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Financing Section */}
+                        <div className="mt-8 bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
+                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <p className="text-white font-semibold">{t('tradein.form.table.financing')}</p>
+                              <div className="flex gap-4">
+                                {['Ja', 'Nein'].map(val => (
+                                  <label key={val} className="flex items-center gap-2 cursor-pointer bg-white/5 px-6 py-2 rounded-lg border border-transparent hover:border-red-500/50 transition-all has-[:checked]:bg-red-500/20 has-[:checked]:border-red-500">
+                                    <input type="radio" value={val} {...register('financing')} className="hidden" />
+                                    <span className="text-sm text-white">{val === 'Ja' ? t('tradein.form.table.yes') : t('tradein.form.table.no')}</span>
+                                  </label>
+                                ))}
+                              </div>
+                           </div>
+                           <input type="text" {...register('financingDetails')} placeholder={t('tradein.form.table.financing_hint')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors mt-2" />
+                        </div>
+
+                        <div className="mt-10">
+                          <label className="text-sm font-medium text-gray-400 pl-1 mb-2 block">{t('tradein.form.table.message')}</label>
+                          <textarea
+                            {...register('message')}
+                            rows={4}
+                            className="w-full bg-white/5 border border-white/10 rounded-[1.5rem] px-5 py-4 text-white outline-none focus:border-red-500 transition-colors resize-none"
+                            placeholder={t('tradein.form.table.message_hint')}
+                          />
+                        </div>
+
+                        <div className="mt-8">
+                          <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                              {...register('privacy', { required: true })}
+                              type="checkbox"
+                              className="mt-1 w-5 h-5 accent-red-600 rounded-md"
+                            />
+                            <span className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
+                              {t('tradein.form.table.privacy')}
+                            </span>
+                          </label>
+                        </div>
                       </div>
 
-                      {/* Not in checklist but required */}
-                      <div className="px-4 py-4 mt-2 bg-gray-50 border-t border-gray-200">
-                         <div className="mb-4">
-                           <textarea
-                             {...register('message')}
-                             rows={3}
-                             placeholder={t('tradein.form.table.message')}
-                             className="w-full border border-gray-300 p-2 text-sm outline-none focus:border-red-500"
-                           />
-                         </div>
-                         <label className="flex items-start gap-2 cursor-pointer mb-4">
-                           <input
-                             {...register('privacy', { required: true })}
-                             type="checkbox"
-                             className="mt-1 w-4 h-4 accent-[#dc2626]"
-                           />
-                           <span className="text-sm font-medium text-gray-700 leading-snug">
-                             {t('tradein.form.table.privacy')}
-                           </span>
-                         </label>
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="relative w-full overflow-hidden bg-gradient-to-r from-red-600 to-red-500 text-white font-black py-5 rounded-[1.5rem] text-lg uppercase tracking-widest flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_0_30px_rgba(239,68,68,0.2)] hover:shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:scale-[1.01] disabled:opacity-50"
+                      >
+                        <div className="absolute inset-0 bg-white/10 translate-y-full hover:translate-y-0 transition-transform duration-300" />
+                        {submitting ? (
+                          <>
+                            <RefreshCw className="w-6 h-6 animate-spin" />
+                            {t('tradein.form.table.submitting')}
+                          </>
+                        ) : (
+                          <>
+                            {t('tradein.form.table.submit')}
+                            <ArrowRight className="w-6 h-6" />
+                          </>
+                        )}
+                      </button>
 
-                         <button
-                           type="submit"
-                           disabled={submitting}
-                           className="bg-[#dc2626] hover:bg-red-700 text-white font-bold py-3 px-8 uppercase w-full flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                         >
-                           {submitting ? t('tradein.form.table.submitting') : t('tradein.form.table.submit')}
-                         </button>
-                      </div>
+                      {/* Honeypot */}
+                      <input type="text" {...register('website')} className="hidden" tabIndex={-1} autoComplete="off" />
 
                     </form>
                   </div>

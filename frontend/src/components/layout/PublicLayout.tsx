@@ -34,7 +34,7 @@ export default function PublicLayout() {
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1.5 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex items-center justify-center w-12 h-12 md:w-14 md:h-14 text-white rounded-2xl transition-shadow duration-500 group cursor-pointer shadow-glass"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex items-center justify-center w-10 h-10 md:w-12 md:h-12 text-white rounded-2xl transition-shadow duration-500 group cursor-pointer shadow-glass"
           style={{
             background: 'linear-gradient(135deg, #ef4444, #dc2626)',
             boxShadow: '0 0 30px rgba(239,68,68,0.3), 0 8px 32px rgba(0,0,0,0.4)',
@@ -43,7 +43,7 @@ export default function PublicLayout() {
         >
           {/* Pulse Ring */}
           <div className="absolute inset-0 rounded-2xl border border-red-400/30 animate-ping opacity-0 group-hover:opacity-100" />
-          <Phone className="w-5 h-5" />
+          <Phone className="w-4 h-4 md:w-5 md:h-5" />
         </motion.a>
       </AnimatePresence>
     </div>

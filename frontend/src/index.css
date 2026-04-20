@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,8 +7,6 @@
 /* ═══════════════════════════════════════════════
    PREMIUM DESIGN SYSTEM — Nordhessen Automobile
    ═══════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -361,6 +361,13 @@
   .animate-delay-400 { animation-delay: 400ms; }
   .animate-delay-500 { animation-delay: 500ms; }
   .animate-delay-600 { animation-delay: 600ms; }
+
+  /* Outline Text for Decorative Backgrounds */
+  .outline-text {
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.08);
+    -webkit-text-fill-color: transparent;
+    transition: -webkit-text-stroke 0.5s ease;
+  }
 }
 
 /* ──────────── Scroll animation elements ──────────── */
