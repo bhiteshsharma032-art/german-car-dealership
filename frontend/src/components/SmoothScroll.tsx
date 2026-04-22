@@ -18,7 +18,12 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Initialize Lenis once
+    // Disable Lenis on homepage — scroll image sequence needs native sticky
+    if (pathname === '/') {
+      lenisRef.current = null;
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -40,7 +45,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [pathname]);
 
   // Control start/stop and scroll position based on pathname
   useEffect(() => {

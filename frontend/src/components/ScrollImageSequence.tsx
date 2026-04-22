@@ -157,42 +157,29 @@ export default function ScrollImageSequence({
         context.fillStyle = '#1a1a1f';
         context.fillRect(0, 0, cw, ch);
         
-        // Smart rendering: contain on mobile (show full car), cover on desktop
+        // object-contain + zoom: matches the deployed site look
         const imgRatio = img.width / img.height;
         const canvasRatio = cw / ch;
         let drawWidth: number;
         let drawHeight: number;
-        let offsetX: number;
-        let offsetY: number;
 
-        const isMobile = cw < 768;
-
-        if (isMobile) {
-          // Mobile: specific zoom so the car stretches perfectly to the borders without empty padding
-          // A factor of 1.45 scales the 16:9 frame to perfectly fit the car width to edge
-          const scaleFactor = 1.45;
-          drawWidth = cw * scaleFactor;
-          drawHeight = drawWidth / imgRatio;
-          
-          // Center horizontally and vertically
-          offsetX = (cw - drawWidth) / 2;
-          offsetY = (ch - drawHeight) / 2;
+        if (canvasRatio > imgRatio) {
+           drawHeight = ch;
+           drawWidth = ch * imgRatio;
         } else {
-          // Desktop: object-cover (fills screen, may crop edges)
-          if (canvasRatio > imgRatio) {
-             drawWidth = cw;
-             drawHeight = cw / imgRatio;
-          } else {
-             drawHeight = ch;
-             drawWidth = ch * imgRatio;
-          }
-          offsetX = (cw - drawWidth) / 2;
-          offsetY = (ch - drawHeight) / 2;
+           drawWidth = cw;
+           drawHeight = cw / imgRatio;
         }
+
+        const zoom = 1.18;
+        const finalW = drawWidth * zoom;
+        const finalH = drawHeight * zoom;
+        const offsetX = (cw - finalW) / 2;
+        const offsetY = (ch - finalH) / 2;
 
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = 'high';
-        context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        context.drawImage(img, offsetX, offsetY, finalW, finalH);
       }
       rafRef.current = requestAnimationFrame(renderFrame);
     };

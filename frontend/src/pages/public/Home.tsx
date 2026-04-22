@@ -178,7 +178,7 @@ export default function Home() {
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ SCROLL IMAGE HERO ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <div className="relative z-0 bg-[#1a1a1f]">
-        <ScrollImageSequence frameCount={120} folderPath="/4k_frames" filePrefix="" fileExtension=".webp" padLength={4} />
+        <ScrollImageSequence frameCount={120} folderPath="/4K-jpg" filePrefix="" fileExtension=".jpg" padLength={4} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1f] via-transparent to-transparent pointer-events-none" />
         
 

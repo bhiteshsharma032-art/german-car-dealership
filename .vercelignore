@@ -1,0 +1,18 @@
+# Heavy image folders (not needed — using 4K-jpg instead)
+frontend/public/4K
+frontend/public/ezgif-sequence
+frontend/public/video-sequence
+
+# Dev/test files
+backend
+.git
+deploy.log
+start-dev.bat
+ezgif-892360eddec94a54-jpg (1)
+test-app.js
+text-audit.js
+spell-check.js
+fix_rgba.js
+revert_theme.js
+update_theme.js
+PRODUCTION_TEST_SUITE.js
