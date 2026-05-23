@@ -161,15 +161,15 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: 'Premium', label: t('home.stats.customers') },
-    { value: 'Top Choice', label: t('home.stats.experience') },
+    { value: '500+', label: t('home.stats.customers') },
+    { value: '10+', label: t('home.stats.experience') },
     { value: '100%', label: t('home.stats.quality') },
   ];
 
   return (
     <>
       <Helmet>
-        <title>Nordhessen Automobile ΓÇö Ihr Partner f├╝r Premium-Fahrzeuge</title>
+        <title>Nordhessen Automobile — Ihr Partner für Premium-Fahrzeuge</title>
         <meta
           name="description"
           content={t('home.hero.subtitle')}
@@ -178,10 +178,7 @@ export default function Home() {
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ SCROLL IMAGE HERO ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
       <div className="relative z-0 bg-[#1a1a1f]">
-        <ScrollImageSequence frameCount={120} folderPath="/4K-jpg" filePrefix="" fileExtension=".jpg" padLength={4} />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1f] via-transparent to-transparent pointer-events-none" />
-        
-
+        <ScrollImageSequence frameCount={192} folderPath="/frames-webp" filePrefix="" fileExtension=".webp" padLength={4} />
       </div>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ BRAND SHOWCASE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}

@@ -28,7 +28,7 @@ export default function PublicLayout() {
       {/* Floating Contact Button */}
       <AnimatePresence>
         <motion.a
-          href="tel:+4956193004649"
+          href="tel:+4956198866911"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 1.5 }}

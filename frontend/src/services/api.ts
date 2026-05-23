@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 // PRODUCTION API CLIENT - NO DEMO MODE
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
-  timeout: 240000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -40,10 +40,7 @@ api.interceptors.response.use(
     
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
-      // Clear auth storage
       localStorage.removeItem('auth-storage');
-      
-      // Redirect to login if on admin page
       if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
         window.location.href = '/admin/login';
         toast.error('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.');
@@ -55,8 +52,12 @@ api.interceptors.response.use(
       toast.error('Zugriff verweigert. Sie haben keine Berechtigung für diese Aktion.');
     }
     
-    // Don't show toast for login errors (handled in component)
-    if (!error.config?.url?.includes('/admin/login')) {
+    // Only show toast for admin actions, not public API calls
+    const url = error.config?.url || '';
+    const isPublicApi = url.includes('/inventory') || url.includes('/brands') || url.includes('/features') || url.includes('/health');
+    const isLoginPage = url.includes('/admin/login');
+    
+    if (!isPublicApi && !isLoginPage && error.response?.status !== 401 && error.response?.status !== 403) {
       toast.error(message);
     }
     

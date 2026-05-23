@@ -33,9 +33,9 @@ function ImpressumDE() {
             <div>
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">{t('legal.impressum.contact')}</h3>
               <div className="space-y-2">
-                <a href="tel:+4956193004649" className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
+                <a href="tel:+4956198866911" className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
                   <Phone className="w-4 h-4" />
-                  <span>0561 930 04 649</span>
+                  <span>0561/98866911</span>
                 </a>
                 <div className="flex items-center gap-2 text-gray-400">
                   <Printer className="w-4 h-4" />
@@ -127,9 +127,9 @@ function ImpressumEN() {
             <div>
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">{t('legal.impressum.contact')}</h3>
               <div className="space-y-2">
-                <a href="tel:+4956193004649" className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
+                <a href="tel:+4956198866911" className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors">
                   <Phone className="w-4 h-4" />
-                  <span>0561 930 04 649</span>
+                  <span>0561/98866911</span>
                 </a>
                 <div className="flex items-center gap-2 text-gray-400">
                   <Printer className="w-4 h-4" />

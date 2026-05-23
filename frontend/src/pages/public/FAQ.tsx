@@ -281,8 +281,8 @@ export default function FAQ() {
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{t('faq.contact.phone')}</h3>
                   <p className="text-gray-500 text-sm mb-4">Mo-Fr: 09:00-18:00 Uhr</p>
-                  <a href="tel:+4956193004649" className="text-red-500 hover:text-[#f87171] font-semibold">
-                    0561 930 04 649
+                  <a href="tel:+4956198866911" className="text-red-500 hover:text-[#f87171] font-semibold">
+                    0561/988669 11
                   </a>
                 </Card>
 

@@ -1,4 +1,5 @@
-import { LOCALE, CURRENCY } from '@car-dealership/shared';
+const LOCALE = 'de-DE';
+const CURRENCY = 'EUR';
 
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat(LOCALE, {

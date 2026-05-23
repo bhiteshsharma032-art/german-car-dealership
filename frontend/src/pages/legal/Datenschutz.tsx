@@ -52,7 +52,7 @@ function DatenschutzDE() {
           <p>Nordhessen-Automobile Seidler & Osmikhovsky GbR</p>
           <p>Sandershäuser Straße 87a</p>
           <p>34123 Kassel</p>
-          <p className="mt-2">Telefon: 0561 930 04 649</p>
+          <p className="mt-2">Telefon: 0561/988669 11</p>
           <p>E-Mail: info@nordhessen-automobile.de</p>
         </div>
         <p className="mb-4">Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z. B. Namen, E-Mail-Adressen o. Ä.) entscheidet.</p>
@@ -195,7 +195,7 @@ function DatenschutzEN() {
           <p>Nordhessen-Automobile Seidler & Osmikhovsky GbR</p>
           <p>Sandershäuser Straße 87a</p>
           <p>34123 Kassel</p>
-          <p className="mt-2">Phone: 0561 930 04 649</p>
+          <p className="mt-2">Phone: 0561/988669 11</p>
           <p>E-mail: info@nordhessen-automobile.de</p>
         </div>
         <p className="mb-4">The controller is the natural person or legal entity that single-handedly or jointly with others makes decisions as to the purposes of and resources for the processing of personal data (e.g., names, e-mail addresses, etc.).</p>

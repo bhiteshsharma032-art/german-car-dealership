@@ -36,7 +36,7 @@ export default function StickyCTA({
     contact: {
       icon: <Phone className="w-5 h-5" />,
       label: label || 'Anrufen',
-      href: href || 'tel:+4956193004649',
+      href: href || 'tel:+4956198866911',
       bg: 'from-green-600 to-green-700',
     },
     financing: {
@@ -124,7 +124,7 @@ export function StickyActionBar() {
       <div className="container mx-auto px-4 py-3">
         <div className="grid grid-cols-3 gap-2">
           <a
-            href="tel:+4956193004649"
+            href="tel:+4956198866911"
             className="flex flex-col items-center justify-center gap-1 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
           >
             <Phone className="w-5 h-5 text-green-500" />

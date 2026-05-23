@@ -10,3 +10,6 @@ frontend/public/4K/
 frontend/public/ezgif-sequence/
 frontend/public/video-sequence/
 ezgif-892360eddec94a54-jpg*/
+
+.vercel
+.env*.local

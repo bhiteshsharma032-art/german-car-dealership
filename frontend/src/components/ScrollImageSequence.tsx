@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface ScrollImageSequenceProps {
@@ -11,531 +11,367 @@ interface ScrollImageSequenceProps {
   onAllLoaded?: () => void;
 }
 
-
-
 const GOLD = '#ef4444';
 const GOLD_LIGHT = '#f87171';
 const NAVY = '#1a1a1f';
 
 export default function ScrollImageSequence({
-  frameCount = 180,
-  folderPath = '/frames',
-  filePrefix = 'frame-',
-  fileExtension = '.jpg',
+  frameCount = 192,
+  folderPath = '/frames-webp',
+  filePrefix = '',
+  fileExtension = '.webp',
   padLength = 4,
   onLoadProgress,
   onAllLoaded,
 }: ScrollImageSequenceProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [loadProgress, setLoadProgress] = useState(0);
+  const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(frameCount).fill(null));
+  const [ready, setReady] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const rafRef = useRef<number>();
-  const currentFrameRef = useRef<number>(0);
-  const targetFrameRef = useRef<number>(0);
-  const smoothScrollRef = useRef<number>(0);
-  const targetScrollRef = useRef<number>(0);
-  const lastScrollProgressRef = useRef<number>(0);
+  const [loadPercent, setLoadPercent] = useState(0);
+  const rafRef = useRef(0);
+  const currentFrameRef = useRef(0);
+  const targetFrameRef = useRef(0);
+  const smoothScrollRef = useRef(0);
+  const targetScrollRef = useRef(0);
+  const lastProgressRef = useRef(0);
+  const lastFrameDrawn = useRef(-1);
 
+  const getUrl = useCallback((i: number) =>
+    `${folderPath}/${filePrefix}${(i + 1).toString().padStart(padLength, '0')}${fileExtension}`,
+    [folderPath, filePrefix, padLength, fileExtension]);
+
+  // ── OPTIMIZED IMAGE LOADING ──
   useEffect(() => {
-    const loadedImages: HTMLImageElement[] = new Array(frameCount);
-    let loadedCount = 0;
-    const totalFrames = frameCount;
+    const arr = imagesRef.current;
+    let loaded = 0;
+    let revealed = false;
+    let cancelled = false;
 
-    const loadImage = (index: number): Promise<void> => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = `${folderPath}/${filePrefix}${(index + 1).toString().padStart(padLength, '0')}${fileExtension}`;
-        img.onload = () => {
-          loadedImages[index] = img;
-          loadedCount++;
-          const progress = Math.round((loadedCount / totalFrames) * 100);
-          setLoadProgress(progress);
-          onLoadProgress?.(progress);
-          // Show content as soon as first frame is ready
-          if (loadedCount === 1) {
-            setImages([...loadedImages]);
-            setImagesLoaded(true);
-          }
-          if (loadedCount === Math.ceil(totalFrames * 0.5)) {
-            onAllLoaded?.();
-          }
-          resolve();
-        };
-        img.onerror = () => {
-          loadedCount++;
-          const progress = Math.round((loadedCount / totalFrames) * 100);
-          setLoadProgress(progress);
-          onLoadProgress?.(progress);
-          if (loadedCount === totalFrames) {
-            onAllLoaded?.();
-          }
-          resolve();
-        };
-      });
-    };
-
-    const loadProgressively = async () => {
-      // Phase 1: Load first frame immediately
-      await loadImage(0);
-
-      // Phase 2: Load priority frames (every 10th) for smooth scrolling preview
-      const priorityIndices: number[] = [];
-      for (let i = 9; i < totalFrames; i += 10) {
-        priorityIndices.push(i);
-      }
-      await Promise.all(priorityIndices.map(i => loadImage(i)));
-      setImages([...loadedImages]);
-
-      // Phase 3: Load remaining frames in small batches
-      const remaining: number[] = [];
-      for (let i = 0; i < totalFrames; i++) {
-        if (i !== 0 && !priorityIndices.includes(i)) {
-          remaining.push(i);
+    const load = (idx: number): Promise<void> => new Promise(r => {
+      if (cancelled || arr[idx]) { r(); return; }
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = getUrl(idx);
+      img.onload = () => {
+        if (cancelled) { r(); return; }
+        arr[idx] = img;
+        loaded++;
+        const pct = Math.round((loaded / frameCount) * 100);
+        setLoadPercent(pct);
+        onLoadProgress?.(pct);
+        if (!revealed) {
+          revealed = true;
+          setReady(true);
+          onAllLoaded?.();
         }
-      }
-      const batchSize = 10;
-      for (let b = 0; b < remaining.length; b += batchSize) {
-        const batch = remaining.slice(b, b + batchSize);
-        await Promise.all(batch.map(i => loadImage(i)));
-        setImages([...loadedImages]);
-      }
-    };
+        r();
+      };
+      img.onerror = () => { loaded++; r(); };
+    });
 
-    loadProgressively();
-  }, [frameCount, folderPath]);
+    (async () => {
+      // Phase 1: Load first frame immediately for instant display
+      await load(0);
+      if (cancelled) return;
 
+      // Phase 2: Load 24 evenly-spaced keyframes for smooth initial scrolling
+      const keyCount = 24;
+      const keys: number[] = [];
+      for (let i = 1; i <= keyCount; i++) keys.push(Math.round((i / keyCount) * (frameCount - 1)));
+      await Promise.all(keys.map(load));
+      if (cancelled) return;
+
+      // Phase 3: Fill remaining frames in batches of 12 (WebP is small, can load more in parallel)
+      const rest: number[] = [];
+      for (let i = 1; i < frameCount; i++) if (!arr[i]) rest.push(i);
+      for (let b = 0; b < rest.length; b += 12) {
+        if (cancelled) return;
+        await Promise.all(rest.slice(b, b + 12).map(load));
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [frameCount, getUrl]);
+
+  // ── CANVAS + SCROLL ──
   useEffect(() => {
-    if (!imagesLoaded || images.length === 0) return;
+    if (!ready) return;
     const canvas = canvasRef.current;
     const container = containerRef.current;
-    const context = canvas?.getContext('2d');
-    if (!canvas || !container || !context) return;
+    if (!canvas || !container) return;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) return;
 
-    const setCanvasSize = () => {
-      if (!canvas) return;
-      const dpr = window.devicePixelRatio || 1;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      lastFrameDrawn.current = -1;
     };
-
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
+    resize();
+    let rt = 0;
+    const onResize = () => { clearTimeout(rt); rt = window.setTimeout(resize, 150) as any; };
+    window.addEventListener('resize', onResize);
 
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
-    const renderFrame = () => {
-      if (!context || !canvas) return;
+    const findImg = (target: number): HTMLImageElement | null => {
+      const imgs = imagesRef.current;
+      const fi = Math.max(0, Math.min(Math.round(target), imgs.length - 1));
+      if (imgs[fi]?.complete) return imgs[fi];
+      // Search nearby frames for closest loaded image
+      for (let d = 1; d < 20; d++) {
+        if (fi - d >= 0 && imgs[fi - d]?.complete) return imgs[fi - d];
+        if (fi + d < imgs.length && imgs[fi + d]?.complete) return imgs[fi + d];
+      }
+      return imgs[0];
+    };
+
+    const render = () => {
+      // Smoother interpolation - higher values = snappier, lower = smoother
       smoothScrollRef.current = lerp(smoothScrollRef.current, targetScrollRef.current, 0.08);
-      if (Math.abs(smoothScrollRef.current - lastScrollProgressRef.current) > 0.001) {
-        lastScrollProgressRef.current = smoothScrollRef.current;
+      currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, 0.10);
+      const fi = Math.round(currentFrameRef.current);
+      if (Math.abs(smoothScrollRef.current - lastProgressRef.current) > 0.0005) {
+        lastProgressRef.current = smoothScrollRef.current;
         setScrollProgress(smoothScrollRef.current);
       }
-      currentFrameRef.current = lerp(currentFrameRef.current, targetFrameRef.current, 0.12);
-      const fi = Math.max(0, Math.min(Math.floor(currentFrameRef.current), images.length - 1));
-
-      let img = images[fi];
-      // If target frame not loaded yet, find closest loaded frame
-      if (!img || !img.complete) {
-        for (let offset = 1; offset < images.length; offset++) {
-          const below = fi - offset;
-          const above = fi + offset;
-          if (below >= 0 && images[below] && images[below].complete) { img = images[below]; break; }
-          if (above < images.length && images[above] && images[above].complete) { img = images[above]; break; }
+      if (fi !== lastFrameDrawn.current || smoothScrollRef.current > 0.92) {
+        const img = findImg(fi);
+        if (img) {
+          const cw = window.innerWidth, ch = window.innerHeight;
+          ctx.fillStyle = NAVY;
+          ctx.fillRect(0, 0, cw, ch);
+          const dw = cw, dh = cw / (img.width / img.height);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, (ch - dh) / 2, dw, dh);
+          
+          // Smooth fade to background at the very end (last 8% of scroll)
+          const fadeStart = 0.92;
+          if (smoothScrollRef.current > fadeStart) {
+            const fadeProgress = (smoothScrollRef.current - fadeStart) / (1 - fadeStart);
+            ctx.fillStyle = NAVY;
+            ctx.globalAlpha = fadeProgress;
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.globalAlpha = 1;
+          }
+          
+          lastFrameDrawn.current = fi;
         }
       }
-      if (img && img.complete) {
-        const cw = window.innerWidth;
-        const ch = window.innerHeight;
-        context.fillStyle = '#1a1a1f';
-        context.fillRect(0, 0, cw, ch);
-        
-        // object-contain + zoom: matches the deployed site look
-        const imgRatio = img.width / img.height;
-        const canvasRatio = cw / ch;
-        let drawWidth: number;
-        let drawHeight: number;
-
-        if (canvasRatio > imgRatio) {
-           drawHeight = ch;
-           drawWidth = ch * imgRatio;
-        } else {
-           drawWidth = cw;
-           drawHeight = cw / imgRatio;
-        }
-
-        const zoom = 1.18;
-        const finalW = drawWidth * zoom;
-        const finalH = drawHeight * zoom;
-        const offsetX = (cw - finalW) / 2;
-        const offsetY = (ch - finalH) / 2;
-
-        context.imageSmoothingEnabled = true;
-        context.imageSmoothingQuality = 'high';
-        context.drawImage(img, offsetX, offsetY, finalW, finalH);
-      }
-      rafRef.current = requestAnimationFrame(renderFrame);
+      rafRef.current = requestAnimationFrame(render);
     };
 
-    const handleScroll = () => {
-      if (!container) return;
+    const onScroll = () => {
       const rect = container.getBoundingClientRect();
       const p = Math.max(0, Math.min(1, -rect.top / (container.offsetHeight - window.innerHeight)));
-      targetScrollRef.current = easeOut(p);
-      targetFrameRef.current = easeOut(p) * (images.length - 1);
+      targetScrollRef.current = p;
+      // Map scroll to frames: use 92% of scroll for all frames, last 8% holds on final frame
+      const frameProgress = Math.min(p / 0.92, 1);
+      targetFrameRef.current = frameProgress * (frameCount - 1);
     };
 
-    handleScroll();
-    renderFrame();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', setCanvasSize);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [imagesLoaded, images]);
+    onScroll();
+    render();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize); cancelAnimationFrame(rafRef.current); };
+  }, [ready, frameCount]);
 
-  const sections = [
-    {
-      subtitle: t('scroll.elegance'),
-      title: 'BMW\nM340i',
-      description: t('scroll.elegance_desc'),
-      price: '',
-      start: 0, fadeInEnd: 0.03, fadeOutStart: 0.22, end: 0.25,
-      posClass: 'left-4 right-4 bottom-8 p-5 sm:p-0 sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
-      align: 'left' as const,
-      alignSm: 'right' as const,
-    },
-    {
-      subtitle: t('scroll.design'),
-      title: t('scroll.design_title'),
-      description: t('scroll.design_desc'),
-      price: '',
-      start: 0.25, fadeInEnd: 0.28, fadeOutStart: 0.47, end: 0.50,
-      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
-      align: 'left' as const,
-      alignSm: 'right' as const,
-    },
-    {
-      subtitle: t('scroll.engine'),
-      title: t('scroll.engine_title'),
-      description: t('scroll.engine_desc'),
-      price: '',
-      start: 0.50, fadeInEnd: 0.53, fadeOutStart: 0.72, end: 0.75,
-      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
-      align: 'left' as const,
-      alignSm: 'right' as const,
-    },
-    {
-      subtitle: t('scroll.performance'),
-      title: t('scroll.performance_title'),
-      description: t('scroll.performance_desc'),
-      price: '',
-      start: 0.75, fadeInEnd: 0.78, fadeOutStart: 0.87, end: 0.90,
-      posClass: 'left-4 right-4 bottom-[15vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md',
-      align: 'left' as const,
-      alignSm: 'right' as const,
-    },
-  ];
+  // ── SECTION DATA ──
+  const sections = useMemo(() => [
+    { subtitle: t('scroll.elegance'), title: 'BMW\nM340i', start: 0, fadeInEnd: 0.03, fadeOutStart: 0.18, end: 0.20,
+      posClass: 'left-4 right-4 bottom-[25vh] p-5 sm:p-0 sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md' },
+    { subtitle: t('scroll.design'), title: t('scroll.design_title'), start: 0.20, fadeInEnd: 0.23, fadeOutStart: 0.38, end: 0.40,
+      posClass: 'left-4 right-4 bottom-[25vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md' },
+    { subtitle: t('scroll.engine'), title: t('scroll.engine_title'), start: 0.40, fadeInEnd: 0.43, fadeOutStart: 0.58, end: 0.60,
+      posClass: 'left-4 right-4 bottom-[25vh] sm:left-auto sm:right-10 md:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-md' },
+    { subtitle: t('scroll.performance'), title: t('scroll.performance_title'), start: 0.60, fadeInEnd: 0.63, fadeOutStart: 0.78, end: 0.80,
+      posClass: 'left-4 right-4 bottom-[25vh] sm:left-auto sm:right-8 md:right-12 lg:right-16 sm:bottom-16 md:bottom-24 sm:max-w-sm md:max-w-lg lg:max-w-xl pr-4 sm:pr-0' },
+  ], [t, language]);
 
-  // Closing CTA section opacity (fades in after Performance)
-  const closingStart = 0.90;
-  const closingFadeInEnd = 0.94;
-  const closingOpacity = scrollProgress <= closingStart ? 0
-    : scrollProgress < closingFadeInEnd ? (scrollProgress - closingStart) / (closingFadeInEnd - closingStart)
-      : 1;
-
-  const smoothStep = (t: number) => t * t * (3 - 2 * t);
+  const closingStart = 0.88, closingFadeInEnd = 0.94;
+  const closingOpacity = scrollProgress <= closingStart ? 0 : scrollProgress < closingFadeInEnd ? (scrollProgress - closingStart) / (closingFadeInEnd - closingStart) : 1;
+  const smoothStep = (x: number) => x * x * (3 - 2 * x);
   const getSectionOpacity = (s: typeof sections[0]) => {
     const p = scrollProgress;
-    const { start = 0, fadeInEnd = 0, fadeOutStart = 0, end = 0 } = s;
-    if (p <= start) return start === 0 ? 1 : 0;
-    if (p < fadeInEnd) return start === 0 ? 1 : smoothStep((p - start) / (fadeInEnd - start));
-    if (p <= fadeOutStart) return 1;
-    if (p < end) return 1 - smoothStep((p - fadeOutStart) / (end - fadeOutStart));
+    if (p <= s.start) return s.start === 0 ? 1 : 0;
+    if (p < s.fadeInEnd) return s.start === 0 ? 1 : smoothStep((p - s.start) / (s.fadeInEnd - s.start));
+    if (p <= s.fadeOutStart) return 1;
+    if (p < s.end) return 1 - smoothStep((p - s.fadeOutStart) / (s.end - s.fadeOutStart));
     return 0;
   };
-
-  const currentSectionIdx = scrollProgress >= closingStart ? 4 : Math.min(Math.floor(scrollProgress * 4), 3);
-
+  const currentSectionIdx = scrollProgress >= closingStart ? 4 : scrollProgress < 0.20 ? 0 : scrollProgress < 0.40 ? 1 : scrollProgress < 0.60 ? 2 : 3;
 
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
-      <div
-        className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden"
-        style={{ background: NAVY }}
-      >
-        {!imagesLoaded && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-4">
-            <div className="w-8 h-8 border-2 border-white/20 rounded-full animate-spin" style={{ borderTopColor: GOLD }} />
-            <div className="text-white/60 text-xs tracking-[0.3em] uppercase">Loading {loadProgress}%</div>
-            <div className="w-40 h-[2px] bg-[#2b2b36]/10 rounded-full overflow-hidden">
-              <div className="h-full rounded-full transition-all duration-300" style={{ width: loadProgress + '%', background: GOLD }} />
+      <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden" style={{ background: NAVY }}>
+
+        {/* Loading Screen */}
+        {!ready && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-20 gap-6 bg-[#1a1a1f]">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
+              <div className="absolute inset-0 border-4 border-transparent rounded-full animate-spin" style={{ borderTopColor: GOLD, borderRightColor: GOLD_LIGHT, animationDuration: '1s' }} />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-white/80 text-xs font-bold">{loadPercent}%</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm tracking-[0.3em] uppercase font-bold mb-2" style={{ color: GOLD }}>Nordhessen Automobile</div>
+              <div className="text-white/40 text-xs tracking-[0.2em] uppercase">Loading Experience</div>
+            </div>
+            {/* Progress bar */}
+            <div className="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full transition-all duration-300" style={{ width: `${loadPercent}%`, background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})` }} />
             </div>
           </div>
         )}
 
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full object-cover absolute inset-0"
-          style={{ willChange: 'transform', transform: 'translateZ(0)' }}
-        />
+        <canvas ref={canvasRef} className="w-full h-full object-cover absolute inset-0" style={{ willChange: 'transform', transform: 'translateZ(0)' }} />
 
-        {imagesLoaded && (
+        {/* Decorative Automotive Graphics */}
+        {ready && (
           <>
-            {/* ── Floating Red Dot Particles ── */}
-            <div className="absolute top-[28%] left-[25%] w-2 h-2 bg-red-500/40 rounded-full pointer-events-none z-[5] animate-pulse" />
-            <div className="absolute bottom-[35%] right-[8%] w-1.5 h-1.5 bg-red-500/30 rounded-full pointer-events-none z-[5] animate-pulse" style={{ animationDelay: '1s' }} />
-            
-            {/* ── Geometric Lines ── */}
-            <div className="absolute top-[22%] right-0 w-24 md:w-32 h-px bg-gradient-to-l from-red-500/20 to-transparent pointer-events-none z-[5]" />
-            <div className="absolute bottom-[38%] left-0 w-28 md:w-40 h-px bg-gradient-to-r from-white/10 to-transparent pointer-events-none z-[5]" />
-
-            {/* ── Left Empty Space Fillers (Tech Elements - Mobile) ── */}
-            <div className="absolute left-4 top-[35%] z-[6] flex flex-col gap-5 md:hidden pointer-events-none opacity-70">
-              
-              {/* Technical Target Graphic */}
-              <div className="relative w-10 h-10 opacity-50">
-                <div className="absolute inset-0 border border-white/[0.08] rounded-full" />
-                <div className="absolute inset-1 border border-white/[0.15] rounded-full border-t-red-500/80" style={{ animation: 'spin 8s linear infinite' }} />
-                <div className="absolute inset-3 border border-white/[0.05] rounded-full border-b-white/50" style={{ animation: 'spin 12s linear infinite reverse' }} />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-1 h-1 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,1)]" />
-                </div>
-                {/* Crosshairs */}
-                <div className="absolute top-[-5px] bottom-[-5px] left-1/2 w-[1px] bg-white/[0.06]" />
-                <div className="absolute left-[-5px] right-[-5px] top-1/2 h-[1px] bg-white/[0.06]" />
-              </div>
-
-              {/* Technical Scan Marker */}
-              <div className="flex flex-col gap-0.5 border-l border-red-500/30 pl-2.5 py-0.5">
-                 <span className="text-[7px] tracking-[0.3em] font-mono text-white/30 uppercase">Scan Active</span>
-                 <div className="flex gap-1 mb-1.5">
-                   {[...Array(3)].map((_, i) => (
-                     <div key={i} className="w-1 h-1 bg-red-500/40 rounded-full animate-pulse" style={{ animationDelay: i * 200 + 'ms' }} />
-                   ))}
-                 </div>
-                 <span className="text-[7px] tracking-[0.3em] font-mono text-red-500/60 uppercase">
-                    Location // Kassel
-                 </span>
-                 <span className="text-[8px] tracking-[0.15em] font-mono text-white/50 uppercase">
-                    51.3127° N
-                 </span>
-                 <span className="text-[8px] tracking-[0.15em] font-mono text-white/50 uppercase">
-                    9.4797° E
-                 </span>
-              </div>
+            <div className="absolute top-0 left-0 w-64 h-64 pointer-events-none z-[3] opacity-20">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(239,68,68,0.3)" strokeWidth="0.5"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+                <line x1="0" y1="0" x2="256" y2="256" stroke="rgba(239,68,68,0.4)" strokeWidth="1" />
+              </svg>
             </div>
-
-            {/* ── Side Navigation ── */}
-            <div className="absolute top-[110px] w-[92%] left-[4%] md:top-[35vh] md:-translate-y-1/4 md:left-10 md:w-auto flex flex-row md:flex-col justify-between md:justify-start z-20 p-4 md:p-5 rounded-[1.5rem] backdrop-blur-md bg-gradient-to-b from-[#2a2a35]/80 to-[#0a0a0a]/90 border border-white/[0.06] shadow-2xl">
-              {/* Vertical Track Line */}
-              <div className="hidden md:block absolute left-[36px] top-8 bottom-8 w-[2px] bg-white/[0.08]" />
-              <div 
-                className="hidden md:block absolute left-[36px] top-8 w-[2px] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(239,68,68,0.8)]" 
-                style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 4rem)`, background: GOLD }} 
-              />
-              
-              {[t('scroll.nav.start'), t('scroll.nav.design'), t('scroll.nav.engine'), t('scroll.nav.performance')].map((label, i) => {
-                const active = currentSectionIdx === i;
-                const handleClick = () => {
-                  const container = containerRef.current;
-                  if (!container) return;
-                  
-                  const sectionProgress = i * 0.25;
-                  const scrollHeight = container.offsetHeight - window.innerHeight;
-                  const targetScroll = sectionProgress * scrollHeight;
-                  
-                  window.scrollTo({
-                    top: container.offsetTop + targetScroll,
-                    behavior: 'smooth'
-                  });
-                };
-
-                return (
-                  <button
-                    key={label}
-                    onClick={handleClick}
-                    className="group relative py-1 md:py-4 px-1 md:pl-14 md:pr-10 text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center justify-center overflow-hidden rounded-xl flex-1 md:flex-none"
-                    style={{ 
-                      color: active ? 'white' : 'rgba(255,255,255,0.4)',
-                      fontWeight: active ? '700' : '500',
-                    }}
-                  >
-                    {/* Active dot indicator on the track (Desktop) */}
-                    <span 
-                      className={`hidden md:block absolute left-[21px] w-2.5 h-2.5 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-[#1a1a1f] border-white/20 group-hover:border-white/40'}`}
-                    />
-                    
-                    <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-2 flex flex-col md:flex-row items-center gap-1.5 md:gap-4 w-full">
-                      <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-500'}`}>
-                        {`0${i+1}`}
-                      </span>
-                      <span>{label}</span>
-                    </span>
-                  </button>
-                );
-              })}
+            <div className="absolute top-20 right-0 w-96 h-32 pointer-events-none z-[3] opacity-30 overflow-hidden">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <line x1="400" y1="20" x2="200" y2="20" stroke="rgba(239,68,68,0.6)" strokeWidth="2" strokeDasharray="10,5" />
+                <line x1="400" y1="40" x2="150" y2="40" stroke="rgba(239,68,68,0.4)" strokeWidth="1.5" strokeDasharray="8,4" />
+                <line x1="400" y1="60" x2="180" y2="60" stroke="rgba(239,68,68,0.5)" strokeWidth="1.5" strokeDasharray="12,6" />
+                <line x1="400" y1="80" x2="220" y2="80" stroke="rgba(239,68,68,0.3)" strokeWidth="1" strokeDasharray="6,3" />
+              </svg>
             </div>
-
-            {/* ── Section Overlays ── */}
-            {sections.map((section, index) => {
-              const opacity = getSectionOpacity(section);
-              if (opacity <= 0) return null;
-              const ty = (1 - opacity) * 16;
-
-              return (
-                <div
-                  key={index}
-                  className={'absolute z-10 ' + section.posClass}
-                  style={{ opacity, transform: 'translateY(' + ty + 'px)' }}
-                >
-                  {/* The Dark Gradient Card exactly like the reference */}
-                  <div className="relative z-10 p-6 md:p-0 bg-gradient-to-b from-[#111116]/95 to-[#050505]/95 md:bg-transparent rounded-3xl md:rounded-none shadow-[0_15px_40px_rgba(0,0,0,0.6)] md:shadow-none border border-white/[0.04] md:border-none">
-                    {/* Gold rule + subtitle */}
-                    <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                      <div className="h-[2px] w-6 sm:w-10 flex-shrink-0" style={{ background: GOLD }} />
-                      <span
-                        className="text-[9px] sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] uppercase font-bold"
-                        style={{ color: GOLD }}
-                      >
-                        {section.subtitle}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h1
-                      className="font-black leading-[0.88] mb-1 sm:mb-4 md:mb-5 tracking-tighter text-white"
-                      style={{
-                        fontSize: 'clamp(2.7rem, 11vw, 7.5rem)',
-                        textAlign: 'left',
-                        textShadow: '0 2px 40px rgba(0,0,0,0.8)',
-                      }}
-                    >
-                      {(section.title || '').split('\n').map((line, li) => (
-                        <span key={li} style={{ display: 'block' }}>{line}</span>
-                      ))}
-                    </h1>
-                  </div>
-                  
-                  {/* SCROLL DOWN indicator positioned OUTSIDE, below the card */}
-                  <div className="md:hidden absolute left-0 right-0 -bottom-[5.5rem] flex flex-col items-center justify-center gap-3 w-full opacity-60">
-                    <div className="w-[1px] h-[30px] bg-gradient-to-b from-white/40 to-transparent" />
-                    <span className="text-[9px] tracking-[0.4em] text-white uppercase font-bold">Scroll Down</span>
-                  </div>
-                </div>
-              );
-            })}
-
-
-
-
-
-            {/* ── Closing CTA Section ── */}
-            {closingOpacity > 0 && (
-              <div
-                className="absolute inset-0 z-20 flex flex-col items-center justify-center"
-                style={{
-                  opacity: closingOpacity,
-                  background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 60%, transparent 100%)',
-                }}
-              >
-                {/* Decorative top line */}
-                <div className="w-20 h-[1px] mb-6" style={{ background: 'linear-gradient(90deg, transparent, ' + GOLD + ', transparent)' }} />
-
-                <div className="text-[10px] tracking-[0.5em] uppercase mb-4" style={{ color: GOLD }}>
-                  Nordhessen Automobile
-                </div>
-
-                <h2
-                  className="font-black text-center leading-[0.9] mb-6"
-                  style={{
-                    fontSize: 'clamp(2.5rem, 6vw, 6rem)',
-                    background: 'linear-gradient(135deg, #ffffff 0%, ' + GOLD + ' 50%, #ffffff 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  {t('scroll.cta.title1')}
-                  <br />
-                  {t('scroll.cta.title2')}
-                </h2>
-
-                <p className="text-white/60 text-sm md:text-base text-center max-w-md mb-10 leading-relaxed px-6">
-                  {t('scroll.cta.desc')}
-                </p>
-
-                {/* Stats row */}
-                <div className="flex gap-10 md:gap-16 mb-10">
-                  {[
-                    ['100%', t('scroll.cta.stat1')],
-                    [t('scroll.cta.stat2_val'), t('scroll.cta.stat2')],
-                    [t('scroll.cta.stat3_val'), t('scroll.cta.stat3')],
-                  ].map(([val, lbl]) => (
-                    <div key={lbl} className="text-center">
-                      <div className="text-2xl md:text-3xl font-black text-white mb-1">{val}</div>
-                      <div className="text-[9px] tracking-[0.3em] uppercase" style={{ color: GOLD + 'cc' }}>{lbl}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => { window.location.href = '/fahrzeuge'; }}
-                    className="px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-extrabold border transition-all duration-300 hover:bg-[#2b2b36]/10"
-                    style={{ borderColor: 'rgba(255,255,255,0.25)', color: 'white' }}
-                  >
-                    {t('scroll.cta.button')}
-                  </button>
-                </div>
-
-                {/* Bottom decorative line */}
-                <div className="w-20 h-[1px] mt-10" style={{ background: 'linear-gradient(90deg, transparent, ' + GOLD + '60, transparent)' }} />
-              </div>
-            )}
-
-
-
-            {/* ── SCROLL DOWN indicator ── */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 pointer-events-none">
-              <div className="w-[1px] h-8 bg-gradient-to-b from-transparent to-white/30" />
-              <span className="text-[8px] tracking-[0.4em] uppercase text-white/30 font-light">Scroll Down</span>
+            <div className="absolute top-10 left-1/2 -translate-x-1/2 w-40 h-40 pointer-events-none z-[3]" style={{ opacity: 0.15, transform: `translate(-50%, 0) rotate(${scrollProgress * 360}deg)` }}>
+              <svg width="100%" height="100%" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(239,68,68,0.4)" strokeWidth="0.5" strokeDasharray="4,4" />
+                <circle cx="80" cy="80" r="50" fill="none" stroke="rgba(239,68,68,0.6)" strokeWidth="1" />
+                <circle cx="80" cy="80" r="30" fill="none" stroke="rgba(239,68,68,0.8)" strokeWidth="1.5" />
+                <line x1="80" y1="10" x2="80" y2="30" stroke="rgba(239,68,68,0.6)" strokeWidth="2" />
+                <line x1="80" y1="130" x2="80" y2="150" stroke="rgba(239,68,68,0.6)" strokeWidth="2" />
+                <line x1="10" y1="80" x2="30" y2="80" stroke="rgba(239,68,68,0.6)" strokeWidth="2" />
+                <line x1="130" y1="80" x2="150" y2="80" stroke="rgba(239,68,68,0.6)" strokeWidth="2" />
+              </svg>
             </div>
-
-            {/* ── Bottom branding ── */}
-            <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10 hidden md:block">
-              <span className="text-[9px] tracking-[0.5em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                Nordhessen Automobile
-              </span>
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[200px] pointer-events-none z-[2] opacity-5">
+              <svg width="100%" height="100%" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 100 150 L 150 150 L 180 120 L 250 120 L 280 100 L 350 100 L 380 120 L 450 120 L 480 150 L 500 150" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                <ellipse cx="200" cy="150" rx="25" ry="25" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="3"/>
+                <ellipse cx="430" cy="150" rx="25" ry="25" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="3"/>
+              </svg>
             </div>
-
-            {/* ── Ambient Background Typography ── */}
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[40%] -rotate-90 pointer-events-none opacity-[0.03] z-0 mix-blend-overlay hidden xl:block">
-              <span className="text-[15rem] font-black tracking-tighter text-white whitespace-nowrap">
-                NORDHESSEN
-              </span>
+            <div className="absolute bottom-32 left-0 w-48 h-48 pointer-events-none z-[3] opacity-10">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="hexagons" width="50" height="43.4" patternUnits="userSpaceOnUse" patternTransform="scale(0.8)"><polygon points="25,0 50,14.43 50,43.3 25,57.73 0,43.3 0,14.43" fill="none" stroke="rgba(239,68,68,0.5)" strokeWidth="1"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#hexagons)" />
+              </svg>
             </div>
-
-            {/* ── Progress bar ── */}
-            <div className="absolute bottom-0 left-0 w-full h-[2px] z-10" style={{ background: 'rgba(255,255,255,0.06)' }}>
-              <div
-                className="h-full"
-                style={{
-                  width: (scrollProgress * 100) + '%',
-                  background: 'linear-gradient(90deg, ' + GOLD + ', ' + GOLD_LIGHT + ')',
-                }}
-              />
+            <div className="absolute bottom-40 right-10 w-32 h-32 pointer-events-none z-[3] opacity-20" style={{ transform: `rotate(${scrollProgress * 180}deg)` }}>
+              <svg width="100%" height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 64 64 L 64 20" stroke="rgba(239,68,68,0.8)" strokeWidth="2" strokeLinecap="round"/>
+                <circle cx="64" cy="64" r="40" fill="none" stroke="rgba(239,68,68,0.4)" strokeWidth="1" strokeDasharray="3,3"/>
+                <circle cx="64" cy="64" r="4" fill="rgba(239,68,68,0.8)"/>
+              </svg>
             </div>
           </>
         )}
+
+        {/* Dynamic Bottom Gradient */}
+        {ready && scrollProgress > 0.7 && (
+          <div className="absolute inset-0 pointer-events-none z-[5]" style={{ background: 'linear-gradient(to top, #1a1a1f 0%, rgba(26, 26, 31, 0.8) 25%, transparent 55%)', opacity: Math.min((scrollProgress - 0.7) / 0.25, 1) }} />
+        )}
+
+        {ready && (<>
+          {/* Side Navigation */}
+          <div key={language} className="absolute top-[110px] w-[92%] left-[4%] md:top-[35vh] md:-translate-y-1/4 md:left-10 md:w-auto flex flex-row md:flex-col justify-between md:justify-start z-20 p-4 md:p-5 rounded-[1.5rem] backdrop-blur-md bg-gradient-to-b from-[#2a2a35]/80 to-[#0a0a0a]/90 border border-white/[0.06] shadow-2xl">
+            <div className="hidden md:block absolute left-[36px] top-8 bottom-8 w-[2px] bg-white/[0.08]" />
+            <div className="hidden md:block absolute left-[36px] top-8 w-[2px] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(239,68,68,0.8)]" style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 4rem)`, background: GOLD }} />
+            {[t('scroll.nav.start'), t('scroll.nav.design'), t('scroll.nav.engine'), t('scroll.nav.performance')].map((label, i) => {
+              const active = currentSectionIdx === i;
+              const handleClick = () => { const c = containerRef.current; if (!c) return; window.scrollTo({ top: c.offsetTop + (i * 0.25) * (c.offsetHeight - window.innerHeight), behavior: 'smooth' }); };
+              return (
+                <button key={`${language}-${i}`} onClick={handleClick} className="group relative py-1 md:py-4 px-1 md:pl-14 md:pr-10 text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center justify-center overflow-hidden rounded-xl flex-1 md:flex-none" style={{ color: active ? 'white' : 'rgba(255,255,255,0.4)', fontWeight: active ? '700' : '500' }}>
+                  <span className={`hidden md:block absolute left-[21px] w-2.5 h-2.5 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-[#1a1a1f] border-white/20 group-hover:border-white/40'}`} />
+                  <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-2 flex flex-col md:flex-row items-center gap-1.5 md:gap-4 w-full">
+                    <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-500'}`}>{`0${i+1}`}</span>
+                    <span>{label}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Section Overlays */}
+          {sections.map((section, index) => {
+            const opacity = getSectionOpacity(section);
+            if (opacity <= 0) return null;
+            const isPerformance = index === 3;
+            return (
+              <div key={`${language}-${index}`} className={'absolute z-10 ' + section.posClass} style={{ opacity, transform: `translateY(${(1 - opacity) * 16}px)` }}>
+                <div className="absolute inset-0 -m-8 rounded-3xl blur-2xl" style={{ background: isPerformance ? 'linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.4) 100%)' : 'linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)' }} />
+                <div className="relative z-10 p-6 md:p-0">
+                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="h-[2px] w-6 sm:w-10 flex-shrink-0" style={{ background: GOLD, boxShadow: `0 0 10px ${GOLD}` }} />
+                    <span className="text-[9px] sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] uppercase font-bold" style={{ color: GOLD, textShadow: `0 0 20px ${GOLD}, 0 2px 10px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)` }}>{section.subtitle}</span>
+                  </div>
+                  <h1 className="font-black leading-[0.88] mb-1 sm:mb-4 md:mb-5 tracking-tighter text-white" style={{ fontSize: isPerformance ? 'clamp(2.5rem, 10vw, 6.5rem)' : 'clamp(2.7rem, 11vw, 7.5rem)', textShadow: '0 4px 20px rgba(0,0,0,0.95), 0 8px 40px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,1), 0 0 80px rgba(0,0,0,0.5)' }}>
+                    {(section.title || '').split('\n').map((line, li) => <span key={li} style={{ display: 'block' }}>{line}</span>)}
+                  </h1>
+                </div>
+                <div className="md:hidden absolute left-0 right-0 -bottom-[5.5rem] flex flex-col items-center justify-center gap-3 w-full opacity-60">
+                  <div className="w-[1px] h-[30px] bg-gradient-to-b from-white/40 to-transparent" />
+                  <span className="text-[9px] tracking-[0.4em] text-white uppercase font-bold" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>Scroll Down</span>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Closing CTA */}
+          {closingOpacity > 0 && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center" style={{ opacity: closingOpacity, background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.3) 100%)' }}>
+              <div className="w-20 h-[1px] mb-6" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)`, boxShadow: `0 0 10px ${GOLD}` }} />
+              <div className="text-[10px] tracking-[0.5em] uppercase mb-4" style={{ color: GOLD, textShadow: `0 0 20px ${GOLD}, 0 2px 10px rgba(0,0,0,0.9)` }}>Nordhessen Automobile</div>
+              <h2 className="font-black text-center leading-[0.9] mb-6" style={{ fontSize: 'clamp(2.5rem, 6vw, 6rem)', background: `linear-gradient(135deg, #ffffff 0%, ${GOLD} 50%, #ffffff 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.9)) drop-shadow(0 2px 10px rgba(0,0,0,1))' }}>
+                {t('scroll.cta.title1')}<br />{t('scroll.cta.title2')}
+              </h2>
+              <p className="text-white/80 text-sm md:text-base text-center max-w-md mb-10 leading-relaxed px-6" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.9), 0 4px 20px rgba(0,0,0,0.8)' }}>{t('scroll.cta.desc')}</p>
+              <div className="flex gap-10 md:gap-16 mb-10">
+                {[['100%', t('scroll.cta.stat1')], [t('scroll.cta.stat2_val'), t('scroll.cta.stat2')], [t('scroll.cta.stat3_val'), t('scroll.cta.stat3')]].map(([val, lbl]) => (
+                  <div key={lbl} className="text-center">
+                    <div className="text-2xl md:text-3xl font-black text-white mb-1" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}>{val}</div>
+                    <div className="text-[9px] tracking-[0.3em] uppercase" style={{ color: GOLD + 'cc', textShadow: `0 0 10px ${GOLD}, 0 2px 8px rgba(0,0,0,0.9)` }}>{lbl}</div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => { window.location.href = '/fahrzeuge'; }} className="px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-extrabold border transition-all duration-300 hover:bg-[#2b2b36]/10" style={{ borderColor: 'rgba(255,255,255,0.25)', color: 'white', textShadow: '0 2px 8px rgba(0,0,0,0.9)', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>{t('scroll.cta.button')}</button>
+              <div className="w-20 h-[1px] mt-10" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}60, transparent)` }} />
+            </div>
+          )}
+
+          {/* Bottom elements */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 pointer-events-none">
+            <div className="w-[1px] h-8 bg-gradient-to-b from-transparent to-white/30" />
+            <span className="text-[8px] tracking-[0.4em] uppercase text-white/30 font-light" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>Scroll Down</span>
+          </div>
+          <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10 hidden md:block">
+            <span className="text-[9px] tracking-[0.5em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.25)', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>Nordhessen Automobile</span>
+          </div>
+          <div className="absolute bottom-0 left-0 w-full h-[2px] z-10" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-full" style={{ width: (scrollProgress * 100) + '%', background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})` }} />
+          </div>
+        </>)}
       </div>
     </div>
   );

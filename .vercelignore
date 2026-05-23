@@ -1,7 +1,13 @@
 # Heavy image folders (not needed — using 4K-jpg instead)
+4kkkk
 frontend/public/4K
 frontend/public/ezgif-sequence
 frontend/public/video-sequence
+
+# Dependencies
+node_modules
+frontend/node_modules
+backend/node_modules
 
 # Dev/test files
 backend

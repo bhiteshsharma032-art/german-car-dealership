@@ -20,6 +20,10 @@ import Geschichte from './pages/public/Geschichte';
 
 // Services
 import Inzahlungnahme from './pages/public/Inzahlungnahme';
+import Finanzierung from './pages/public/Finanzierung';
+import Contact from './pages/public/Contact';
+import Service from './pages/public/Service';
+import FAQ from './pages/public/FAQ';
 
 // Utility Pages
 import NotFound from './pages/utility/NotFound';
@@ -51,6 +55,10 @@ function App() {
           {/* Company Pages */}
           <Route path="/geschichte" element={<Geschichte />} />
           <Route path="/inzahlungnahme" element={<Inzahlungnahme />} />
+          <Route path="/finanzierung" element={<Finanzierung />} />
+          <Route path="/kontakt" element={<Contact />} />
+          <Route path="/service" element={<Service />} />
+          <Route path="/faq" element={<FAQ />} />
           
           {/* 404 - Must be last */}
           <Route path="*" element={<NotFound />} />

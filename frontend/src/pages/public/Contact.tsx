@@ -437,6 +437,35 @@ export default function Contact() {
           </motion.div>
         </div>
 
+        {/* Team Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+        >
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">Unser Team</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { name: 'Tim Spangenberg', role: 'Verkauf', email: 'spangenberg@nordhessen-automobile.de', phone: '0561/988669 12' },
+              { name: 'Berk Demirhan', role: 'Verkauf', email: 'demirhan@nordhessen-automobile.de', phone: '0561/988669 13' },
+              { name: 'Stas Saevich', role: 'Verkauf', email: 'saevich@nordhessen-automobile.de', phone: '0561/988669 11' },
+              { name: 'Markus Gernand', role: 'Werkstatt', email: 'werkstatt@nordhessen-automobile.de', phone: '0561/988669 18' },
+              { name: 'Vanessa Bolten', role: 'Office-Manager', email: 'bolten@nordhessen-automobile.de', phone: '0561/988669 14' },
+            ].map((member) => (
+              <div key={member.name} className="p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-red-500/20 transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mb-4">
+                  <span className="text-lg font-bold">{member.name.charAt(0)}</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-1">{member.name}</h3>
+                <p className="text-red-400 text-sm font-medium mb-3">{member.role}</p>
+                <div className="space-y-1.5 text-sm">
+                  <a href={`mailto:${member.email}`} className="block text-gray-400 hover:text-white transition-colors truncate">{member.email}</a>
+                  <a href={`tel:${member.phone.replace(/[^+\d]/g, '')}`} className="block text-gray-400 hover:text-white transition-colors">{member.phone}</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
       </div>
     </>

@@ -36,6 +36,8 @@ export default function Footer() {
               {[
                 { label: t('nav.home'), to: '/' },
                 { label: t('nav.vehicles'), to: '/fahrzeuge' },
+                { label: t('nav.tradein'), to: '/inzahlungnahme' },
+                { label: t('nav.about'), to: '/geschichte' },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -83,13 +85,13 @@ export default function Footer() {
                 <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">
                   <Phone className="h-4 w-4 text-gray-300 group-hover:text-red-400" />
                 </div>
-                <span className="tracking-wide">0561/98866911 (Verkauf)</span>
+                <span className="tracking-wide">0561/98866911 ({t('footer.phone.sales')})</span>
               </a>
               <a href="tel:+4956198866918" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
                 <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">
                   <Phone className="h-4 w-4 text-gray-300 group-hover:text-red-400" />
                 </div>
-                <span className="tracking-wide">0561/98866918 (Werkstatt)</span>
+                <span className="tracking-wide">0561/98866918 ({t('footer.phone.workshop')})</span>
               </a>
               <a href="mailto:verkauf@nordhessen-automobile.de" className="flex items-center gap-4 hover:text-white transition-colors group w-fit">
                 <div className="w-10 h-10 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-red-500/50 group-hover:bg-red-500/10 transition-all">

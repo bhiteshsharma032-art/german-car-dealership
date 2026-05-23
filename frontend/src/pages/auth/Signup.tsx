@@ -142,7 +142,7 @@ export default function Signup() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="block w-full pl-10 pr-3 py-3 border border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                    placeholder="0561 930 04 649"
+                    placeholder="0561/988669 11"
                   />
                 </div>
               </div>

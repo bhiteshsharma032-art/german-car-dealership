@@ -12,7 +12,7 @@ dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase: any = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : { from: () => ({ insert: async () => ({ error: null }), select: () => ({ order: async () => ({ data: [], error: null }) }), update: () => ({ eq: async () => ({ error: null }) }), delete: () => ({ eq: async () => ({ error: null }) }) }) };
 
 // Email configuration
 const hasEmailConfig = process.env.SMTP_USER && process.env.SMTP_PASS;
@@ -138,7 +138,7 @@ const MOBILE_DE_CONFIG = {
   username: process.env.MOBILEDE_API_USERNAME || 'dlr_dimitriosmikhovsky',
   password: process.env.MOBILEDE_API_PASSWORD || 'kovoExT0mG3Y',
   customerId: process.env.MOBILEDE_CUSTOMER_ID || '712285',
-  timeout: parseInt(process.env.MOBILEDE_TIMEOUT || '15000')
+  timeout: parseInt(process.env.MOBILEDE_TIMEOUT || '30000')
 };
 
 function getAuthHeader() {
@@ -148,24 +148,40 @@ function getAuthHeader() {
 
 async function makeMobileDeRequest(endpoint: string, params: Record<string, any> = {}) {
   try {
+    console.log('🔄 Mobile.de API Request:', { endpoint, params, hasAuth: !!MOBILE_DE_CONFIG.username });
     const response = await axios.get(`${MOBILE_DE_CONFIG.baseURL}${endpoint}`, {
       headers: {
         'Authorization': getAuthHeader(),
         'Accept': 'application/xml',
+        'Accept-Language': 'de',
         'User-Agent': 'Nordhessen-Automobile/1.0'
       },
       params,
       timeout: MOBILE_DE_CONFIG.timeout
     });
+    console.log('✅ Mobile.de API Response:', response.status);
     return { success: true, data: response.data, status: response.status };
   } catch (error: any) {
     console.error('❌ Mobile.de API Error:', {
       status: error.response?.status,
-      message: error.message
+      message: error.message,
+      data: error.response?.data ? 'XML/HTML Data received' : 'No data'
     });
+    
+    // Ensure error message is always a string
+    let errorMsg = 'Failed to fetch from mobile.de';
+    if (error.response?.data && typeof error.response.data === 'string' && error.response.data.includes('<error')) {
+      errorMsg = `Mobile.de API Error: ${error.response.status} ${error.response.statusText || ''}`;
+    } else {
+      errorMsg = error.message || 'Unknown network error';
+    }
+
     return {
       success: false,
-      error: { status: error.response?.status || 500, message: error.response?.statusText || error.message }
+      error: { 
+        status: error.response?.status || 500, 
+        message: errorMsg
+      }
     };
   }
 }
@@ -233,6 +249,25 @@ function getAllImages(images: any): string[] {
   return allImages;
 }
 
+function decodeHtmlEntities(str: string): string {
+  if (!str || typeof str !== 'string') return str;
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#34;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&euro;/g, '€')
+    .replace(/&#8364;/g, '€')
+    .replace(/&auml;/g, 'ä').replace(/&Auml;/g, 'Ä')
+    .replace(/&ouml;/g, 'ö').replace(/&Ouml;/g, 'Ö')
+    .replace(/&uuml;/g, 'ü').replace(/&Uuml;/g, 'Ü')
+    .replace(/&szlig;/g, 'ß');
+}
+
 function transformVehicle(ad: any) {
   const vehicle = ad['ad:vehicle'] || {};
   const price = ad['ad:price'] || {};
@@ -267,19 +302,26 @@ function transformVehicle(ad: any) {
 
   return {
     id: ad.$?.key || `vehicle_${Date.now()}`,
-    title: modelDescription || `${make} ${model}`,
-    make, model, modelDescription,
+    title: decodeHtmlEntities(modelDescription || `${make} ${model}`),
+    make: decodeHtmlEntities(make),
+    model: decodeHtmlEntities(model),
+    modelDescription: decodeHtmlEntities(modelDescription),
     price: { amount: priceAmount, currency, formatted: `${priceAmount.toLocaleString('de-DE')} ${currency}` },
     image: getFirstImage(images),
     images: getAllImages(images),
     mileage: { value: mileageValue, unit: 'km', formatted: `${mileageValue.toLocaleString('de-DE')} km` },
     firstRegistration: firstReg,
     year: extractYear(firstReg),
-    fuelType, transmission, bodyType, condition,
+    fuelType: decodeHtmlEntities(fuelType),
+    transmission: decodeHtmlEntities(transmission),
+    bodyType: decodeHtmlEntities(bodyType),
+    condition: decodeHtmlEntities(condition),
     power: { kw: powerKw, hp: powerHp, formatted: `${powerKw} kW (${powerHp} PS)` },
-    exteriorColor, interiorColor, interiorType, doorCount,
-    cubicCapacity, previousOwners, driveType,
-    features: featureList,
+    exteriorColor: decodeHtmlEntities(exteriorColor),
+    interiorColor: decodeHtmlEntities(interiorColor),
+    interiorType: decodeHtmlEntities(interiorType),
+    doorCount, cubicCapacity, previousOwners, driveType,
+    features: featureList.map(decodeHtmlEntities),
     publicUrl: ad.$?.url || '#'
   };
 }
@@ -430,7 +472,7 @@ app.get('/api/inventory/test', async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 1
+      'max-results': 1
     });
     if (result.success) {
       const parsed = await parseXMLResponse(result.data);
@@ -438,7 +480,9 @@ app.get('/api/inventory/test', async (req, res) => {
       const total = parseInt(searchResult['search:total'] || '0');
       res.json({ success: true, message: 'Mobile.de API connection successful', status: result.status, customerNumber: MOBILE_DE_CONFIG.customerId, vehicleCount: total });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, message: 'Mobile.de API connection failed', error: result.error });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Connection failed');
+      res.status(resAny.error?.status || 500).json({ success: false, message: 'Mobile.de API connection failed', error: errorMsg });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
@@ -449,7 +493,7 @@ app.get('/api/inventory/filters', async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 100
+      'max-results': 100
     });
     if (result.success) {
       const parsed = await parseXMLResponse(result.data);
@@ -486,7 +530,9 @@ app.get('/api/inventory/filters', async (req, res) => {
         message: 'Filter options extracted from mobile.de data'
       });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, data: { brands: [], fuelTypes: [], bodyTypes: [], transmissions: [], conditions: [], years: [], priceRanges: [] }, error: result.error });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Failed to get filters');
+      res.status(resAny.error?.status || 500).json({ success: false, data: { brands: [], fuelTypes: [], bodyTypes: [], transmissions: [], conditions: [], years: [], priceRanges: [] }, error: errorMsg });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, data: { brands: [], fuelTypes: [], bodyTypes: [], transmissions: [], conditions: [], years: [], priceRanges: [] }, error: error.message });
@@ -497,7 +543,7 @@ app.get('/api/inventory/search', async (req, res) => {
   try {
     const searchParams: any = {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      'page.size': parseInt(req.query.limit as string) || 100
+      'max-results': parseInt(req.query.limit as string) || 100
     };
     if (req.query.make) searchParams.make = req.query.make;
     if (req.query.model) searchParams.model = req.query.model;
@@ -512,7 +558,9 @@ app.get('/api/inventory/search', async (req, res) => {
       const vehicles = adsArray.filter((ad: any) => ad).map(transformVehicle);
       res.json({ success: true, data: vehicles, total: parseInt(searchResult['search:total'] || '0'), customerNumber: MOBILE_DE_CONFIG.customerId, searchParams: req.query });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, data: [], total: 0, error: result.error, searchParams: req.query });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Search failed');
+      res.status(resAny.error?.status || 500).json({ success: false, data: [], total: 0, error: errorMsg, searchParams: req.query });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, data: [], total: 0, error: error.message });
@@ -521,21 +569,61 @@ app.get('/api/inventory/search', async (req, res) => {
 
 app.get('/api/inventory', async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit as string) || 100;
-    const result = await makeMobileDeRequest('/search', {
+    const allVehicles: any[] = [];
+    const pageSize = 100; // mobile.de max per request
+    
+    // First request to get total count and first page
+    const firstResult = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      'page.size': limit
+      'max-results': pageSize,
+      'page.number': 1,
+      'page.size': pageSize
     });
-    if (result.success) {
-      const parsed = await parseXMLResponse(result.data);
-      const searchResult = parsed['search:search-result'];
-      const ads = searchResult['search:ads']?.['ad:ad'] || [];
-      const adsArray = Array.isArray(ads) ? ads : [ads];
-      const vehicles = adsArray.filter((ad: any) => ad).map(transformVehicle);
-      res.json({ success: true, data: vehicles, total: parseInt(searchResult['search:total'] || '0'), customerNumber: MOBILE_DE_CONFIG.customerId, message: `Successfully fetched ${vehicles.length} vehicles` });
-    } else {
-      res.status(result.error?.status || 500).json({ success: false, data: [], total: 0, error: result.error, message: 'Failed to fetch inventory from mobile.de' });
+    
+    if (!firstResult.success) {
+      const resData = firstResult as any;
+      const errorMsg = typeof resData.error === 'object' ? resData.error.message : (resData.error || 'Failed to fetch inventory');
+      return res.status(resData.error?.status || 500).json({ 
+        success: false, data: [], total: 0, error: errorMsg,
+        message: 'Failed to fetch inventory from mobile.de' 
+      });
     }
+    
+    const firstParsed = await parseXMLResponse(firstResult.data);
+    const firstSearchResult = firstParsed['search:search-result'];
+    const totalAvailable = parseInt(firstSearchResult['search:total'] || '0');
+    const firstAds = firstSearchResult['search:ads']?.['ad:ad'] || [];
+    const firstAdsArray = Array.isArray(firstAds) ? firstAds : [firstAds];
+    allVehicles.push(...firstAdsArray.filter((ad: any) => ad).map(transformVehicle));
+    
+    // Fetch ALL remaining pages
+    const totalPages = Math.ceil(totalAvailable / pageSize);
+    
+    if (totalPages > 1) {
+      for (let p = 2; p <= totalPages; p++) {
+        const pageResult = await makeMobileDeRequest('/search', {
+          customerNumber: MOBILE_DE_CONFIG.customerId,
+          'max-results': pageSize,
+          'page.number': p,
+          'page.size': pageSize
+        });
+        if (pageResult.success) {
+          const parsed = await parseXMLResponse(pageResult.data);
+          const searchResult = parsed['search:search-result'];
+          const ads = searchResult['search:ads']?.['ad:ad'] || [];
+          const adsArray = Array.isArray(ads) ? ads : [ads];
+          allVehicles.push(...adsArray.filter((ad: any) => ad).map(transformVehicle));
+        }
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      data: allVehicles, 
+      total: totalAvailable, 
+      fetched: allVehicles.length,
+      message: `Successfully fetched ${allVehicles.length} of ${totalAvailable} vehicles` 
+    });
   } catch (error: any) {
     res.status(500).json({ success: false, data: [], total: 0, error: error.message });
   }
@@ -554,7 +642,9 @@ app.get('/api/inventory/:id', async (req, res) => {
       const vehicle = transformVehicle(adData);
       res.json({ success: true, data: vehicle, message: 'Successfully fetched vehicle details' });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, data: null, error: result.error, message: 'Failed to fetch vehicle from mobile.de' });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Failed to fetch vehicle');
+      res.status(resAny.error?.status || 500).json({ success: false, data: null, error: errorMsg, message: 'Failed to fetch vehicle from mobile.de' });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, data: null, error: error.message });
@@ -580,7 +670,7 @@ app.get('/api/admin/cars', authMiddleware, adminOnly, async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 50
+      'max-results': 50
     });
     if (result.success) {
       const parsed = await parseXMLResponse(result.data);
@@ -601,7 +691,7 @@ app.get('/api/admin/cars/:id', authMiddleware, adminOnly, async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 100
+      'max-results': 100
     });
     if (result.success) {
       const parsed = await parseXMLResponse(result.data);
@@ -613,7 +703,9 @@ app.get('/api/admin/cars/:id', authMiddleware, adminOnly, async (req, res) => {
       if (!vehicle) return res.status(404).json({ success: false, error: 'Vehicle not found' });
       res.json({ success: true, data: vehicle });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, error: result.error });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Failed to fetch car by ID');
+      res.status(resAny.error?.status || 500).json({ success: false, error: errorMsg });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -636,7 +728,7 @@ app.get('/api/admin/stats', authMiddleware, adminOnly, async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 50
+      'max-results': 50
     });
     if (result.success) {
       const parsed = await parseXMLResponse(result.data);
@@ -658,12 +750,14 @@ app.get('/api/mobilede/test-connection', async (req, res) => {
   try {
     const result = await makeMobileDeRequest('/search', {
       customerNumber: MOBILE_DE_CONFIG.customerId,
-      pageSize: 1
+      'max-results': 1
     });
     if (result.success) {
       res.json({ success: true, message: 'Mobile.de connection successful', status: result.status });
     } else {
-      res.status(result.error?.status || 500).json({ success: false, message: 'Connection failed', error: result.error });
+      const resAny = result as any;
+      const errorMsg = typeof resAny.error === 'object' ? resAny.error.message : (resAny.error || 'Connection failed');
+      res.status(resAny.error?.status || 500).json({ success: false, message: 'Connection failed', error: errorMsg });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });

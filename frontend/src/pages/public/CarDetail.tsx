@@ -153,7 +153,7 @@ export default function CarDetail() {
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link to="/fahrzeuge" className="hover:text-red-400 transition-colors">
-              {t('nav.inventory')}
+              {t('nav.vehicles')}
             </Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-gray-100">{vehicle.brand} {vehicle.model}</span>
@@ -453,7 +453,7 @@ export default function CarDetail() {
                         >
                           {showAllFeatures 
                             ? (t('car.features.show_less') === 'car.features.show_less' ? 'Weniger anzeigen' : t('car.features.show_less') || 'Weniger anzeigen') 
-                            : (t('car.features.show_more') === 'car.features.show_more' ? 'Mehr anzeigen' : t('car.features.show_more') || 'Mehr anzeigen')}
+                            : t('card.show_more')}
                         </Button>
                       </div>
                     )}
@@ -485,7 +485,7 @@ export default function CarDetail() {
                   {!vehicle.isVatable && <div className="mb-6" />}
 
                   <div className="space-y-4">
-                    <a href="tel:+4956193004649" className="block w-full border-0 p-0 m-0">
+                    <a href="tel:+4956198866911" className="block w-full border-0 p-0 m-0">
                       <Button size="lg" className="w-full h-14 bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
                         <Phone className="w-5 h-5 pointer-events-none" />
                         {t('car.price.call_now')}

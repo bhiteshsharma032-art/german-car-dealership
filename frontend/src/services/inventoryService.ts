@@ -93,7 +93,7 @@ export interface InventoryResponse {
 class InventoryService {
   private cache: InventoryResponse | null = null;
   private lastFetch: number = 0;
-  private CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private CACHE_TTL = 2 * 60 * 1000; // 2 minutes - show new cars quickly
   private inflightRequest: Promise<InventoryResponse> | null = null;
 
   async getInventory(limit: number = 1000, params?: SearchParams): Promise<InventoryResponse> {
@@ -153,7 +153,7 @@ class InventoryService {
         return {
           success: false,
           data: [],
-          error: response.data.error || 'Failed to fetch inventory',
+          error: typeof response.data.error === 'string' ? response.data.error : (response.data.message || 'Failed to fetch inventory'),
         };
       })();
 
@@ -177,10 +177,11 @@ class InventoryService {
     } catch (error: any) {
       this.inflightRequest = null;
       console.error('❌ Error fetching inventory:', error);
+      const errMsg = error?.response?.data?.error || error?.response?.data?.message || error?.message || 'Network error';
       return {
         success: false,
         data: [],
-        error: error.message || 'Network error',
+        error: typeof errMsg === 'string' ? errMsg : 'Network error',
       };
     }
   }

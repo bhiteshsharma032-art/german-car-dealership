@@ -73,7 +73,7 @@ export default function Inzahlungnahme() {
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const {
     register,
@@ -265,7 +265,7 @@ export default function Inzahlungnahme() {
                 <ArrowRight className="w-5 h-5" />
               </button>
               <a
-                href="tel:+4956193004649"
+                href="tel:+4956198866911"
                 className="inline-flex items-center justify-center gap-3 border-2 border-[#dc2626] text-[#dc2626] hover:bg-[#dc2626] hover:text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-300"
               >
                 <Phone className="w-5 h-5" />
@@ -282,19 +282,19 @@ export default function Inzahlungnahme() {
             >
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-1">24h</div>
-                <div className="text-sm text-gray-300">Bewertung</div>
+                <div className="text-sm text-gray-300">{t('tradein.stats.evaluation')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-1">100%</div>
-                <div className="text-sm text-gray-300">Transparent</div>
+                <div className="text-sm text-gray-300">{t('tradein.stats.transparent')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-1">0€</div>
-                <div className="text-sm text-gray-300">Gebühren</div>
+                <div className="text-sm text-gray-300">{t('tradein.stats.fees')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-1">Sofort</div>
-                <div className="text-sm text-gray-300">Zahlung</div>
+                <div className="text-sm text-gray-300">{t('tradein.stats.payment')}</div>
               </div>
             </motion.div>
           </div>
@@ -434,7 +434,7 @@ export default function Inzahlungnahme() {
                             </div>
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.firstregistration')} *</label>
-                              <input type="text" {...register('firstRegistration', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" placeholder="MM/JJJJ" />
+                              <input type="text" {...register('firstRegistration', { required: true })} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors" placeholder={language === 'de' ? 'MM/JJJJ' : 'MM/YYYY'} />
                             </div>
                           </div>
                           <div className="space-y-2">
@@ -554,7 +554,7 @@ export default function Inzahlungnahme() {
                              </div>
                              <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 space-y-4">
                                 <p className="text-white font-semibold text-sm">{t('tradein.form.table.tuv')}</p>
-                                <input type="text" {...register('tuvValidUntil', { required: true })} placeholder="MM/JJJJ" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-red-500" />
+                                <input type="text" {...register('tuvValidUntil', { required: true })} placeholder={language === 'de' ? 'MM/JJJJ' : 'MM/YYYY'} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-red-500" />
                              </div>
                           </div>
 
@@ -580,14 +580,6 @@ export default function Inzahlungnahme() {
                                 </div>
                                 <span className="text-sm text-gray-300">{t('tradein.form.table.metallic')}</span>
                              </label>
-
-                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-400 pl-1">{t('tradein.form.table.price')}</label>
-                                <div className="relative">
-                                  <input type="text" {...register('expectedPrice')} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-red-500 transition-colors pr-10" placeholder="0" />
-                                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">€</span>
-                                </div>
-                             </div>
                           </div>
                           
                           {/* Interior */}

@@ -24,6 +24,8 @@ export default function CarList() {
   const [sortBy, setSortBy] = useState('newest');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 50;
   
   const [filters, setFilters] = useState<SearchParams>({ make: initialBrand || undefined });
   const [filterOptions, setFilterOptions] = useState({
@@ -117,7 +119,15 @@ export default function CarList() {
       default: result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
     }
     setFilteredVehicles(result);
+    setCurrentPage(1); // Reset to first page when filters change
   };
+
+  // Sort: cars with images first, then without
+  const sortedForDisplay = [...filteredVehicles].sort((a, b) => {
+    const aHasImg = a.images && a.images.length > 0 && a.images[0] ? 1 : 0;
+    const bHasImg = b.images && b.images.length > 0 && b.images[0] ? 1 : 0;
+    return bHasImg - aHasImg;
+  });
 
   const handleFilterChange = (key: keyof SearchParams, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -315,15 +325,16 @@ export default function CarList() {
                   action={{ label: t('inv.empty.action'), onClick: clearFilters }}
                 />
               ) : (
+                <>
                 <motion.div layout className={cn('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1')}>
                   <AnimatePresence mode="popLayout">
-                    {filteredVehicles.map((vehicle, index) => (
+                    {sortedForDisplay.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((vehicle, index) => (
                       <motion.div
                         layout
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                        transition={{ duration: 0.4, delay: index * 0.05 }}
+                        transition={{ duration: 0.4, delay: index * 0.03 }}
                         key={vehicle.id}
                       >
                         <VehicleCard
@@ -351,6 +362,43 @@ export default function CarList() {
                     ))}
                   </AnimatePresence>
                 </motion.div>
+
+                {/* Pagination */}
+                {filteredVehicles.length > ITEMS_PER_PAGE && (
+                  <div className="flex items-center justify-center gap-3 mt-12">
+                    <button
+                      onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={currentPage === 1}
+                      className="px-5 py-2.5 rounded-xl text-sm font-medium border border-white/[0.08] bg-white/[0.03] text-gray-300 hover:bg-white/[0.06] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      ← Zurück
+                    </button>
+                    
+                    {Array.from({ length: Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className={cn(
+                          'w-10 h-10 rounded-xl text-sm font-bold transition-all',
+                          currentPage === page
+                            ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                            : 'border border-white/[0.08] bg-white/[0.03] text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                        )}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    
+                    <button
+                      onClick={() => { setCurrentPage(p => Math.min(Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE), p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={currentPage >= Math.ceil(filteredVehicles.length / ITEMS_PER_PAGE)}
+                      className="px-5 py-2.5 rounded-xl text-sm font-medium border border-white/[0.08] bg-white/[0.03] text-gray-300 hover:bg-white/[0.06] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      Weiter →
+                    </button>
+                  </div>
+                )}
+                </>
               )}
             </div>
           </div>

@@ -1,0 +1,5 @@
+node_modules
+public/4K
+.env*.local
+dist
+*.log
