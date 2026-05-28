@@ -20,6 +20,7 @@ import Card from '../../components/ui/Card';
 import { Input, Select } from '../../components/ui/FormField';
 import Badge from '../../components/ui/Badge';
 import Accordion from '../../components/ui/Accordion';
+import ExpandableText from '../../components/ui/ExpandableText';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Finanzierung() {
@@ -218,7 +219,7 @@ export default function Finanzierung() {
                     {benefit.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{benefit.title}</h3>
-                  <p className="text-gray-500 text-sm">{benefit.description}</p>
+                  <ExpandableText maxLines={3} className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
                 </Card>
               ))}
             </div>
@@ -297,7 +298,7 @@ export default function Finanzierung() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-gray-100 mb-2">{step.title}</h3>
-                        <p className="text-gray-500">{step.description}</p>
+                        <ExpandableText maxLines={4} className="text-gray-500">{step.description}</ExpandableText>
                       </div>
                       <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 hidden md:block" />
                     </div>

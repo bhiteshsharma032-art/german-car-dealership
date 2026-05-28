@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { Award, Star, Heart, TrendingUp, ShieldCheck, ArrowRight, Users, Wrench, Car, Building2, GraduationCap, Truck, Target, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import ExpandableText from '../../components/ui/ExpandableText';
 
 function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -64,7 +65,7 @@ export default function Geschichte() {
       <div className="bg-[#0a0a0a] min-h-screen">
 
         {/* ══ HERO ══ */}
-        <section className="relative pt-36 pb-28 overflow-hidden">
+        <section className="relative pt-28 sm:pt-36 pb-16 sm:pb-28 overflow-hidden">
           <div className="absolute inset-0">
             <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.8) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
             <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-red-500/10 rounded-full blur-[120px] pointer-events-none" />
@@ -72,20 +73,20 @@ export default function Geschichte() {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-4xl mx-auto text-center">
               <FadeUp>
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/25 bg-red-500/8 text-red-500 text-[10px] tracking-[0.3em] uppercase font-bold mb-8">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-500/25 bg-red-500/8 text-red-500 text-[10px] tracking-[0.3em] uppercase font-bold mb-6 sm:mb-8">
                   <Award className="w-3.5 h-3.5" />
                   {t('story.hero.badge')}
                 </span>
               </FadeUp>
               <FadeUp delay={0.1}>
-                <h1 className="text-5xl sm:text-6xl md:text-7xl font-display font-black tracking-tighter leading-none text-white mb-8">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black tracking-tighter leading-[1.05] text-white mb-6 sm:mb-8">
                   {t('story.hero.title.prefix')}{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-400 to-white">{t('story.hero.title.highlight')}</span>
                 </h1>
               </FadeUp>
               <FadeUp delay={0.2}>
-                <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-3xl mx-auto font-light">
-                  {t('story.hero.subtitle')}
+                <p className="text-base sm:text-lg md:text-xl text-gray-400 leading-relaxed max-w-3xl mx-auto font-light">
+                  <ExpandableText maxLines={4}>{t('story.hero.subtitle')}</ExpandableText>
                 </p>
               </FadeUp>
             </div>
@@ -97,28 +98,28 @@ export default function Geschichte() {
           <div className="container mx-auto px-5 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
               <FadeUp>
-                <div className="p-8 md:p-10 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] h-full">
+                <div className="p-6 sm:p-8 md:p-10 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] h-full">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                       <Target className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white">{t('story.vision.title')}</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white">{t('story.vision.title')}</h3>
                   </div>
-                  <p className="text-gray-400 leading-relaxed">
-                    {t('story.vision.desc')}
+                  <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
+                    <ExpandableText maxLines={5}>{t('story.vision.desc')}</ExpandableText>
                   </p>
                 </div>
               </FadeUp>
               <FadeUp delay={0.15}>
-                <div className="p-8 md:p-10 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] h-full">
+                <div className="p-6 sm:p-8 md:p-10 rounded-[2rem] border border-white/[0.06] bg-white/[0.02] h-full">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                       <Users className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold text-white">{t('story.mission.title')}</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white">{t('story.mission.title')}</h3>
                   </div>
-                  <p className="text-gray-400 leading-relaxed">
-                    {t('story.mission.desc')}
+                  <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
+                    <ExpandableText maxLines={5}>{t('story.mission.desc')}</ExpandableText>
                   </p>
                 </div>
               </FadeUp>
@@ -156,7 +157,9 @@ export default function Geschichte() {
                         <span className="text-red-400/60">{item.icon}</span>
                       </div>
                       <h3 className="text-xl font-bold text-white mb-2">{t(`story.timeline.${item.key}.title`)}</h3>
-                      <p className="text-sm text-gray-400 leading-relaxed">{t(`story.timeline.${item.key}.desc`)}</p>
+                      <p className="text-sm text-gray-400 leading-relaxed">
+                        <ExpandableText maxLines={4}>{t(`story.timeline.${item.key}.desc`)}</ExpandableText>
+                      </p>
                     </div>
                   </div>
                 </FadeUp>
@@ -185,7 +188,9 @@ export default function Geschichte() {
                       {v.icon}
                     </div>
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-red-400 transition-colors duration-300">{t(`story.values.${v.key}.title`)}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{t(`story.values.${v.key}.desc`)}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      <ExpandableText maxLines={4}>{t(`story.values.${v.key}.desc`)}</ExpandableText>
+                    </p>
                   </div>
                 </FadeUp>
               ))}
@@ -204,8 +209,8 @@ export default function Geschichte() {
                 </h2>
               </FadeUp>
               <FadeUp delay={0.1}>
-                <p className="text-lg text-gray-400 leading-relaxed mb-10">
-                  {t('story.today.desc')}
+                <p className="text-base sm:text-lg text-gray-400 leading-relaxed mb-10">
+                  <ExpandableText maxLines={5}>{t('story.today.desc')}</ExpandableText>
                 </p>
               </FadeUp>
               <FadeUp delay={0.2}>
@@ -222,19 +227,19 @@ export default function Geschichte() {
         </section>
 
         {/* ══ CTA ══ */}
-        <section className="py-32 relative overflow-hidden bg-[#050505] border-t border-white/[0.05]">
+        <section className="py-20 sm:py-32 relative overflow-hidden bg-[#050505] border-t border-white/[0.05]">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="w-[700px] h-[400px] bg-red-500/8 rounded-full blur-[120px]" />
           </div>
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 text-center relative z-10">
             <FadeUp>
-              <h2 className="text-5xl md:text-7xl font-display font-black text-white tracking-tighter leading-none mb-6">
+              <h2 className="text-4xl sm:text-5xl md:text-7xl font-display font-black text-white tracking-tighter leading-[1.05] mb-6">
                 {t('story.cta.title.prefix')}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-400 to-white">{t('story.cta.title.highlight')}</span>
               </h2>
             </FadeUp>
             <FadeUp delay={0.1}>
-              <p className="text-lg text-gray-400 mb-14 max-w-xl mx-auto font-light">
+              <p className="text-base sm:text-lg text-gray-400 mb-10 sm:mb-14 max-w-xl mx-auto font-light">
                 {t('story.cta.subtitle')}
               </p>
             </FadeUp>

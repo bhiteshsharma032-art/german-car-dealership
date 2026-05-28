@@ -15,6 +15,7 @@ import {
 import ScrollImageSequence from '../../components/ScrollImageSequence';
 import { carService, Car as CarType } from '../../services/carService';
 import VehicleCard from '../../components/inventory/VehicleCard';
+import ExpandableText from '../../components/ui/ExpandableText';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 
@@ -225,7 +226,7 @@ export default function Home() {
       </div>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ BRAND SHOWCASE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section className="py-24 relative overflow-hidden bg-[#0e0e0e]">
+      <section className="py-16 sm:py-24 relative overflow-hidden bg-[#0e0e0e]">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, rgba(239,68,68,0.15) 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-500/5 rounded-full blur-[100px] pointer-events-none" />
@@ -278,7 +279,7 @@ export default function Home() {
       </section>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ PREMIUM SERVICES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section className="py-32 relative bg-[#111111] overflow-hidden">
+      <section className="py-20 sm:py-32 relative bg-[#111111] overflow-hidden">
         <div className="absolute inset-0 border-t border-white/[0.04]" />
         
         <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
@@ -329,7 +330,7 @@ export default function Home() {
       </section>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ STATS BAR ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section className="py-24 relative bg-[#0a0a0a] overflow-hidden">
+      <section className="py-16 sm:py-24 relative bg-[#0a0a0a] overflow-hidden">
         <div className="absolute inset-0 border-y border-white/[0.06]" />
         
         <div className="absolute -left-40 top-0 w-80 h-full bg-red-500/5 blur-3xl pointer-events-none" />
@@ -353,7 +354,7 @@ export default function Home() {
       </section>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ FEATURED VEHICLES ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section className="py-24 relative overflow-hidden bg-[#111111]">
+      <section className="py-16 sm:py-24 relative overflow-hidden bg-[#111111]">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
           <FadeUp>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-14 gap-6">
@@ -437,7 +438,7 @@ export default function Home() {
       </section>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ ABOUT US / PHILOSOPHIE ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section id="philosophie" className="py-32 relative overflow-hidden bg-[#0c0c0c]">
+      <section id="philosophie" className="py-20 sm:py-32 relative overflow-hidden bg-[#0c0c0c]">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-red-500/5 to-transparent pointer-events-none blur-3xl" />
         
@@ -504,12 +505,12 @@ export default function Home() {
                 </h2>
               </FadeUp>
               <FadeUp delay={0.2}>
-                <p className="text-lg text-gray-400 mb-8 leading-relaxed font-light">
+                <ExpandableText maxLines={5} className="text-base sm:text-lg text-gray-400 mb-6 sm:mb-8 leading-relaxed font-light">
                   {t('home.phi.desc1')}
-                </p>
-                <p className="text-base text-gray-500 mb-12 leading-relaxed">
+                </ExpandableText>
+                <ExpandableText maxLines={4} className="text-sm sm:text-base text-gray-500 mb-10 sm:mb-12 leading-relaxed">
                   {t('home.phi.desc2')}
-                </p>
+                </ExpandableText>
               </FadeUp>
               
               <FadeUp delay={0.3}>
@@ -530,7 +531,7 @@ export default function Home() {
       </section>
 
       {/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ WHY CHOOSE US ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */}
-      <section className="py-24 relative overflow-hidden bg-[#161616]">
+      <section className="py-16 sm:py-24 relative overflow-hidden bg-[#161616]">
         <div className="absolute inset-0 opacity-[0.015]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
@@ -600,7 +601,7 @@ export default function Home() {
           </FadeUp>
           
           <FadeUp delay={0.1}>
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-white mb-6 tracking-tighter leading-none" style={{ textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-black text-white mb-6 tracking-tighter leading-[1.05]" style={{ textShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
               {t('home.cta.title1')} <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-400 to-white">{t('home.cta.title2')}</span>
             </h2>

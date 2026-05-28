@@ -19,6 +19,7 @@ import api from '../../services/api';
 import { useLenis } from '../../components/SmoothScroll';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { saveTradeInToSupabase } from '../../services/supabaseService';
+import ExpandableText from '../../components/ui/ExpandableText';
 
 // ---------- Types ----------
 interface TradeInFormData {
@@ -315,7 +316,7 @@ export default function Inzahlungnahme() {
                     {benefit.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{benefit.title}</h3>
-                  <p className="text-gray-500 text-sm">{benefit.description}</p>
+                  <ExpandableText maxLines={3} className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
                 </Card>
               ))}
             </div>
@@ -338,7 +339,7 @@ export default function Inzahlungnahme() {
                       <span className="text-2xl font-bold text-white">{step.number}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-100 mb-3">{step.title}</h3>
-                    <p className="text-gray-500">{step.description}</p>
+                    <ExpandableText maxLines={4} className="text-gray-500">{step.description}</ExpandableText>
                   </Card>
                 ))}
               </div>

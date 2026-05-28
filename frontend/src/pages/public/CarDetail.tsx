@@ -26,6 +26,7 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import VehicleCard from '../../components/inventory/VehicleCard';
+import ExpandableText from '../../components/ui/ExpandableText';
 import { cn } from '../../utils/cn';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -269,7 +270,7 @@ export default function CarDetail() {
                     <h1 className="text-3xl md:text-5xl font-bold text-gray-100 mb-2 tracking-tight" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                       {vehicle.title || `${vehicle.brand} ${vehicle.model}`}
                     </h1>
-                    <p className="text-lg text-gray-400 font-light whitespace-pre-line">{vehicle.description}</p>
+                    <p className="text-lg text-gray-400 font-light"><ExpandableText maxLines={3} whitespace="pre-line">{vehicle.description}</ExpandableText></p>
                   </div>
                   <div className="flex gap-3">
                     <button className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass">
@@ -414,11 +415,11 @@ export default function CarDetail() {
                       <div className="w-8 h-px bg-red-500" />
                       {t('car.description.title')}
                     </h2>
-                    <div className="prose prose-invert max-w-none">
-                      <p className="text-gray-300/90 leading-loose whitespace-pre-line font-light text-lg">
+                    <ExpandableText maxLines={6} className="prose prose-invert max-w-none">
+                      <p className="text-gray-300/90 leading-loose font-light text-base md:text-lg">
                         {vehicle.description}
                       </p>
-                    </div>
+                    </ExpandableText>
                   </div>
                 </div>
               )}
