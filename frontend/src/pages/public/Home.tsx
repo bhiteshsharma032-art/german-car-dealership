@@ -82,13 +82,47 @@ export default function Home() {
   const BEAUTIFUL_LOGOS: Record<string, string> = {
     'bmw': 'https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg',
     'mercedes-benz': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg',
+    'mercedes': 'https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg',
     'audi': 'https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg',
     'porsche': 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Porsche_Wappen.svg/440px-Porsche_Wappen.svg.png',
     'volkswagen': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Volkswagen_Logo_till_1995.svg/512px-Volkswagen_Logo_till_1995.svg.png',
+    'vw': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Volkswagen_Logo_till_1995.svg/512px-Volkswagen_Logo_till_1995.svg.png',
     'skoda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Skoda_Auto_logo_%282011-2016%29.svg/512px-Skoda_Auto_logo_%282011-2016%29.svg.png',
+    'škoda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Skoda_Auto_logo_%282011-2016%29.svg/512px-Skoda_Auto_logo_%282011-2016%29.svg.png',
     'seat': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/SEAT_Logo_2012.svg/512px-SEAT_Logo_2012.svg.png',
     'ford': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Ford_Motor_Company_Logo.svg/512px-Ford_Motor_Company_Logo.svg.png',
     'opel': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Opel_Logo_2020.svg/512px-Opel_Logo_2020.svg.png',
+    'mini': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/MINI_logo.svg/512px-MINI_logo.svg.png',
+    'toyota': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Toyota_carlogo.svg/512px-Toyota_carlogo.svg.png',
+    'honda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Honda.svg/512px-Honda.svg.png',
+    'mazda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Mazda_logo_with_emblem.svg/512px-Mazda_logo_with_emblem.svg.png',
+    'nissan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Nissan_2020_logo.svg/512px-Nissan_2020_logo.svg.png',
+    'hyundai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Hyundai_Motor_Company_logo.svg/512px-Hyundai_Motor_Company_logo.svg.png',
+    'kia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/KIA_logo3.svg/512px-KIA_logo3.svg.png',
+    'renault': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Renault_2021.svg/512px-Renault_2021.svg.png',
+    'peugeot': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Peugeot_2021_Logo.svg/512px-Peugeot_2021_Logo.svg.png',
+    'citroen': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Citroen_2022.svg/512px-Citroen_2022.svg.png',
+    'citroën': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Citroen_2022.svg/512px-Citroen_2022.svg.png',
+    'fiat': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Fiat_logo_2020.svg/512px-Fiat_logo_2020.svg.png',
+    'volvo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Volvo_Cars_logo.svg/512px-Volvo_Cars_logo.svg.png',
+    'jaguar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Jaguar_2012_logo.svg/512px-Jaguar_2012_logo.svg.png',
+    'land rover': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Land_Rover_logo2.svg/512px-Land_Rover_logo2.svg.png',
+    'tesla': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Tesla_logo.png/512px-Tesla_logo.png',
+    'lexus': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Lexus_division_emblem.svg/512px-Lexus_division_emblem.svg.png',
+    'alfa romeo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Logo_of_Alfa_Romeo.svg/512px-Logo_of_Alfa_Romeo.svg.png',
+    'maserati': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Logo_of_Maserati.svg/512px-Logo_of_Maserati.svg.png',
+    'ferrari': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Ferrari-Logo.svg/512px-Ferrari-Logo.svg.png',
+    'lamborghini': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Lamborghini_Logo.svg/512px-Lamborghini_Logo.svg.png',
+    'bentley': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Bentley_logo.svg/512px-Bentley_logo.svg.png',
+    'jeep': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Jeep_wordmark.svg/512px-Jeep_wordmark.svg.png',
+    'dodge': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Dodge.svg/512px-Dodge.svg.png',
+    'chevrolet': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Chevrolet.svg/512px-Chevrolet.svg.png',
+    'mitsubishi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Mitsubishi_logo.svg/512px-Mitsubishi_logo.svg.png',
+    'subaru': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Subaru_logo.svg/512px-Subaru_logo.svg.png',
+    'suzuki': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Suzuki_logo_2.svg/512px-Suzuki_logo_2.svg.png',
+    'smart': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Smart_logo.svg/512px-Smart_logo.svg.png',
+    'dacia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Dacia_logo_2021.svg/512px-Dacia_logo_2021.svg.png',
+    'cupra': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/CUPRA_Logo_NEW.svg/512px-CUPRA_Logo_NEW.svg.png',
   };
 
   useEffect(() => {
@@ -115,17 +149,26 @@ export default function Home() {
 
         if (brandsRes && brandsRes.length > 0) {
           const dynamicBrands = brandsRes
-            .filter((b) => ['audi', 'mercedes-benz', 'mercedes', 'bmw'].includes(b.brand.toLowerCase()))
+            .filter((b) => !!BEAUTIFUL_LOGOS[b.brand.toLowerCase()])
             .map((b) => ({
               name: b.brand,
               logo: BEAUTIFUL_LOGOS[b.brand.toLowerCase()] || '',
             }));
-          setAvailableBrands(dynamicBrands.slice(0, 3));
+          setAvailableBrands(dynamicBrands);
         } else {
           setAvailableBrands([
             { name: 'Audi', logo: BEAUTIFUL_LOGOS['audi'] },
-            { name: 'Mercedes-Benz', logo: BEAUTIFUL_LOGOS['mercedes-benz'] },
             { name: 'BMW', logo: BEAUTIFUL_LOGOS['bmw'] },
+            { name: 'Mercedes-Benz', logo: BEAUTIFUL_LOGOS['mercedes-benz'] },
+            { name: 'Porsche', logo: BEAUTIFUL_LOGOS['porsche'] },
+            { name: 'Volkswagen', logo: BEAUTIFUL_LOGOS['volkswagen'] },
+            { name: 'Skoda', logo: BEAUTIFUL_LOGOS['skoda'] },
+            { name: 'Seat', logo: BEAUTIFUL_LOGOS['seat'] },
+            { name: 'Opel', logo: BEAUTIFUL_LOGOS['opel'] },
+            { name: 'Ford', logo: BEAUTIFUL_LOGOS['ford'] },
+            { name: 'Toyota', logo: BEAUTIFUL_LOGOS['toyota'] },
+            { name: 'Renault', logo: BEAUTIFUL_LOGOS['renault'] },
+            { name: 'Peugeot', logo: BEAUTIFUL_LOGOS['peugeot'] },
           ]);
         }
       } catch (error) {
@@ -201,17 +244,17 @@ export default function Home() {
             </p>
           </FadeUp>
 
-          <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center justify-center gap-4 sm:gap-12 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
             {availableBrands.map((brand, i) => (
-              <FadeUp key={brand.name} delay={i * 0.1} className="w-full lg:w-64">
+              <FadeUp key={brand.name} delay={Math.min(i * 0.05, 0.5)}>
                 <Magnetic>
                   <Link
                     to={`/fahrzeuge?brand=${brand.name}`}
-                    className="group relative w-full lg:w-64 aspect-square rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-14 flex flex-col items-center justify-center transition-all duration-500 border border-white/[0.08] hover:border-red-500/40 bg-[#141414]/90 hover:bg-[#1a1a1a] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(239,68,68,0.15)] focus:outline-none focus:ring-2 focus:ring-red-500/50 overflow-hidden"
+                    className="group relative w-full aspect-square rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-7 flex flex-col items-center justify-center transition-all duration-500 border border-white/[0.08] hover:border-red-500/40 bg-[#141414]/90 hover:bg-[#1a1a1a] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(239,68,68,0.15)] focus:outline-none focus:ring-2 focus:ring-red-500/50 overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                    
-                    <div className="relative z-10 h-16 sm:h-28 w-full flex items-center justify-center mb-4 sm:mb-6">
+
+                    <div className="relative z-10 h-12 sm:h-14 md:h-16 w-full flex items-center justify-center mb-2 sm:mb-3">
                       <img
                         src={brand.logo}
                         alt={brand.name}
@@ -222,8 +265,8 @@ export default function Home() {
                         }}
                       />
                     </div>
-                    
-                    <span className="relative z-10 mt-auto text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-gray-500 group-hover:text-white transition-colors duration-300">
+
+                    <span className="relative z-10 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-[0.18em] sm:tracking-[0.22em] text-gray-500 group-hover:text-white transition-colors duration-300 text-center leading-tight">
                       {brand.name}
                     </span>
                   </Link>

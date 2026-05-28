@@ -208,6 +208,7 @@ export default function ScrollImageSequence({
     return 0;
   };
   const currentSectionIdx = scrollProgress >= closingStart ? 4 : scrollProgress < 0.20 ? 0 : scrollProgress < 0.40 ? 1 : scrollProgress < 0.60 ? 2 : 3;
+  void currentSectionIdx; // kept for potential future use
 
   return (
     <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
@@ -294,23 +295,13 @@ export default function ScrollImageSequence({
         )}
 
         {ready && (<>
-          {/* Side Navigation */}
-          <div key={language} className="absolute top-[110px] w-[92%] left-[4%] md:top-[35vh] md:-translate-y-1/4 md:left-10 md:w-auto flex flex-row md:flex-col justify-between md:justify-start z-20 p-4 md:p-5 rounded-[1.5rem] backdrop-blur-md bg-gradient-to-b from-[#2a2a35]/80 to-[#0a0a0a]/90 border border-white/[0.06] shadow-2xl">
-            <div className="hidden md:block absolute left-[36px] top-8 bottom-8 w-[2px] bg-white/[0.08]" />
-            <div className="hidden md:block absolute left-[36px] top-8 w-[2px] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(239,68,68,0.8)]" style={{ height: `calc(${(currentSectionIdx / 3) * 100}% - 4rem)`, background: GOLD }} />
-            {[t('scroll.nav.start'), t('scroll.nav.design'), t('scroll.nav.engine'), t('scroll.nav.performance')].map((label, i) => {
-              const active = currentSectionIdx === i;
-              const handleClick = () => { const c = containerRef.current; if (!c) return; window.scrollTo({ top: c.offsetTop + (i * 0.25) * (c.offsetHeight - window.innerHeight), behavior: 'smooth' }); };
-              return (
-                <button key={`${language}-${i}`} onClick={handleClick} className="group relative py-1 md:py-4 px-1 md:pl-14 md:pr-10 text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.25em] uppercase transition-all duration-500 cursor-pointer text-center md:text-left flex flex-col md:flex-row items-center justify-center overflow-hidden rounded-xl flex-1 md:flex-none" style={{ color: active ? 'white' : 'rgba(255,255,255,0.4)', fontWeight: active ? '700' : '500' }}>
-                  <span className={`hidden md:block absolute left-[21px] w-2.5 h-2.5 rounded-full transition-all duration-500 border-[2px] ${active ? 'bg-red-500 border-red-500 shadow-[0_0_15px_rgba(239,68,68,1)]' : 'bg-[#1a1a1f] border-white/20 group-hover:border-white/40'}`} />
-                  <span className="relative z-10 transition-transform duration-500 md:group-hover:translate-x-2 flex flex-col md:flex-row items-center gap-1.5 md:gap-4 w-full">
-                    <span className={`font-bold transition-colors duration-500 ${active ? 'text-red-500' : 'text-gray-500'}`}>{`0${i+1}`}</span>
-                    <span>{label}</span>
-                  </span>
-                </button>
-              );
-            })}
+          {/* Static Brand Identity (always visible during scroll) */}
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 md:top-10 z-20 pointer-events-none flex flex-col items-center gap-2">
+            <div className="h-[1px] w-12 md:w-20" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)`, boxShadow: `0 0 8px ${GOLD}` }} />
+            <span className="text-[10px] sm:text-xs md:text-sm tracking-[0.4em] md:tracking-[0.5em] uppercase font-extrabold text-white" style={{ textShadow: `0 0 20px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95), 0 4px 20px rgba(0,0,0,0.9)` }}>
+              Nordhessen Automobile
+            </span>
+            <div className="h-[1px] w-8 md:w-14" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}80, transparent)` }} />
           </div>
 
           {/* Section Overlays */}

@@ -76,6 +76,25 @@ export default function FilterSidebar({
       </div>
 
       <div className="space-y-4">
+        {/* Brand Filter */}
+        <FilterSection
+          title={t('filter.brand')}
+          isExpanded={expandedSections.brand}
+          onToggle={() => toggleSection('brand')}
+          count={filterOptions.brands.length}
+        >
+          <select
+            value={filters.make || ''}
+            onChange={(e) => onFilterChange('make', e.target.value || undefined)}
+            className={inputClasses}
+          >
+            <option value="">{t('filter.all_brands')}</option>
+            {filterOptions.brands.map(brand => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
+        </FilterSection>
+
         {/* Price Filter */}
         <FilterSection
           title={t('filter.price')}
@@ -120,25 +139,6 @@ export default function FilterSidebar({
               ))}
             </div>
           </div>
-        </FilterSection>
-
-        {/* Brand Filter */}
-        <FilterSection
-          title={t('filter.brand')}
-          isExpanded={expandedSections.brand}
-          onToggle={() => toggleSection('brand')}
-          count={filterOptions.brands.length}
-        >
-          <select
-            value={filters.make || ''}
-            onChange={(e) => onFilterChange('make', e.target.value || undefined)}
-            className={inputClasses}
-          >
-            <option value="">{t('filter.all_brands')}</option>
-            {filterOptions.brands.map(brand => (
-              <option key={brand} value={brand}>{brand}</option>
-            ))}
-          </select>
         </FilterSection>
 
         {/* Year Filter */}

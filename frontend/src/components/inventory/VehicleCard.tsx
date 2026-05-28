@@ -114,7 +114,7 @@ export default function VehicleCard({
       )}>
         {/* Title */}
         <Link to={`/fahrzeug/${id}`}>
-          <h3 className="text-base font-display font-bold text-white mb-1 leading-snug min-h-[2.75rem] group-hover:text-red-400 transition-colors duration-300">
+          <h3 className="text-base font-sans font-bold text-white mb-1 leading-snug min-h-[2.75rem] group-hover:text-red-400 transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
             {title}
           </h3>
         </Link>

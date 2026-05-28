@@ -2,6 +2,13 @@ import { Link } from 'react-router-dom';
 import { Instagram, MapPin, Phone, Mail } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
+// TikTok icon (lucide-react does not bundle one)
+const TikTokIcon = ({ className = '' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.2a8.16 8.16 0 0 0 4.77 1.52V6.27a4.83 4.83 0 0 1-1.84-.42z" />
+  </svg>
+);
+
 export default function Footer() {
   const { t } = useLanguage();
 
@@ -121,15 +128,26 @@ export default function Footer() {
           <p className="text-[10px] sm:text-xs tracking-widest uppercase text-gray-500 font-bold">
             © {new Date().getFullYear()} NORDHESSEN-AUTOMOBILE SEIDLER UND OSMIKHOVSKI GBR
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <a
               href="https://www.instagram.com/nordhessen_automobile?igsh=eW9rcnM1eWloM2I3"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Instagram"
               className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] hover:bg-gradient-to-r hover:from-[#833ab4] hover:via-[#fd1d1d] hover:to-[#fcb045] hover:border-transparent hover:text-white transition-all duration-500 group"
             >
               <Instagram className="h-4 w-4 text-gray-400 group-hover:text-white transition-colors" />
               <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-white transition-colors">Instagram</span>
+            </a>
+            <a
+              href="https://www.tiktok.com/@nordhessen_automobile"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.08] hover:bg-black hover:border-white/40 hover:text-white transition-all duration-500 group"
+            >
+              <TikTokIcon className="h-4 w-4 text-gray-400 group-hover:text-white transition-colors" />
+              <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 group-hover:text-white transition-colors">TikTok</span>
             </a>
           </div>
         </div>

@@ -268,6 +268,43 @@ function decodeHtmlEntities(str: string): string {
     .replace(/&szlig;/g, 'ß');
 }
 
+// Extracts plaintext description from mobile.de's ad:description (which is HTML)
+// Preserves line breaks for <br>, <p>, <li> so bullet points remain readable
+function extractDescription(descriptionNode: any): string {
+  if (!descriptionNode) return '';
+  // mobile.de returns description as an object with possibly multiple language variants
+  // It may look like: { 'resource:local-description': { _: '<html>...</html>', $: { lang: 'de' } } }
+  // OR: { 'resource:local-description': [{ _: '...', $: { lang: 'de' } }, { _: '...', $: { lang: 'en' } }] }
+  let raw = '';
+  const localDesc = descriptionNode['resource:local-description'] || descriptionNode;
+  if (Array.isArray(localDesc)) {
+    // Prefer German, then first
+    const de = localDesc.find((d: any) => d?.$?.lang === 'de');
+    raw = de?._ || localDesc[0]?._ || '';
+  } else if (typeof localDesc === 'object' && localDesc?._) {
+    raw = localDesc._;
+  } else if (typeof localDesc === 'string') {
+    raw = localDesc;
+  } else if (typeof descriptionNode === 'string') {
+    raw = descriptionNode;
+  }
+  if (!raw) return '';
+
+  // Convert common HTML structure to plaintext with line breaks preserved
+  let text = raw
+    .replace(/<\s*br\s*\/?\s*>/gi, '\n')
+    .replace(/<\s*\/p\s*>/gi, '\n\n')
+    .replace(/<\s*li\s*[^>]*>/gi, '\n• ')
+    .replace(/<\s*\/li\s*>/gi, '')
+    .replace(/<\s*\/?ul\s*[^>]*>/gi, '\n')
+    .replace(/<\s*\/?ol\s*[^>]*>/gi, '\n')
+    .replace(/<[^>]+>/g, ''); // strip remaining tags
+  text = decodeHtmlEntities(text);
+  // Collapse excessive whitespace but keep line breaks
+  text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return text;
+}
+
 function transformVehicle(ad: any) {
   const vehicle = ad['ad:vehicle'] || {};
   const price = ad['ad:price'] || {};
@@ -300,12 +337,16 @@ function transformVehicle(ad: any) {
     features.map((f: any) => f['resource:local-description']?._).filter(Boolean) :
     (features['resource:local-description']?._ ? [features['resource:local-description']._] : []);
 
+  // Full description (HTML in mobile.de XML — extract plaintext preserving line breaks)
+  const description = extractDescription(ad['ad:description']);
+
   return {
     id: ad.$?.key || `vehicle_${Date.now()}`,
     title: decodeHtmlEntities(modelDescription || `${make} ${model}`),
     make: decodeHtmlEntities(make),
     model: decodeHtmlEntities(model),
     modelDescription: decodeHtmlEntities(modelDescription),
+    description,
     price: { amount: priceAmount, currency, formatted: `${priceAmount.toLocaleString('de-DE')} ${currency}` },
     image: getFirstImage(images),
     images: getAllImages(images),

@@ -14,6 +14,7 @@ import {
   Users,
   Palette,
   Phone,
+  Mail,
 
   MapPin,
   CheckCircle,
@@ -265,10 +266,10 @@ export default function CarDetail() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl md:text-5xl font-display font-bold text-gray-100 mb-2 tracking-tight">
+                    <h1 className="text-3xl md:text-5xl font-bold text-gray-100 mb-2 tracking-tight" style={{ fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
                       {vehicle.title || `${vehicle.brand} ${vehicle.model}`}
                     </h1>
-                    <p className="text-lg text-gray-400 font-light">{vehicle.description}</p>
+                    <p className="text-lg text-gray-400 font-light whitespace-pre-line">{vehicle.description}</p>
                   </div>
                   <div className="flex gap-3">
                     <button className="w-12 h-12 bg-white/[0.03] backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-all border border-white/[0.08] shadow-glass">
@@ -484,11 +485,24 @@ export default function CarDetail() {
                   )}
                   {!vehicle.isVatable && <div className="mb-6" />}
 
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <a href="tel:+4956198866911" className="block w-full border-0 p-0 m-0">
                       <Button size="lg" className="w-full h-14 bg-red-500 hover:bg-[#dc2626] text-white rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)]">
                         <Phone className="w-5 h-5 pointer-events-none" />
                         {t('car.price.call_now')}
+                      </Button>
+                    </a>
+                    <a
+                      href={`mailto:verkauf@nordhessen-automobile.de?subject=${encodeURIComponent(`Anfrage: ${vehicle.title || `${vehicle.brand} ${vehicle.model}`}`)}`}
+                      className="block w-full border-0 p-0 m-0"
+                    >
+                      <Button
+                        size="lg"
+                        variant="secondary"
+                        className="w-full h-14 bg-white/[0.04] hover:bg-white/[0.08] text-white border border-white/[0.12] hover:border-red-500/40 rounded-xl backdrop-blur-md"
+                      >
+                        <Mail className="w-5 h-5 pointer-events-none" />
+                        {t('car.price.email_now')}
                       </Button>
                     </a>
                   </div>
