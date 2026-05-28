@@ -657,12 +657,50 @@ app.get('/api/inventory', async (req, res) => {
         }
       }
     }
-    
+
+    // Image enrichment: any car missing images gets fetched from per-ad endpoint in parallel.
+    // mobile.de /search sometimes omits images for certain ads, but the /ad/{id} endpoint always has them.
+    const missingImageVehicles = allVehicles.filter(v => !v.images || v.images.length === 0);
+    if (missingImageVehicles.length > 0) {
+      console.log(`🔍 Enriching ${missingImageVehicles.length} cars with missing images via per-ad fetch...`);
+      const enrichLimit = 8; // 8 concurrent per-ad fetches to stay within Vercel timeouts
+      for (let i = 0; i < missingImageVehicles.length; i += enrichLimit) {
+        const batch = missingImageVehicles.slice(i, i + enrichLimit);
+        await Promise.all(batch.map(async (v) => {
+          try {
+            const adResult = await makeMobileDeRequest(`/ad/${v.id}`);
+            if (adResult.success) {
+              const parsed = await parseXMLResponse(adResult.data);
+              const adData = parsed['ad:ad'];
+              if (adData) {
+                const enriched = transformVehicle(adData);
+                if (enriched.images && enriched.images.length > 0) {
+                  v.images = enriched.images;
+                  v.image = enriched.image || enriched.images[0];
+                }
+                if (enriched.description && !v.description) v.description = enriched.description;
+              }
+            }
+          } catch (e) {
+            // Skip silently — vehicle still appears in results without images
+          }
+        }));
+      }
+    }
+
+    // Sort: cars with images first, cars without images last
+    allVehicles.sort((a, b) => {
+      const aHas = a.images && a.images.length > 0 ? 1 : 0;
+      const bHas = b.images && b.images.length > 0 ? 1 : 0;
+      return bHas - aHas;
+    });
+
     res.json({ 
       success: true, 
       data: allVehicles, 
       total: totalAvailable, 
       fetched: allVehicles.length,
+      withImages: allVehicles.filter(v => v.images && v.images.length > 0).length,
       message: `Successfully fetched ${allVehicles.length} of ${totalAvailable} vehicles` 
     });
   } catch (error: any) {
