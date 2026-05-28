@@ -295,13 +295,15 @@ export default function ScrollImageSequence({
         )}
 
         {ready && (<>
-          {/* Static Brand Identity (always visible during scroll) */}
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 md:top-10 z-20 pointer-events-none flex flex-col items-center gap-2">
-            <div className="h-[1px] w-12 md:w-20" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)`, boxShadow: `0 0 8px ${GOLD}` }} />
-            <span className="text-[10px] sm:text-xs md:text-sm tracking-[0.4em] md:tracking-[0.5em] uppercase font-extrabold text-white" style={{ textShadow: `0 0 20px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95), 0 4px 20px rgba(0,0,0,0.9)` }}>
-              Nordhessen Automobile
+          {/* Static Brand Identity (always visible during scroll, positioned to avoid header) */}
+          <div className="absolute left-4 right-4 md:left-10 md:right-auto bottom-24 md:top-1/2 md:-translate-y-1/2 z-20 pointer-events-none flex flex-col items-start gap-2 md:gap-3">
+            <div className="h-[1px] w-12 md:w-16" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)`, boxShadow: `0 0 8px ${GOLD}` }} />
+            <span className="text-[10px] md:text-xs tracking-[0.35em] md:tracking-[0.45em] uppercase font-extrabold text-white" style={{ textShadow: `0 0 20px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95), 0 4px 20px rgba(0,0,0,0.9)` }}>
+              Nordhessen
             </span>
-            <div className="h-[1px] w-8 md:w-14" style={{ background: `linear-gradient(90deg, transparent, ${GOLD}80, transparent)` }} />
+            <span className="text-[10px] md:text-xs tracking-[0.35em] md:tracking-[0.45em] uppercase font-extrabold text-white/80" style={{ textShadow: `0 0 16px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95)` }}>
+              Automobile
+            </span>
           </div>
 
           {/* Section Overlays */}
@@ -355,9 +357,6 @@ export default function ScrollImageSequence({
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 pointer-events-none">
             <div className="w-[1px] h-8 bg-gradient-to-b from-transparent to-white/30" />
             <span className="text-[8px] tracking-[0.4em] uppercase text-white/30 font-light" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>Scroll Down</span>
-          </div>
-          <div className="absolute right-10 bottom-20 rotate-90 origin-bottom-right z-10 hidden md:block">
-            <span className="text-[9px] tracking-[0.5em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.25)', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>Nordhessen Automobile</span>
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] z-10" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <div className="h-full" style={{ width: (scrollProgress * 100) + '%', background: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})` }} />
