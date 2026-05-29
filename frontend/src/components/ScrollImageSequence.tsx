@@ -306,7 +306,7 @@ export default function ScrollImageSequence({
 
         {ready && (<>
           {/* Static Brand Identity — top-left on all screens */}
-          <div className="absolute left-4 right-4 md:left-10 md:right-auto top-24 md:top-28 z-20 pointer-events-none flex flex-col items-start gap-2 md:gap-3">
+          <div className="absolute left-8 right-4 md:left-20 md:right-auto top-24 md:top-28 z-20 pointer-events-none flex flex-col items-start gap-2 md:gap-3">
             <div className="h-[2px] w-14 md:w-20" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)`, boxShadow: `0 0 10px ${GOLD}` }} />
             <div className="flex flex-col leading-[0.95]">
               <span className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-black text-white" style={{ textShadow: `0 0 24px ${GOLD}, 0 2px 14px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,0.9)` }}>
