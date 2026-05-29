@@ -220,11 +220,11 @@ export default function CarDetail() {
 
                 {/* Thumbnail Grid */}
                 {vehicle.images && vehicle.images.length > 1 && (
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-3">
                     {vehicle.images.map((image, index) => {
-                      const isHidden = index > 11;
-                      const isLastVisible = index === 11;
-                      const hasMoreImages = vehicle.images.length > 12;
+                      const isHidden = index > 14;
+                      const isLastVisible = index === 14;
+                      const hasMoreImages = vehicle.images.length > 15;
 
                       if (isHidden) return null;
 
@@ -239,7 +239,7 @@ export default function CarDetail() {
                             }
                           }}
                           className={cn(
-                            'relative aspect-video rounded-xl overflow-hidden border-2 transition-all hover:scale-105',
+                            'relative aspect-[4/3] rounded-xl overflow-hidden border-2 transition-all hover:scale-105',
                             selectedImageIndex === index
                               ? 'border-[#ef4444] shadow-glow-red'
                               : 'border-transparent opacity-60 hover:opacity-100 hover:border-white/20'
@@ -250,10 +250,10 @@ export default function CarDetail() {
                             alt={`${vehicle.brand} ${vehicle.model} - Bild ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
-                          {/* "+X" overlay on the 12th image */}
+                          {/* "+X" overlay on the 15th image */}
                           {isLastVisible && hasMoreImages && (
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
-                              <span className="text-white font-bold text-xl drop-shadow-md">+{vehicle.images.length - 11}</span>
+                              <span className="text-white font-bold text-xl drop-shadow-md">+{vehicle.images.length - 14}</span>
                             </div>
                           )}
                         </button>
