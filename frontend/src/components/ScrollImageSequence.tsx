@@ -31,6 +31,8 @@ export default function ScrollImageSequence({
   const [ready, setReady] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [loadPercent, setLoadPercent] = useState(0);
+  // Shorter scroll distance on mobile so users don't have to scroll forever
+  const [scrollHeight, setScrollHeight] = useState('500vh');
   const rafRef = useRef(0);
   const currentFrameRef = useRef(0);
   const targetFrameRef = useRef(0);
@@ -42,6 +44,14 @@ export default function ScrollImageSequence({
   const getUrl = useCallback((i: number) =>
     `${folderPath}/${filePrefix}${(i + 1).toString().padStart(padLength, '0')}${fileExtension}`,
     [folderPath, filePrefix, padLength, fileExtension]);
+
+  // Responsive scroll length: shorter on mobile (250vh) vs desktop (500vh)
+  useEffect(() => {
+    const updateHeight = () => setScrollHeight(window.innerWidth < 768 ? '260vh' : '500vh');
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   // ── OPTIMIZED IMAGE LOADING ──
   useEffect(() => {
@@ -211,7 +221,7 @@ export default function ScrollImageSequence({
   void currentSectionIdx; // kept for potential future use
 
   return (
-    <div ref={containerRef} className="relative w-full" style={{ height: '500vh' }}>
+    <div ref={containerRef} className="relative w-full" style={{ height: scrollHeight }}>
       <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center overflow-hidden" style={{ background: NAVY }}>
 
         {/* Loading Screen */}
@@ -295,14 +305,19 @@ export default function ScrollImageSequence({
         )}
 
         {ready && (<>
-          {/* Static Brand Identity (always visible during scroll, positioned to avoid header) */}
+          {/* Static Brand Identity — prominent, always visible during scroll */}
           <div className="absolute left-4 right-4 md:left-10 md:right-auto bottom-24 md:top-1/2 md:-translate-y-1/2 z-20 pointer-events-none flex flex-col items-start gap-2 md:gap-3">
-            <div className="h-[1px] w-12 md:w-16" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)`, boxShadow: `0 0 8px ${GOLD}` }} />
-            <span className="text-[10px] md:text-xs tracking-[0.35em] md:tracking-[0.45em] uppercase font-extrabold text-white" style={{ textShadow: `0 0 20px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95), 0 4px 20px rgba(0,0,0,0.9)` }}>
-              Nordhessen
-            </span>
-            <span className="text-[10px] md:text-xs tracking-[0.35em] md:tracking-[0.45em] uppercase font-extrabold text-white/80" style={{ textShadow: `0 0 16px ${GOLD}, 0 2px 12px rgba(0,0,0,0.95)` }}>
-              Automobile
+            <div className="h-[2px] w-14 md:w-20" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)`, boxShadow: `0 0 10px ${GOLD}` }} />
+            <div className="flex flex-col leading-[0.95]">
+              <span className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-black text-white" style={{ textShadow: `0 0 24px ${GOLD}, 0 2px 14px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,0.9)` }}>
+                Nordhessen
+              </span>
+              <span className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-black text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.9))' }}>
+                Automobile
+              </span>
+            </div>
+            <span className="text-[8px] md:text-[10px] tracking-[0.4em] uppercase font-bold text-white/60" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
+              Kassel · Premium Fahrzeuge
             </span>
           </div>
 

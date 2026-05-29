@@ -25,6 +25,7 @@ export default function CarList() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [brandFallback, setBrandFallback] = useState<string | null>(null);
   const ITEMS_PER_PAGE = 50;
   
   const [filters, setFilters] = useState<SearchParams>({ make: initialBrand || undefined });
@@ -109,6 +110,15 @@ export default function CarList() {
     if (filters.bodyType) result = result.filter(car => car.bodyType === filters.bodyType);
     if (filters.powerFrom) result = result.filter(car => car.horsePower >= filters.powerFrom!);
     if (filters.powerTo) result = result.filter(car => car.horsePower <= filters.powerTo!);
+
+    // If a brand was selected but the dealership has no cars of that brand,
+    // fall back to showing the full inventory instead of a blank page.
+    if (result.length === 0 && filters.make && vehicles.length > 0) {
+      setBrandFallback(filters.make);
+      result = [...vehicles];
+    } else {
+      setBrandFallback(null);
+    }
 
     switch (sortBy) {
       case 'price-low': result.sort((a, b) => a.price - b.price); break;
@@ -317,6 +327,16 @@ export default function CarList() {
             </aside>
 
             <div className="lg:col-span-3 xl:col-span-4">
+              {brandFallback && (
+                <div className="mb-6 px-5 py-4 rounded-2xl border border-red-500/20 bg-red-500/[0.06] text-sm text-gray-300 flex items-start gap-3">
+                  <CarIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    {t('inv.no_brand_fallback').replace('{brand}', brandFallback) !== 'inv.no_brand_fallback'
+                      ? t('inv.no_brand_fallback').replace('{brand}', brandFallback)
+                      : `Aktuell keine ${brandFallback}-Fahrzeuge im Bestand – hier ist unsere komplette Auswahl.`}
+                  </span>
+                </div>
+              )}
               {filteredVehicles.length === 0 ? (
                 <EmptyState
                   icon={<CarIcon className="w-12 h-12" />}
