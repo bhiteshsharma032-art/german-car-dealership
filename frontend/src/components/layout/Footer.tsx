@@ -126,7 +126,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/[0.05] flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[10px] sm:text-xs tracking-widest uppercase text-gray-500 font-bold">
-            © {new Date().getFullYear()} NORDHESSEN-AUTOMOBILE SEIDLER UND OSMIKHOVSKI GBR
+            © {new Date().getFullYear()} NORDHESSEN-AUTOMOBILE SEIDLER UND OSMIKHOVSKY GBR
           </p>
           <div className="flex items-center gap-3">
             <a

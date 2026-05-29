@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   Euro,
   CreditCard,
-  BadgeCheck,
+  Wrench,
   Star,
   Sparkles,
   Car,
@@ -195,11 +195,6 @@ export default function Home() {
       desc: t('home.features.c.desc'),
     },
     {
-      icon: <BadgeCheck className="w-6 h-6" />,
-      title: t('home.features.g.title'),
-      desc: t('home.features.g.desc'),
-    },
-    {
       icon: <CreditCard className="w-6 h-6" />,
       title: t('home.features.f.title'),
       desc: t('home.features.f.desc'),
@@ -320,9 +315,9 @@ export default function Home() {
                 desc: t('home.services.fin.desc'),
               },
               {
-                icon: <BadgeCheck className="w-8 h-8" />,
-                title: t('home.services.gar.title'),
-                desc: t('home.services.gar.desc'),
+                icon: <Wrench className="w-8 h-8" />,
+                title: t('home.services.workshop.title'),
+                desc: t('home.services.workshop.desc'),
               },
               {
                 icon: <Euro className="w-8 h-8" />,

@@ -941,10 +941,27 @@ app.post('/api/trade-ins', async (req, res) => {
     if (hasEmailConfig) {
       const mailOptions = {
         from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        to: process.env.TRADEIN_EMAIL || 'seidler@nordhessen-automobile.de',
         replyTo: newTradeIn.email,
         subject: `Neue Inzahlungnahme-Anfrage: ${newTradeIn.name}`,
-        text: `Name: ${newTradeIn.name}\nVIN: ${newTradeIn.vin}\nPrice: ${newTradeIn.expectedPrice}`
+        text: [
+          `Name: ${newTradeIn.name || '-'}`,
+          `E-Mail: ${newTradeIn.email || '-'}`,
+          `Telefon: ${newTradeIn.phone || '-'}`,
+          `Adresse: ${newTradeIn.address || '-'}`,
+          `FIN/VIN: ${newTradeIn.vin || '-'}`,
+          `Kennzeichen: ${newTradeIn.licensePlate || '-'}`,
+          `Erstzulassung: ${newTradeIn.firstRegistration || '-'}`,
+          `Kilometerstand: ${newTradeIn.mileage || '-'}`,
+          `Wunschpreis: ${newTradeIn.expectedPrice || '-'}`,
+          `Unfallfrei: ${newTradeIn.accidentFree ? 'Ja' : 'Nein'}`,
+          `Vorbesitzer: ${newTradeIn.previousOwners ?? '-'}`,
+          `Außenfarbe: ${newTradeIn.exteriorColor || '-'}`,
+          `Innenfarbe: ${newTradeIn.interiorColor || '-'}`,
+          `Scheckheft: ${newTradeIn.serviceHistory ? 'Ja' : 'Nein'}`,
+          `TÜV gültig bis: ${newTradeIn.tuvValidUntil || '-'}`,
+          `Nachricht: ${newTradeIn.message || '-'}`,
+        ].join('\n')
       };
       await transporter.sendMail(mailOptions);
     }

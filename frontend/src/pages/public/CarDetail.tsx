@@ -517,7 +517,7 @@ export default function CarDetail() {
                   {t('car.location.title')}
                 </h3>
                 <p className="text-gray-300 text-sm mb-1 font-semibold">Nordhessen-Automobile</p>
-                <p className="text-gray-400 text-sm mb-2">Seidler und Osmikhovski GbR</p>
+                <p className="text-gray-400 text-sm mb-2">Seidler und Osmikhovsky GbR</p>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   Sandershäuser Straße 87a<br />
                   34123 Kassel

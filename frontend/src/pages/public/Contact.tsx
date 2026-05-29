@@ -360,7 +360,7 @@ export default function Contact() {
                 <div>
                   <h3 className="font-semibold text-gray-100 text-lg mb-2">{t('contact.info.address')}</h3>
                   <p className="text-gray-500 leading-relaxed font-light">
-                    Nordhessen-Automobile<br/>Seidler und Osmikhovski GbR<br />
+                    Nordhessen-Automobile<br/>Seidler und Osmikhovsky GbR<br />
                     Sandershäuser Straße 87a<br />
                     34123 Kassel<br />
                     Deutschland

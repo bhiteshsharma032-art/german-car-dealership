@@ -22,7 +22,7 @@ function ImpressumDE() {
             <div>
               <h2 className="text-2xl font-bold text-gray-100 mb-4">{t('legal.impressum.company_info')}</h2>
               <div className="space-y-2 text-gray-400">
-                <p className="font-semibold text-gray-100">Nordhessen-Automobile<br />Seidler und Osmikhovski GbR</p>
+                <p className="font-semibold text-gray-100">Nordhessen-Automobile<br />Seidler und Osmikhovsky GbR</p>
                 <p>Sandershäuser Straße 87a</p>
                 <p>34123 Kassel</p>
               </div>
@@ -116,7 +116,7 @@ function ImpressumEN() {
             <div>
               <h2 className="text-2xl font-bold text-gray-100 mb-4">{t('legal.impressum.company_info')}</h2>
               <div className="space-y-2 text-gray-400">
-                <p className="font-semibold text-gray-100">Nordhessen-Automobile<br />Seidler und Osmikhovski GbR</p>
+                <p className="font-semibold text-gray-100">Nordhessen-Automobile<br />Seidler und Osmikhovsky GbR</p>
                 <p>Sandershäuser Straße 87a</p>
                 <p>34123 Kassel</p>
               </div>
