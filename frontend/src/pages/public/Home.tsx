@@ -80,59 +80,59 @@ export default function Home() {
   const [availableBrands, setAvailableBrands] = useState<{ name: string; logo: string; dark?: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Brand logos via Clearbit CDN (rock-solid uptime, returns clean PNGs).
+  // Brand logos via verified direct Wikimedia Commons SVG URLs.
+  // Each URL was hand-checked to render natively in browsers.
   // dark === logo is mostly black/dark and needs to be inverted to white on the dark cards.
   const BRAND_DATA: Record<string, { logo: string; dark?: boolean }> = {
-    'audi':           { logo: 'https://logo.clearbit.com/audi.com', dark: true },
-    'bmw':            { logo: 'https://logo.clearbit.com/bmw.com' },
-    'mercedes-benz':  { logo: 'https://logo.clearbit.com/mercedes-benz.com' },
-    'mercedes':       { logo: 'https://logo.clearbit.com/mercedes-benz.com' },
-    'porsche':        { logo: 'https://logo.clearbit.com/porsche.com' },
-    'volkswagen':     { logo: 'https://logo.clearbit.com/volkswagen.com' },
-    'vw':             { logo: 'https://logo.clearbit.com/volkswagen.com' },
-    'skoda':          { logo: 'https://logo.clearbit.com/skoda-auto.com' },
-    'škoda':          { logo: 'https://logo.clearbit.com/skoda-auto.com' },
-    'seat':           { logo: 'https://logo.clearbit.com/seat.com' },
-    'cupra':          { logo: 'https://logo.clearbit.com/cupraofficial.com' },
-    'ford':           { logo: 'https://logo.clearbit.com/ford.com' },
-    'opel':           { logo: 'https://logo.clearbit.com/opel.com' },
-    'mini':           { logo: 'https://logo.clearbit.com/mini.com', dark: true },
-    'toyota':         { logo: 'https://logo.clearbit.com/toyota.com' },
-    'lexus':          { logo: 'https://logo.clearbit.com/lexus.com', dark: true },
-    'honda':          { logo: 'https://logo.clearbit.com/honda.com' },
-    'mazda':          { logo: 'https://logo.clearbit.com/mazda.com' },
-    'nissan':         { logo: 'https://logo.clearbit.com/nissan.com' },
-    'hyundai':        { logo: 'https://logo.clearbit.com/hyundai.com' },
-    'kia':            { logo: 'https://logo.clearbit.com/kia.com' },
-    'renault':        { logo: 'https://logo.clearbit.com/renault.com' },
-    'peugeot':        { logo: 'https://logo.clearbit.com/peugeot.com' },
-    'citroen':        { logo: 'https://logo.clearbit.com/citroen.com' },
-    'citroën':        { logo: 'https://logo.clearbit.com/citroen.com' },
-    'fiat':           { logo: 'https://logo.clearbit.com/fiat.com' },
-    'volvo':          { logo: 'https://logo.clearbit.com/volvocars.com' },
-    'jaguar':         { logo: 'https://logo.clearbit.com/jaguar.com', dark: true },
-    'land rover':     { logo: 'https://logo.clearbit.com/landrover.com', dark: true },
-    'tesla':          { logo: 'https://logo.clearbit.com/tesla.com', dark: true },
-    'alfa romeo':     { logo: 'https://logo.clearbit.com/alfaromeo.com' },
-    'maserati':       { logo: 'https://logo.clearbit.com/maserati.com' },
-    'ferrari':        { logo: 'https://logo.clearbit.com/ferrari.com' },
-    'lamborghini':    { logo: 'https://logo.clearbit.com/lamborghini.com', dark: true },
-    'bentley':        { logo: 'https://logo.clearbit.com/bentleymotors.com' },
-    'jeep':           { logo: 'https://logo.clearbit.com/jeep.com', dark: true },
-    'dodge':          { logo: 'https://logo.clearbit.com/dodge.com', dark: true },
-    'chevrolet':      { logo: 'https://logo.clearbit.com/chevrolet.com' },
-    'mitsubishi':     { logo: 'https://logo.clearbit.com/mitsubishi-motors.com' },
-    'subaru':         { logo: 'https://logo.clearbit.com/subaru.com' },
-    'suzuki':         { logo: 'https://logo.clearbit.com/suzuki.com' },
-    'smart':          { logo: 'https://logo.clearbit.com/smart.com', dark: true },
-    'dacia':          { logo: 'https://logo.clearbit.com/dacia.com', dark: true },
-    'mclaren':        { logo: 'https://logo.clearbit.com/mclaren.com' },
-    'aston martin':   { logo: 'https://logo.clearbit.com/astonmartin.com', dark: true },
-    'rolls-royce':    { logo: 'https://logo.clearbit.com/rolls-roycemotorcars.com', dark: true },
-    'genesis':        { logo: 'https://logo.clearbit.com/genesis.com', dark: true },
-    'infiniti':       { logo: 'https://logo.clearbit.com/infiniti.com', dark: true },
-    'acura':          { logo: 'https://logo.clearbit.com/acura.com', dark: true },
-    'polestar':       { logo: 'https://logo.clearbit.com/polestar.com', dark: true },
+    'audi':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg', dark: true },
+    'bmw':            { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg' },
+    'mercedes-benz':  { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg', dark: true },
+    'mercedes':       { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg', dark: true },
+    'porsche':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Porsche_Crest.svg' },
+    'volkswagen':     { logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Volkswagen_logo_2019.svg' },
+    'vw':             { logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Volkswagen_logo_2019.svg' },
+    'skoda':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9b/%C5%A0koda_Auto_logo_%282016%29.svg' },
+    'škoda':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9b/%C5%A0koda_Auto_logo_%282016%29.svg' },
+    'seat':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/SEAT_Logo_2012.svg', dark: true },
+    'cupra':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/CUPRA_Logo_NEW.svg', dark: true },
+    'ford':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg' },
+    'opel':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Opel_2017.svg' },
+    'mini':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/8/88/MINI_logo.svg', dark: true },
+    'toyota':         { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg', dark: true },
+    'lexus':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Lexus_division_emblem.svg', dark: true },
+    'honda':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/3/38/Honda.svg', dark: true },
+    'mazda':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Mazda_logo_with_emblem.svg', dark: true },
+    'nissan':         { logo: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Nissan_2020_logo.svg' },
+    'hyundai':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Hyundai_Motor_Company_logo.svg', dark: true },
+    'kia':            { logo: 'https://upload.wikimedia.org/wikipedia/commons/1/14/KIA_logo3.svg', dark: true },
+    'renault':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Renault_2021.svg' },
+    'peugeot':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Peugeot_2021_Logo.svg' },
+    'citroen':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Citroen_2022.svg' },
+    'citroën':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Citroen_2022.svg' },
+    'fiat':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/FIAT_logo_2021.svg' },
+    'volvo':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d6/Volvo_Cars_logo.svg' },
+    'jaguar':         { logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Jaguar_2012_logo.svg', dark: true },
+    'land rover':     { logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Land_Rover_logo2.svg', dark: true },
+    'tesla':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bb/Tesla_T_symbol.svg' },
+    'alfa romeo':     { logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_of_Alfa_Romeo.svg' },
+    'maserati':       { logo: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Logo_of_Maserati.svg' },
+    'ferrari':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Ferrari-Logo.svg' },
+    'lamborghini':    { logo: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Lamborghini_Logo.svg', dark: true },
+    'bentley':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Bentley_logo.svg', dark: true },
+    'jeep':           { logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Jeep_wordmark.svg', dark: true },
+    'dodge':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Dodge.svg', dark: true },
+    'chevrolet':      { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Chevrolet.svg' },
+    'mitsubishi':     { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9b/Mitsubishi_logo.svg' },
+    'subaru':         { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Subaru_logo.svg' },
+    'suzuki':         { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/49/Suzuki_logo_2.svg' },
+    'smart':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Smart_logo.svg', dark: true },
+    'dacia':          { logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Dacia_logo_2021.svg', dark: true },
+    'mclaren':        { logo: 'https://upload.wikimedia.org/wikipedia/en/6/68/McLaren_Racing_logo.svg' },
+    'aston martin':   { logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Aston_Martin_logo.svg', dark: true },
+    'rolls-royce':    { logo: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Rolls-Royce_Motor_Cars_logo.svg', dark: true },
+    'genesis':        { logo: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Genesis_division_emblem.svg', dark: true },
+    'infiniti':       { logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Infiniti.svg', dark: true },
+    'polestar':       { logo: 'https://upload.wikimedia.org/wikipedia/commons/2/27/Polestar_logo.svg', dark: true },
   };
 
 
@@ -265,12 +265,19 @@ export default function Home() {
                         className="max-h-full max-w-full object-contain transition-transform duration-700 ease-out group-hover:scale-110 drop-shadow-2xl"
                         style={brand.dark ? { filter: 'brightness(0) invert(1)' } : undefined}
                         onError={(e) => {
-                          // Fallback chain: Clearbit fail → Google favicon (always works)
+                          // Fallback chain: Wikimedia fail → carlogos.org → Clearbit → favicon
                           const img = e.currentTarget;
-                          const slug = brand.name.toLowerCase().replace(/\s+/g, '');
-                          if (!img.dataset.fallback) {
-                            img.dataset.fallback = '1';
-                            img.src = `https://www.google.com/s2/favicons?domain=${slug}.com&sz=128`;
+                          const slug = brand.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                          const step = parseInt(img.dataset.fallbackStep || '0', 10);
+                          if (step === 0) {
+                            img.dataset.fallbackStep = '1';
+                            img.src = `https://www.carlogos.org/car-logos/${slug}-logo.png`;
+                          } else if (step === 1) {
+                            img.dataset.fallbackStep = '2';
+                            img.src = `https://logo.clearbit.com/${slug.replace(/-/g, '')}.com`;
+                          } else if (step === 2) {
+                            img.dataset.fallbackStep = '3';
+                            img.src = `https://www.google.com/s2/favicons?domain=${slug.replace(/-/g, '')}.com&sz=128`;
                           } else {
                             img.style.display = 'none';
                           }
