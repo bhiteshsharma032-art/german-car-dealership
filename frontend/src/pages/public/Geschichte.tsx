@@ -86,7 +86,7 @@ export default function Geschichte() {
               </FadeUp>
               <FadeUp delay={0.2}>
                 <p className="text-base sm:text-lg md:text-xl text-gray-400 leading-relaxed max-w-3xl mx-auto font-light">
-                  <ExpandableText maxLines={4}>{t('story.hero.subtitle')}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp>{t('story.hero.subtitle')}</ExpandableText>
                 </p>
               </FadeUp>
             </div>
@@ -106,7 +106,7 @@ export default function Geschichte() {
                     <h3 className="text-xl sm:text-2xl font-bold text-white">{t('story.vision.title')}</h3>
                   </div>
                   <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                    <ExpandableText maxLines={5}>{t('story.vision.desc')}</ExpandableText>
+                    <ExpandableText maxLines={2} alwaysClamp>{t('story.vision.desc')}</ExpandableText>
                   </p>
                 </div>
               </FadeUp>
@@ -119,7 +119,7 @@ export default function Geschichte() {
                     <h3 className="text-xl sm:text-2xl font-bold text-white">{t('story.mission.title')}</h3>
                   </div>
                   <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                    <ExpandableText maxLines={5}>{t('story.mission.desc')}</ExpandableText>
+                    <ExpandableText maxLines={2} alwaysClamp>{t('story.mission.desc')}</ExpandableText>
                   </p>
                 </div>
               </FadeUp>
@@ -158,7 +158,7 @@ export default function Geschichte() {
                       </div>
                       <h3 className="text-xl font-bold text-white mb-2">{t(`story.timeline.${item.key}.title`)}</h3>
                       <p className="text-sm text-gray-400 leading-relaxed">
-                        <ExpandableText maxLines={4}>{t(`story.timeline.${item.key}.desc`)}</ExpandableText>
+                        <ExpandableText maxLines={2} alwaysClamp>{t(`story.timeline.${item.key}.desc`)}</ExpandableText>
                       </p>
                     </div>
                   </div>
@@ -189,7 +189,7 @@ export default function Geschichte() {
                     </div>
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-red-400 transition-colors duration-300">{t(`story.values.${v.key}.title`)}</h3>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                      <ExpandableText maxLines={4}>{t(`story.values.${v.key}.desc`)}</ExpandableText>
+                      <ExpandableText maxLines={2} alwaysClamp>{t(`story.values.${v.key}.desc`)}</ExpandableText>
                     </p>
                   </div>
                 </FadeUp>
@@ -210,7 +210,7 @@ export default function Geschichte() {
               </FadeUp>
               <FadeUp delay={0.1}>
                 <p className="text-base sm:text-lg text-gray-400 leading-relaxed mb-10">
-                  <ExpandableText maxLines={5}>{t('story.today.desc')}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp>{t('story.today.desc')}</ExpandableText>
                 </p>
               </FadeUp>
               <FadeUp delay={0.2}>

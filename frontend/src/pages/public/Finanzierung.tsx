@@ -219,7 +219,7 @@ export default function Finanzierung() {
                     {benefit.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{benefit.title}</h3>
-                  <ExpandableText maxLines={3} className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
                 </Card>
               ))}
             </div>
@@ -298,7 +298,7 @@ export default function Finanzierung() {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-gray-100 mb-2">{step.title}</h3>
-                        <ExpandableText maxLines={4} className="text-gray-500">{step.description}</ExpandableText>
+                        <ExpandableText maxLines={2} alwaysClamp className="text-gray-500">{step.description}</ExpandableText>
                       </div>
                       <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 hidden md:block" />
                     </div>

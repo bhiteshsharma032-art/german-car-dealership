@@ -316,7 +316,7 @@ export default function Inzahlungnahme() {
                     {benefit.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{benefit.title}</h3>
-                  <ExpandableText maxLines={3} className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp className="text-gray-500 text-sm">{benefit.description}</ExpandableText>
                 </Card>
               ))}
             </div>
@@ -339,7 +339,7 @@ export default function Inzahlungnahme() {
                       <span className="text-2xl font-bold text-white">{step.number}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-100 mb-3">{step.title}</h3>
-                    <ExpandableText maxLines={4} className="text-gray-500">{step.description}</ExpandableText>
+                    <ExpandableText maxLines={2} alwaysClamp className="text-gray-500">{step.description}</ExpandableText>
                   </Card>
                 ))}
               </div>

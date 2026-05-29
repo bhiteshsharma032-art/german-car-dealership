@@ -523,10 +523,10 @@ export default function Home() {
                 </h2>
               </FadeUp>
               <FadeUp delay={0.2}>
-                <ExpandableText maxLines={5} className="text-base sm:text-lg text-gray-400 mb-6 sm:mb-8 leading-relaxed font-light">
+                <ExpandableText maxLines={2} alwaysClamp className="text-base sm:text-lg text-gray-400 mb-6 sm:mb-8 leading-relaxed font-light">
                   {t('home.phi.desc1')}
                 </ExpandableText>
-                <ExpandableText maxLines={4} className="text-sm sm:text-base text-gray-500 mb-10 sm:mb-12 leading-relaxed">
+                <ExpandableText maxLines={2} alwaysClamp className="text-sm sm:text-base text-gray-500 mb-10 sm:mb-12 leading-relaxed">
                   {t('home.phi.desc2')}
                 </ExpandableText>
               </FadeUp>

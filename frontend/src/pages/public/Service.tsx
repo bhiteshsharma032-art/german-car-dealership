@@ -234,7 +234,7 @@ export default function Service() {
                     {service.icon}
                   </div>
                   <h3 className="text-xl font-bold text-gray-100 mb-2">{service.title}</h3>
-                  <ExpandableText maxLines={3} className="text-gray-500 mb-4">{service.description}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp className="text-gray-500 mb-4">{service.description}</ExpandableText>
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-gray-400">
@@ -266,7 +266,7 @@ export default function Service() {
                     {advantage.icon}
                   </div>
                   <h3 className="text-lg font-bold text-gray-100 mb-2">{advantage.title}</h3>
-                  <ExpandableText maxLines={3} className="text-gray-500 text-sm">{advantage.description}</ExpandableText>
+                  <ExpandableText maxLines={2} alwaysClamp className="text-gray-500 text-sm">{advantage.description}</ExpandableText>
                 </Card>
               ))}
             </div>
