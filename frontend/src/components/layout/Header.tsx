@@ -82,7 +82,8 @@ export default function Header() {
                 <img
                   src="/logo.png?v=3"
                   alt="Nordhessen Automobile"
-                  className="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  className="h-16 md:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.9)) drop-shadow(0 0 14px rgba(239,68,68,0.45)) brightness(1.15)' }}
                   onError={() => setLogoError(true)}
                 />
               ) : (
