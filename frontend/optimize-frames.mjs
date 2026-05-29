@@ -4,8 +4,8 @@ import { join } from 'path';
 
 const INPUT = 'public/4kkkk';
 const OUTPUT = 'public/frames-webp';
-const TARGET_WIDTH = 1920; // Full HD width - crisp on all screens
-const WEBP_QUALITY = 82;   // High quality, great compression
+const TARGET_WIDTH = 1920; // Source is 1080p; keep native resolution (no upscaling)
+const WEBP_QUALITY = 92;   // Higher quality to eliminate compression artifacts/pixelation
 
 async function run() {
   await mkdir(OUTPUT, { recursive: true });
@@ -28,7 +28,7 @@ async function run() {
       
       await sharp(inPath)
         .resize(TARGET_WIDTH, null, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: WEBP_QUALITY, effort: 4 })
+        .webp({ quality: WEBP_QUALITY, effort: 6, smartSubsample: true })
         .toFile(outPath);
       
       const outStat = await stat(outPath);
