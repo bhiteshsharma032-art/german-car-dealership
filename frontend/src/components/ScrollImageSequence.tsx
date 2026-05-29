@@ -305,15 +305,17 @@ export default function ScrollImageSequence({
         )}
 
         {ready && (<>
-          {/* Static Brand Identity — company logo, top-left on all screens */}
-          <div className="absolute left-4 right-4 md:left-10 md:right-auto top-24 md:top-28 z-20 pointer-events-none flex flex-col items-start gap-3">
+          {/* Static Brand Identity — top-left on all screens */}
+          <div className="absolute left-4 right-4 md:left-10 md:right-auto top-24 md:top-28 z-20 pointer-events-none flex flex-col items-start gap-2 md:gap-3">
             <div className="h-[2px] w-14 md:w-20" style={{ background: `linear-gradient(90deg, ${GOLD}, transparent)`, boxShadow: `0 0 10px ${GOLD}` }} />
-            <img
-              src="/logo.png?v=3"
-              alt="Nordhessen Automobile"
-              className="h-20 sm:h-24 md:h-32 w-auto object-contain"
-              style={{ filter: 'brightness(0) invert(1) drop-shadow(0 2px 14px rgba(0,0,0,0.95)) drop-shadow(0 0 28px rgba(239,68,68,0.35))' }}
-            />
+            <div className="flex flex-col leading-[0.95]">
+              <span className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-black text-white" style={{ textShadow: `0 0 24px ${GOLD}, 0 2px 14px rgba(0,0,0,0.95), 0 4px 24px rgba(0,0,0,0.9)` }}>
+                Nordhessen
+              </span>
+              <span className="text-2xl sm:text-3xl md:text-4xl tracking-tight font-black text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT})`, filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.9))' }}>
+                Automobile
+              </span>
+            </div>
             <span className="text-[8px] md:text-[10px] tracking-[0.4em] uppercase font-bold text-white/60" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}>
               Kassel · Premium Fahrzeuge
             </span>
