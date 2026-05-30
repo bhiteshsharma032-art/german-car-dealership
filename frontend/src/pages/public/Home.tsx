@@ -78,6 +78,7 @@ export default function Home() {
   const [featuredCars, setFeaturedCars] = useState<CarType[]>([]);
   const [heroCars, setHeroCars] = useState<CarType[]>([]);
   const [availableBrands, setAvailableBrands] = useState<{ name: string; logo: string; dark?: boolean }[]>([]);
+  const [showAllBrands, setShowAllBrands] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Brand logos via verified direct Wikimedia Commons SVG URLs.
@@ -229,7 +230,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-500/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="container mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
-          <FadeUp className="text-center mb-20">
+          <FadeUp className="text-center mb-10 md:mb-20">
             <span className="section-label mb-4 inline-flex px-4 py-1.5 rounded-full border border-red-500/20 bg-red-500/10 text-red-500 text-[10px] tracking-[0.2em] uppercase font-bold">
               <Sparkles className="w-3.5 h-3.5 mr-2" />
               {t('home.brands.label')}
@@ -243,8 +244,11 @@ export default function Home() {
           </FadeUp>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
-            {availableBrands.map((brand, i) => (
-              <FadeUp key={brand.name} delay={Math.min(i * 0.05, 0.5)}>
+            {availableBrands.map((brand, i) => {
+              // On mobile (<md), hide brands beyond the first 4 unless expanded
+              const hiddenOnMobile = !showAllBrands && i >= 4;
+              return (
+              <FadeUp key={brand.name} delay={Math.min(i * 0.05, 0.5)} className={hiddenOnMobile ? 'hidden md:block' : ''}>
                 <Magnetic>
                   <Link
                     to={`/fahrzeuge?brand=${brand.name}`}
@@ -286,8 +290,22 @@ export default function Home() {
                   </Link>
                 </Magnetic>
               </FadeUp>
-            ))}
+              );
+            })}
           </div>
+
+          {/* Mobile-only show more/less toggle */}
+          {availableBrands.length > 4 && (
+            <div className="mt-8 flex justify-center md:hidden">
+              <button
+                onClick={() => setShowAllBrands(v => !v)}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all"
+              >
+                {showAllBrands ? t('card.show_less') : t('card.show_more')}
+                <span className={`transition-transform ${showAllBrands ? 'rotate-180' : ''}`}>▾</span>
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

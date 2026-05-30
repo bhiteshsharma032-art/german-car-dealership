@@ -856,7 +856,7 @@ app.post('/api/contact', async (req, res) => {
     if (hasEmailConfig) {
       const mailOptions = {
         from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        to: process.env.CONTACT_EMAIL || 'seidler@nordhessen-automobile.de',
         replyTo: formData.email,
         subject: `Neue Kontaktanfrage: ${formData.subject}`,
         text: `Name: ${formData.firstName} ${formData.lastName}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message}`
@@ -889,7 +889,7 @@ app.post('/api/contact/financing', async (req, res) => {
     if (hasEmailConfig) {
       const mailOptions = {
         from: `"Nordhessen Automobile Website" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || 'info@nordhessen-automobile.de',
+        to: process.env.CONTACT_EMAIL || 'seidler@nordhessen-automobile.de',
         replyTo: formData.email,
         subject: `Neue Finanzierungsanfrage: ${formData.name}`,
         text: `Name: ${formData.name}\nEmail: ${formData.email}\nPrice: ${formData.vehiclePrice}\nTerm: ${formData.term}`
